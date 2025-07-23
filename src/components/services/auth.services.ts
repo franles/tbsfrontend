@@ -1,9 +1,5 @@
 import { api, API_URL } from "../config/axios";
-import type {
-  GetAccessTokenResponse,
-  GetStatusResponse,
-  LogOutResponse,
-} from "../types/types";
+import type { GetAccessTokenResponse, LogOutResponse } from "../types/types";
 
 export async function generateAccessToken(): Promise<GetAccessTokenResponse> {
   try {
@@ -16,17 +12,6 @@ export async function generateAccessToken(): Promise<GetAccessTokenResponse> {
   }
   return { accessToken: "" };
 }
-
-export async function status(): Promise<GetStatusResponse> {
-  try {
-    const { data } = await api.get<GetStatusResponse>(`${API_URL}/auth/status`);
-    return data;
-  } catch (error) {
-    console.error(error);
-  }
-  return { user: { nombre: "", email: "", auth: false } };
-}
-
 export async function logOut(): Promise<LogOutResponse> {
   try {
     const { data } = await api.post<LogOutResponse>(`${API_URL}/auth/logout`);

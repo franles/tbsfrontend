@@ -11,18 +11,15 @@ export type GetAccessTokenResponse = {
   accessToken: string;
 };
 
-export type GetStatusResponse = {
-  user: User;
-};
-
 export type LogOutResponse = {
   message: string;
 };
 
 export type User = {
-  auth: boolean;
-  nombre: string;
-  email: string;
+  auth: boolean | undefined;
+  nombre: string | undefined;
+  email: string | undefined;
+  avatar: string | undefined;
 };
 
 export type Trip = {
@@ -36,10 +33,4 @@ export type Trip = {
   ganancia: number;
   costo: number;
   servicios: { id: number; valor: number; nombre: string }[];
-};
-
-export type AuthContextType = {
-  user: User | null;
-  token: string | undefined;
-  signOut: () => Promise<string | undefined>;
 };

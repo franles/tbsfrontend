@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { isTokenNearExpiry } from "../utils/utils";
+import { decodeToken, isTokenNearExpiry } from "../utils/utils";
 import { useUserStore } from "../store/userStore";
 
 export const API_URL = import.meta.env.VITE_API_URL;
@@ -92,13 +92,17 @@ api.interceptors.response.use(
         // Llamada a /auth/refresh para obtener nuevo accessToken
         const { data } = await api.post("/auth/refresh");
         const newToken = data.accessToken;
-
+        const payload = decodeToken(newToken);
         // Guardamos el nuevo token en el store
         useUserStore.getState().setAccessToken(newToken);
-
+        useUserStore.getState().setUser({
+          auth: true,
+          nombre: payload?.nombre,
+          email: payload?.email,
+          avatar: payload?.avatar,
+        });
         // Procesamos la cola de peticiones pendientes
         processQueue(null, newToken);
-
         // Reintentamos la petición original con el token actualizado
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
