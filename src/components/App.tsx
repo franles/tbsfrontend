@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/auth-success" element={<AuthSuccess />} />
-        <Route path="/PaquetesTuristicos" element={<Trips />} />
+        <Route path="/home" element={<Trips />} />
         <Route path="/ResumenMensual" element={<Monthly />} />
         <Route path="/ResumenAnual" element={<Annual />} />
       </Routes>
