@@ -10,6 +10,7 @@ function Navbar() {
 
   const handleLogOut = async () => {
     clearUser();
+    sessionStorage.clear();
     await logOut();
     navigate("/login");
   };

@@ -6,10 +6,10 @@ import { useUser } from "../hooks/useUser";
 import { useToken } from "../hooks/useToken";
 
 export const AuthSuccess = () => {
-  const location = useLocation();
   const { setUser } = useUser();
-  const navigate = useNavigate();
   const { setToken } = useToken();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -17,13 +17,15 @@ export const AuthSuccess = () => {
     if (token) {
       setToken(token);
       const payload = decodeToken(token);
-      console.log("payload", payload);
-      setUser({
-        auth: payload?.auth,
-        nombre: payload?.nombre,
-        email: payload?.email,
-        avatar: payload?.avatar,
-      });
+      if (payload) {
+        const user = {
+          auth: payload.auth,
+          nombre: payload.nombre,
+          email: payload.email,
+          avatar: payload.avatar,
+        };
+        setUser(user);
+      }
       navigate("/home");
     }
   }, [location.search, navigate, setToken, setUser]);

@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { getTrips } from "../services/trips.services";
 import type { Trip } from "../types/types";
-import { useUserStore } from "../store/userStore";
+import { useUser } from "../hooks/useUser";
 
 function Trips() {
   const [viajes, setViajes] = useState<Trip[]>();
-  const user = useUserStore((state) => state.user);
-
+  const { user, loading } = useUser();
   useEffect(() => {
     const fetchTrips = async () => {
       try {
@@ -20,7 +19,11 @@ function Trips() {
     };
     fetchTrips();
   }, []);
-  console.log(user);
+
+  useEffect(() => {
+    console.log(user);
+    console.log(loading);
+  }, [user, loading]);
 
   return (
     <>
