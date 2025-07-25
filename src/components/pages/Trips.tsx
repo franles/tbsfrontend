@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getTrips } from "../services/trips.services";
 import type { Trip } from "../types/types";
 import { useUser } from "../hooks/useUser";
+import Table from "../layout/TableMonth";
 
 function Trips() {
   const [viajes, setViajes] = useState<Trip[]>();
@@ -48,13 +49,6 @@ function Trips() {
 
 </Table>
 
-      <div className="px-4 py-8">
-        {viajes?.map((viaje) => (
-          <div key={viaje.id} className="mb-4">
-            ID: {viaje.id}
-          </div>
-        ))}
-      </div>
     </>
   );
 }
