@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { getTrips } from "../services/trips.services";
 import { useUser } from "../hooks/useUser";
-import { useTrips } from "../hooks/useTrips";
+import Table from "../layout/TableMonth";
 
 function Trips() {
   const { user, loading } = useUser();
@@ -45,29 +45,7 @@ function Trips() {
         </div>
       </div>
 
-      <div className="px-4 py-8">
-        {trips?.map((viaje) => (
-          <div key={viaje.id} className="mb-4 flex gap-2">
-            ID: {viaje.id}
-            <button
-              className="bg-black text-white"
-              onClick={() => {
-                setTripSelected(viaje.id);
-              }}
-            >
-              Seleccionar viaje
-            </button>
-            <button
-              className="bg-black text-white"
-              onClick={() => {
-                setTripSelected(undefined);
-              }}
-            >
-              Deseleccionar viaje
-            </button>
-          </div>
-        ))}
-      </div>
+      <Table></Table>
     </>
   );
 }
