@@ -1,6 +1,6 @@
 import axios from "axios";
 import { isTokenNearExpiry } from "../utils/utils";
-import { useUserStore } from "../store/userStore";
+import { userStore } from "../store/userStore";
 
 export const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,7 +11,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    let token = useUserStore.getState().accessToken;
+    let token = userStore.getState().accessToken;
 
     if (config.url?.includes("/auth/refresh")) {
       return config;
@@ -20,7 +20,7 @@ api.interceptors.request.use(
     if (token && isTokenNearExpiry(token, 30)) {
       const { data } = await api.post(`${API_URL}/auth/refresh`);
       token = data.accessToken;
-      useUserStore.getState().setAccessToken(token!);
+      userStore.getState().setAccessToken(token!);
     }
 
     if (token) {

@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getTrips } from "../services/trips.services";
-import type { Trip } from "../types/types";
 import { useUser } from "../hooks/useUser";
+import { useTrips } from "../hooks/useTrips";
 
 function Trips() {
-  const [viajes, setViajes] = useState<Trip[]>();
   const { user, loading } = useUser();
+  const { trips, setTrips, tripSelected, setTripSelected } = useTrips();
   useEffect(() => {
     const fetchTrips = async () => {
       try {
         const response = await getTrips();
         if (response) {
-          setViajes(response.viajes);
+          setTrips(response.viajes);
         }
       } catch (error) {
         console.log(error);
@@ -25,6 +25,7 @@ function Trips() {
     console.log(loading);
   }, [user, loading]);
 
+  console.log(tripSelected);
   return (
     <>
       <div className="relative h-[400px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274365/maletas_jzcjf2.webp')]">
@@ -45,9 +46,25 @@ function Trips() {
       </div>
 
       <div className="px-4 py-8">
-        {viajes?.map((viaje) => (
-          <div key={viaje.id} className="mb-4">
+        {trips?.map((viaje) => (
+          <div key={viaje.id} className="mb-4 flex gap-2">
             ID: {viaje.id}
+            <button
+              className="bg-black text-white"
+              onClick={() => {
+                setTripSelected(viaje.id);
+              }}
+            >
+              Seleccionar viaje
+            </button>
+            <button
+              className="bg-black text-white"
+              onClick={() => {
+                setTripSelected(undefined);
+              }}
+            >
+              Deseleccionar viaje
+            </button>
           </div>
         ))}
       </div>

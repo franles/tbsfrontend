@@ -24,8 +24,8 @@ function Navbar() {
           <AiOutlineUser size={30} color="white" />
         )}
 
-        <span className="text-sm font-semibold text-white drop-shadow-sm">
-          {user?.email}
+        <span className="text-sm font-semibold text-white drop-shadow-sm capitalize">
+          Hola, {user?.nombre}!
         </span>
       </div>
 
