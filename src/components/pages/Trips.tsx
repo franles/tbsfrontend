@@ -1,31 +1,6 @@
-import { useEffect } from "react";
-import { getTrips } from "../services/trips.services";
-import { useUser } from "../hooks/useUser";
-import Table from "../layout/TableMonth";
+import Table from "../layout/Table";
 
 function Trips() {
-  const { user, loading } = useUser();
-  const { trips, setTrips, tripSelected, setTripSelected } = useTrips();
-  useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const response = await getTrips();
-        if (response) {
-          setTrips(response.viajes);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTrips();
-  }, []);
-
-  useEffect(() => {
-    console.log(user);
-    console.log(loading);
-  }, [user, loading]);
-
-  console.log(tripSelected);
   return (
     <>
       <div className="relative h-[400px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274365/maletas_jzcjf2.webp')]">

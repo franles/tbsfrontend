@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import type { Trip } from "../types/types";
+import type { GetTripsResponse } from "../types/types";
 
 interface TripsStore {
-  trips: Trip[] | null;
-  setTrips: (trips: Trip[] | null) => void;
+  trips: GetTripsResponse | null;
+  setTrips: (trips: GetTripsResponse) => void;
   tripSelected: string | undefined;
   setTripSelected: (trip: string | undefined) => void;
 }
