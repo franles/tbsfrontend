@@ -3,34 +3,46 @@ import { getTrips } from "../services/trips.services";
 import { useTrips } from "../hooks/useTrips";
 import { Filter } from "../common/Filter";
 import { Spinner } from "../common/widget/Spinner";
+import { Pagination } from "../common/Pagination";
 
 function TripsTable() {
   const { trips, setTrips } = useTrips();
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState<number | string | null>(null);
+  const [filter, setFilter] = useState<number | string>("desc");
+  const [month, setMonth] = useState<number | null>(null);
+  const [year, setYear] = useState<number | null>(null);
 
-  const totalPages = trips?.pagination.totalPages ?? 1;
   const noTrips = trips?.pagination.totalItems === 0;
-  console.log(filter);
-  console.log(trips);
+
+  console.log("filter", typeof filter);
+  console.log("year", typeof year, year);
+  console.log("month", typeof month, month);
+
   useEffect(() => {
     async function fetchTrips() {
-      const response = await getTrips(filter, 10, page);
+      const response = await getTrips(filter, 10, page, month, year);
       if (response && response.viajes) {
         setTrips(response);
       }
       setLoading(false);
     }
     fetchTrips();
-  }, [filter, setTrips, page]);
+  }, [filter, setTrips, page, month, year]);
 
   if (loading) return <Spinner text="Cargando" />;
 
   return (
-    <div style={{ maxWidth: 900, margin: "auto" }}>
-      <Filter filter={filter} setFilter={setFilter} />
+    <div className="max-w-[900px] mx-auto">
+      <Filter
+        filter={filter}
+        setFilter={setFilter}
+        year={year}
+        setYear={setYear}
+        month={month}
+        setMonth={setMonth}
+      />
       <div className="flex flex-wrap justify-between mb-4 items-center gap-3">
         <input
           type="text"
@@ -108,25 +120,8 @@ function TripsTable() {
           )}
         </tbody>
       </table>
-      <section className="flex justify-center items-center gap-4 mt-4">
-        <button
-          disabled={page <= 1}
-          onClick={() => setPage((p) => Math.max(p - 1, 1))}
-          className="px-3 py-1 border rounded"
-        >
-          Anterior
-        </button>
-        <span>
-          Página {totalPages === 0 ? 0 : page} de {totalPages}
-        </span>
-        <button
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => p + 1)}
-          className="px-3 py-1 border rounded"
-        >
-          Siguiente
-        </button>
-      </section>
+
+      <Pagination page={page} setPage={setPage} />
     </div>
   );
 }

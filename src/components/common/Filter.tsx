@@ -1,25 +1,51 @@
 type Props = {
-  filter: string | number | null;
-  setFilter: React.Dispatch<React.SetStateAction<string | null | number>>;
+  filter: string | number;
+  setFilter: React.Dispatch<React.SetStateAction<string | number>>;
+  month: number | null;
+  setMonth: React.Dispatch<React.SetStateAction<null | number>>;
+  year: number | null;
+  setYear: React.Dispatch<React.SetStateAction<null | number>>;
 };
-export const Filter = ({ filter, setFilter }: Props) => {
+export const Filter = ({
+  filter,
+  year,
+  month,
+  setFilter,
+  setMonth,
+  setYear,
+}: Props) => {
   return (
-    <select
-      name="filtro"
-      id="filtro"
-      onChange={(e) => setFilter(e.target.value)}
-      value={filter ?? "desc"}
-      className="mb-4 border border-black w-28 text-sm "
-    >
-      <optgroup label="Orden por fecha">
-        <option value="asc">Más antiguos</option>
-        <option value="desc">Más recientes</option>
-      </optgroup>
-      <optgroup label="Estado">
-        <option value="pendiente">Pendiente</option>
-        <option value="finalizado">Finalizado</option>
-      </optgroup>
-      <optgroup label="Mes">
+    <div>
+      <select
+        name="filtro"
+        id="filtro"
+        onChange={(e) => {
+          setFilter(e.target.value);
+          setMonth(null);
+          setYear(null);
+        }}
+        value={filter ?? "desc"}
+        className="mb-4 border border-black w-28 text-sm "
+      >
+        <optgroup label="Orden por fecha">
+          <option value="asc">Más antiguos</option>
+          <option value="desc">Más recientes</option>
+        </optgroup>
+        <optgroup label="Estado">
+          <option value="pendiente">Pendiente</option>
+          <option value="finalizado">Finalizado</option>
+        </optgroup>
+      </select>
+
+      <select
+        onChange={(e) => {
+          const val = e.target.value;
+          setMonth(val === "" ? null : Number(val));
+        }}
+        value={month !== null ? month : ""}
+        className="mb-4 border border-black w-28 text-sm "
+      >
+        <option value={""}>Seleccionar</option>
         <option value={1}>Enero</option>
         <option value={2}>Febrero</option>
         <option value={3}>Marzo</option>
@@ -32,7 +58,19 @@ export const Filter = ({ filter, setFilter }: Props) => {
         <option value={10}>Octubre</option>
         <option value={11}>Noviembre</option>
         <option value={12}>Diciembre</option>
-      </optgroup>
-    </select>
+      </select>
+
+      <select
+        onChange={(e) => {
+          const val = e.target.value;
+          setYear(val === "" ? null : Number(val));
+        }}
+        value={year !== null ? year : ""}
+        className="mb-4 border border-black w-28 text-sm "
+      >
+        <option value={""}>Seleccionar</option>
+        <option value={2025}>2025</option>
+      </select>
+    </div>
   );
 };
