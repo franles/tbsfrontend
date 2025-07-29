@@ -1,15 +1,14 @@
-import React from "react";
 import { useTrips } from "../hooks/useTrips";
 import { BiLastPage } from "react-icons/bi";
 import { BiFirstPage } from "react-icons/bi";
 
 type Props = {
   page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
+  setPage: (page: number | ((prev: number) => number)) => void;
 };
 
 export const Pagination = ({ page, setPage }: Props) => {
-  const { trips } = useTrips();
+  const { data: trips } = useTrips();
   const totalPages = trips?.pagination.totalPages ?? 1;
 
   return (
@@ -28,7 +27,7 @@ export const Pagination = ({ page, setPage }: Props) => {
         Página {totalPages === 0 ? 0 : page} de {totalPages}
       </span>
 
-      {page !== totalPages && (
+      {totalPages > 0 && page !== totalPages && (
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((p) => p + 1)}

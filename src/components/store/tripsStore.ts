@@ -1,16 +1,26 @@
 import { create } from "zustand";
-import type { GetTripsResponse } from "../types/types";
 
 interface TripsStore {
-  trips: GetTripsResponse | null;
-  setTrips: (trips: GetTripsResponse) => void;
-  tripSelected: string | undefined;
-  setTripSelected: (trip: string | undefined) => void;
+  filter: string;
+  year: number | null;
+  month: number | null;
+  page: number;
+  setFilter: (filter: string) => void;
+  setYear: (year: number | null) => void;
+  setMonth: (month: number | null) => void;
+  setPage: (page: number | ((prev: number) => number)) => void;
 }
 
 export const tripsStore = create<TripsStore>((set) => ({
-  trips: null,
-  tripSelected: undefined,
-  setTrips: (trips) => set({ trips }),
-  setTripSelected: (tripSelected) => set({ tripSelected }),
+  filter: "desc",
+  year: null,
+  month: null,
+  page: 1,
+  setFilter: (filter) => set({ filter }),
+  setYear: (year) => set({ year }),
+  setMonth: (month) => set({ month }),
+  setPage: (page) =>
+    set((state) => ({
+      page: typeof page === "function" ? page(state.page) : page,
+    })),
 }));

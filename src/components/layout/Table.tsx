@@ -1,40 +1,35 @@
-import { useEffect, useState } from "react";
-import { getTrips } from "../services/trips.services";
 import { useTrips } from "../hooks/useTrips";
 import { Filter } from "../common/Filter";
 import { Spinner } from "../common/widget/Spinner";
 import { Pagination } from "../common/Pagination";
+import { tripsStore } from "../store/tripsStore";
+import { useState } from "react";
 
 function TripsTable() {
-  const { trips, setTrips } = useTrips();
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState<number>(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState<number | string>("desc");
-  const [month, setMonth] = useState<number | null>(null);
-  const [year, setYear] = useState<number | null>(null);
+  const { data: trips, isLoading } = useTrips();
+  const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
+    tripsStore();
 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+  };
+
+  const filteredTrips = trips?.viajes.filter(
+    (item) =>
+      item.id.toString().includes(searchTerm) ||
+      item.apellido.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   const noTrips = trips?.pagination.totalItems === 0;
 
-  console.log("filter", typeof filter);
-  console.log("year", typeof year, year);
-  console.log("month", typeof month, month);
+  console.log(trips);
 
-  useEffect(() => {
-    async function fetchTrips() {
-      const response = await getTrips(filter, 10, page, month, year);
-      if (response && response.viajes) {
-        setTrips(response);
-      }
-      setLoading(false);
-    }
-    fetchTrips();
-  }, [filter, setTrips, page, month, year]);
-
-  if (loading) return <Spinner text="Cargando" />;
+  if (isLoading) return <Spinner text="Cargando" />;
 
   return (
-    <div className="max-w-[900px] mx-auto">
+    <section className="max-w-[900px] mx-auto">
       <Filter
         filter={filter}
         setFilter={setFilter}
@@ -48,7 +43,7 @@ function TripsTable() {
           type="text"
           placeholder="Buscar por legajo o nombre"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={searchHandleChange}
           className="px-3 py-2 rounded border border-gray-300 flex-grow min-w-[200px] shadow-sm"
         />
       </div>
@@ -71,7 +66,7 @@ function TripsTable() {
               </td>
             </tr>
           ) : (
-            trips?.viajes.map((trip) => (
+            filteredTrips?.map((trip) => (
               <tr key={trip.id} className="capitalize border-b border-gray-200">
                 <td className="p-2">{trip.id}</td>
                 <td className="p-2">{trip.apellido}</td>
@@ -122,7 +117,7 @@ function TripsTable() {
       </table>
 
       <Pagination page={page} setPage={setPage} />
-    </div>
+    </section>
   );
 }
 

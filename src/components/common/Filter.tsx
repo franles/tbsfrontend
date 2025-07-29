@@ -1,10 +1,10 @@
 type Props = {
-  filter: string | number;
-  setFilter: React.Dispatch<React.SetStateAction<string | number>>;
+  filter: string;
+  setFilter: (filter: string) => void;
   month: number | null;
-  setMonth: React.Dispatch<React.SetStateAction<null | number>>;
+  setMonth: (month: number | null) => void;
   year: number | null;
-  setYear: React.Dispatch<React.SetStateAction<null | number>>;
+  setYear: (year: number | null) => void;
 };
 export const Filter = ({
   filter,

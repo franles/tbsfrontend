@@ -1,10 +1,12 @@
+import { useQuery } from "@tanstack/react-query";
 import { tripsStore } from "../store/tripsStore";
+import { getTrips } from "../services/trips.services";
 
 export const useTrips = () => {
-  const tripSelected = tripsStore((state) => state.tripSelected);
-  const trips = tripsStore((state) => state.trips);
-  const setTrips = tripsStore((state) => state.setTrips);
-  const setTripSelected = tripsStore((state) => state.setTripSelected);
+  const { filter, year, month, page } = tripsStore();
 
-  return { tripSelected, trips, setTrips, setTripSelected };
+  return useQuery({
+    queryKey: ["trips", filter, year, month, page],
+    queryFn: () => getTrips(filter, 10, page, month, year),
+  });
 };

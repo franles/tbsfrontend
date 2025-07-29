@@ -2,7 +2,7 @@ import { api, API_URL } from "../config/axios";
 import type { GetTripsResponse } from "../types/types";
 
 export async function getTrips(
-  filter: string | number | null,
+  filter: string,
   limit: number,
   page: number,
   month: number | null,
@@ -10,16 +10,15 @@ export async function getTrips(
 ): Promise<GetTripsResponse | undefined> {
   try {
     const params = new URLSearchParams();
-    if (month !== null && month !== undefined) {
-      params.append("month", String(month));
-    }
+    params.append("filter", filter);
+    params.append("limit", limit.toString());
+    params.append("page", page.toString());
 
-    if (year !== null && year !== undefined) {
-      params.append("year", String(year));
-    }
+    if (year !== null) params.append("year", year.toString());
+    if (month !== null) params.append("month", month.toString());
 
     const { data } = await api.get<GetTripsResponse>(
-      `${API_URL}/trips?filter=${filter}&limit=${limit}&page=${page}&${params.toString()}`
+      `${API_URL}/trips?${params.toString()}`
     );
     return data;
   } catch (error) {
