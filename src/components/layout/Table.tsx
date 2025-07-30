@@ -4,14 +4,31 @@ import { Spinner } from "../common/widget/Spinner";
 import { Pagination } from "../common/Pagination";
 import { tripsStore } from "../store/tripsStore";
 import { useState } from "react";
+import { Modal } from "./Modal";
+import { modalStore } from "../store/modalStore";
+import { TripModal } from "../common/TripModal";
+import { TripEditModal } from "../common/TripEditModal";
 
 function TripsTable() {
+  const {
+    filter,
+    page,
+    setFilter,
+    setMonth,
+    setPage,
+    year,
+    setYear,
+    month,
+    tripId,
+    setTripId,
+  } = tripsStore();
+
+  const { isOpen, setIsOpen, isEditOpen } = modalStore();
   const { data: trips, isLoading } = useTrips();
-  const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
-    tripsStore();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
+  console.log(tripId);
   const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -23,8 +40,6 @@ function TripsTable() {
       item.apellido.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const noTrips = trips?.pagination.totalItems === 0;
-
-  console.log(trips);
 
   if (isLoading) return <Spinner text="Cargando" />;
 
@@ -85,7 +100,10 @@ function TripsTable() {
                 <td className="p-2">
                   <button
                     className="mr-2 px-2.5 py-1.5 bg-blue-600 text-white border-none rounded cursor-pointer"
-                    onClick={() => alert(`Ver detalles de legajo ${trip.id}`)}
+                    onClick={() => {
+                      setTripId(trip.id);
+                      setIsOpen(true);
+                    }}
                     title="Ver"
                   >
                     Ver
@@ -115,7 +133,17 @@ function TripsTable() {
           )}
         </tbody>
       </table>
+      {isOpen && (
+        <Modal>
+          <TripModal />
+        </Modal>
+      )}
 
+      {isEditOpen && (
+        <Modal>
+          <TripEditModal />
+        </Modal>
+      )}
       <Pagination page={page} setPage={setPage} />
     </section>
   );

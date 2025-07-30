@@ -5,6 +5,8 @@ interface TripsStore {
   year: number | null;
   month: number | null;
   page: number;
+  tripId: string | null;
+  setTripId: (id: string | null) => void;
   setFilter: (filter: string) => void;
   setYear: (year: number | null) => void;
   setMonth: (month: number | null) => void;
@@ -16,6 +18,8 @@ export const tripsStore = create<TripsStore>((set) => ({
   year: null,
   month: null,
   page: 1,
+  tripId: null,
+  setTripId: (tripId) => set({ tripId }),
   setFilter: (filter) => set({ filter }),
   setYear: (year) => set({ year }),
   setMonth: (month) => set({ month }),

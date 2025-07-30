@@ -7,8 +7,38 @@ export type GetTripsResponse = {
   };
 };
 
+export type GetTripResponse = {
+  viaje: {
+    id: string;
+    estado: "pendiente" | "finalizado";
+    fecha: Date;
+    moneda: "ARS" | "USD";
+    destino: "internacional" | "nacional";
+    apellido: string;
+    valor_total: number;
+    ganancia: number;
+    costo: number;
+    servicios: {
+      id: number;
+      valor: number;
+      nombre: string;
+      pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+    }[];
+  };
+};
+
 export type GetAccessTokenResponse = {
   accessToken: string;
+};
+
+export type CreateTripData = {
+  apellido: string;
+  valor_total: number;
+  destino: "internacional" | "nacional";
+};
+
+export type CreateTripResponse = {
+  trip: number;
 };
 
 export type LogOutResponse = {

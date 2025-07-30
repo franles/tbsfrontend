@@ -1,5 +1,10 @@
 import { api, API_URL } from "../config/axios";
-import type { GetTripsResponse } from "../types/types";
+import type {
+  CreateTripData,
+  CreateTripResponse,
+  GetTripResponse,
+  GetTripsResponse,
+} from "../types/types";
 
 export async function getTrips(
   filter: string,
@@ -24,4 +29,31 @@ export async function getTrips(
   } catch (error) {
     console.error("Error al obtener los viajes", error);
   }
+}
+
+export async function getTrip(id: string): Promise<GetTripResponse | null> {
+  try {
+    const { data } = await api.get<GetTripResponse>(`${API_URL}/trips/${id}`);
+
+    return data;
+  } catch (error) {
+    console.log("Error al obtener el viaje", error);
+  }
+
+  return null;
+}
+
+export async function createTrip(
+  tripData: CreateTripData
+): Promise<number | null> {
+  try {
+    const { data } = await api.post<CreateTripResponse>(`${API_URL}/trips`, {
+      tripData,
+    });
+
+    return data.trip;
+  } catch (error) {
+    console.error("Error al crear el viaje", error);
+  }
+  return null;
 }
