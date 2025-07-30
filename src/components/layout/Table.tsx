@@ -1,152 +1,45 @@
-import { useTrips } from "../hooks/useTrips";
-import { Filter } from "../common/Filter";
-import { Spinner } from "../common/widget/Spinner";
-import { Pagination } from "../common/Pagination";
-import { tripsStore } from "../store/tripsStore";
-import { useState } from "react";
-import { Modal } from "./Modal";
-import { modalStore } from "../store/modalStore";
-import { TripModal } from "../common/TripModal";
-import { TripEditModal } from "../common/TripEditModal";
+import React from "react";
 
-function TripsTable() {
-  const {
-    filter,
-    page,
-    setFilter,
-    setMonth,
-    setPage,
-    year,
-    setYear,
-    month,
-    tripId,
-    setTripId,
-  } = tripsStore();
+type Header = {
+  label: string;
+  key: string;
+};
 
-  const { isOpen, setIsOpen, isEditOpen } = modalStore();
-  const { data: trips, isLoading } = useTrips();
+type Props<T> = {
+  headers: Header[];
+  data: T[];
+  renderRow: (item: T) => React.ReactNode;
+  noDataMessage?: string;
+};
 
-  const [searchTerm, setSearchTerm] = useState<string>("");
-
-  console.log(tripId);
-  const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-  };
-
-  const filteredTrips = trips?.viajes.filter(
-    (item) =>
-      item.id.toString().includes(searchTerm) ||
-      item.apellido.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const noTrips = trips?.pagination.totalItems === 0;
-
-  if (isLoading) return <Spinner text="Cargando" />;
-
+export function Table<T>({
+  headers,
+  data,
+  renderRow,
+  noDataMessage = "No hay resultados",
+}: Props<T>) {
   return (
-    <section className="max-w-[900px] mx-auto">
-      <Filter
-        filter={filter}
-        setFilter={setFilter}
-        year={year}
-        setYear={setYear}
-        month={month}
-        setMonth={setMonth}
-      />
-      <div className="flex flex-wrap justify-between mb-4 items-center gap-3">
-        <input
-          type="text"
-          placeholder="Buscar por legajo o nombre"
-          value={searchTerm}
-          onChange={searchHandleChange}
-          className="px-3 py-2 rounded border border-gray-300 flex-grow min-w-[200px] shadow-sm"
-        />
-      </div>
-
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-[#007bff] text-white">
-            <th className="text-left p-3">Legajo</th>
-            <th className="text-left p-3">Nombre</th>
-            <th className="text-left p-3">Fecha creacion:</th>
-            <th className="text-left p-3">Estado</th>
-            <th className="text-left p-3">Acciones</th>
+    <table className="w-full border-collapse">
+      <thead>
+        <tr className="bg-[#007bff] text-white">
+          {headers.map((header) => (
+            <th key={header.key} className="text-left p-3">
+              {header.label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.length === 0 ? (
+          <tr>
+            <td colSpan={headers.length} className="p-3 text-center">
+              {noDataMessage}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {noTrips ? (
-            <tr>
-              <td colSpan={4} className="p-3 text-center">
-                No hay resultados
-              </td>
-            </tr>
-          ) : (
-            filteredTrips?.map((trip) => (
-              <tr key={trip.id} className="capitalize border-b border-gray-200">
-                <td className="p-2">{trip.id}</td>
-                <td className="p-2">{trip.apellido}</td>
-                <td className="p-2">
-                  {new Date(trip.fecha).toLocaleDateString("es-AR")}
-                </td>
-                <td
-                  className={`p-2 font-bold capitalize ${
-                    trip.estado === "pendiente"
-                      ? "text-orange-500"
-                      : "text-green-500"
-                  }`}
-                >
-                  {trip.estado}
-                </td>
-                <td className="p-2">
-                  <button
-                    className="mr-2 px-2.5 py-1.5 bg-blue-600 text-white border-none rounded cursor-pointer"
-                    onClick={() => {
-                      setTripId(trip.id);
-                      setIsOpen(true);
-                    }}
-                    title="Ver"
-                  >
-                    Ver
-                  </button>
-                  <button
-                    className="mr-2 px-2.5 py-1.5 bg-green-600 text-white border-none rounded cursor-pointer"
-                    onClick={() => alert(`Editar legajo ${trip.id}`)}
-                    title="Editar"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="px-2.5 py-1.5 bg-red-600 text-white border-none rounded cursor-pointer"
-                    onClick={() => {
-                      if (window.confirm(`¿Eliminar legajo ${trip.id}?`)) {
-                        alert(`Legajo ${trip.id} eliminado (simulado)`);
-                        // eliminar
-                      }
-                    }}
-                    title="Eliminar"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-      {isOpen && (
-        <Modal>
-          <TripModal />
-        </Modal>
-      )}
-
-      {isEditOpen && (
-        <Modal>
-          <TripEditModal />
-        </Modal>
-      )}
-      <Pagination page={page} setPage={setPage} />
-    </section>
+        ) : (
+          data.map((item) => renderRow(item))
+        )}
+      </tbody>
+    </table>
   );
 }
-
-export default TripsTable;

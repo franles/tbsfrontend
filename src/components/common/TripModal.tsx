@@ -44,7 +44,7 @@ export const TripModal = () => {
               Apellido: <p className="font-normal">{trip?.viaje.apellido}</p>
             </span>
             <span className="flex gap-1 font-semibold">
-              Fecha:{" "}
+              Fecha creación:{" "}
               <p className="font-normal">
                 {trip?.viaje.fecha &&
                   new Date(trip.viaje.fecha).toLocaleDateString()}

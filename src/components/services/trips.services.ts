@@ -2,6 +2,7 @@ import { api, API_URL } from "../config/axios";
 import type {
   CreateTripData,
   CreateTripResponse,
+  DeleteTripResponse,
   GetTripResponse,
   GetTripsResponse,
 } from "../types/types";
@@ -56,4 +57,15 @@ export async function createTrip(
     console.error("Error al crear el viaje", error);
   }
   return null;
+}
+
+export async function deleteTrip(id: string) {
+  try {
+    const { data } = await api.delete<DeleteTripResponse>(
+      `${API_URL}/trips/${id}`
+    );
+    return data;
+  } catch (error) {
+    console.log("Error al eliminar el viaje", error);
+  }
 }

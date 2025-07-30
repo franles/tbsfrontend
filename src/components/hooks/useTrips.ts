@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { tripsStore } from "../store/tripsStore";
-import { createTrip, getTrip, getTrips } from "../services/trips.services";
+import {
+  createTrip,
+  deleteTrip,
+  getTrip,
+  getTrips,
+} from "../services/trips.services";
 
 export const useTrips = () => {
   const { filter, year, month, page } = tripsStore();
@@ -62,6 +67,17 @@ export const useCreateTrip = () => {
           context.previousTrips
         );
       }
+    },
+  });
+};
+
+export const useDeleteTrip = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteTrip,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
   });
 };

@@ -31,18 +31,22 @@ export type GetAccessTokenResponse = {
   accessToken: string;
 };
 
-export type CreateTripData = {
-  apellido: string;
-  valor_total: number;
-  destino: "internacional" | "nacional";
-};
-
 export type CreateTripResponse = {
   trip: number;
 };
 
 export type LogOutResponse = {
   message: string;
+};
+
+export type DeleteTripResponse = {
+  message: string;
+  trip: string;
+};
+export type CreateTripData = {
+  apellido: string;
+  valor_total: number;
+  destino: "internacional" | "nacional";
 };
 
 export type User = {
