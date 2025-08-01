@@ -9,6 +9,8 @@ import { TripModal } from "../common/TripModal";
 import { TripEditModal } from "../common/TripEditModal";
 import { Pagination } from "../common/Pagination";
 import { TripsTable } from "../common/TripsTable";
+import { Link } from "react-router-dom";
+
 
 function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
@@ -33,7 +35,7 @@ function Home() {
   if (isLoading) return <Spinner text="Cargando" />;
   return (
     <>
-      <div className="relative h-[400px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274365/maletas_jzcjf2.webp')]">
+      <div className="relative h-[225px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274365/maletas_jzcjf2.webp')]">
         <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
 
         <div
@@ -44,33 +46,52 @@ function Home() {
           }}
         ></div>
         <div className="relative z-20 h-full flex items-center justify-center">
-          <h1 className="text-7xl font-bold text-white drop-shadow-lg text-center">
+          <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10">
             Paquetes Turísticos
           </h1>
         </div>
       </div>
 
       <section className="max-w-[900px] mx-auto">
-        <Filter
-          filter={filter}
-          setFilter={setFilter}
-          year={year}
-          setYear={setYear}
-          month={month}
-          setMonth={setMonth}
-        />
-        <div className="flex flex-wrap justify-between mb-4 items-center gap-3">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
           <input
             type="text"
             placeholder="Buscar por legajo o nombre"
             value={searchTerm}
             onChange={searchHandleChange}
-            className="px-3 py-2 rounded border border-gray-300 flex-grow min-w-[200px] shadow-sm"
+            className="px-3 py-2 rounded border border-gray-300 shadow-sm min-w-[200px] flex-grow"
+          />
+
+          <Filter
+            filter={filter}
+            setFilter={setFilter}
+            year={year}
+            setYear={setYear}
+            month={month}
+            setMonth={setMonth}
           />
         </div>
 
         <TripsTable filteredTrips={filteredTrips} />
-        <Pagination page={page} setPage={setPage} />
+<div className="flex justify-between items-center mt-4">
+  {/* Paginación a la izquierda */}
+  <Pagination page={page} setPage={setPage} />
+
+  {/* Botones con rutas a la derecha */}
+  <div className="flex gap-2">
+    <Link to="/ResumenMensual">
+      <button className="px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
+        Resumen Mensual
+      </button>
+    </Link>
+    <Link to="/ResumenAnual">
+      <button className="px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
+        Resumen Anual
+      </button>
+    </Link>
+  </div>
+</div>
+
       </section>
 
       {isOpen && (

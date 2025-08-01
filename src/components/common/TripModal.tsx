@@ -10,13 +10,13 @@ export const TripModal = () => {
   const { data: trip, isLoading } = useTrip(tripId!);
   const { setIsOpen, setIsEditOpen } = modalStore();
   return (
-    <div className="bg-slate-800 rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-white">
+    <div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-black">
       <button
         onClick={() => {
           setTripId(null);
           setIsOpen(false);
         }}
-        className="absolute top-3 right-3 text-gray-300 transition"
+        className="absolute top-3 right-3 text-red-500 transition"
       >
         <CgClose size={30} />
       </button>
@@ -27,7 +27,7 @@ export const TripModal = () => {
           setIsOpen(false);
           setIsEditOpen(true);
         }}
-        className="absolute top-3 right-16 text-gray-300 transition"
+        className="absolute top-3 right-14 text-blue-600 transition"
       >
         <VscEdit size={30} />
       </button>
@@ -37,47 +37,63 @@ export const TripModal = () => {
           <Spinner size={40} text="Cargando..." />
         </div>
       ) : (
+
         <section className="flex flex-col items-center gap-10">
-          <h1 className="font-bold text-2xl">Legajo: {trip?.viaje.id}</h1>
-          <div className="flex flex-wrap gap-5">
-            <span className="flex gap-1 font-semibold ">
-              Apellido: <p className="font-normal">{trip?.viaje.apellido}</p>
-            </span>
+<h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2">
+  LEGAJO Nº {trip?.viaje.id}
+</h1>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+    <div className="border border-gray-300 rounded-xl p-4">
+      <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">Información:</h1>
+      <span className="flex gap-1 font-semibold">
+        Apellido: <p className="font-normal ml-3">{trip?.viaje.apellido}</p>
+      </span>
+      <span className="capitalize flex gap-1 font-semibold">
+        Destino: <p className="font-normal ml-3">{trip?.viaje.destino}</p>
+      </span>
             <span className="flex gap-1 font-semibold">
-              Fecha creación:{" "}
-              <p className="font-normal">
-                {trip?.viaje.fecha &&
-                  new Date(trip.viaje.fecha).toLocaleDateString()}
-              </p>
-            </span>
-            <span className="capitalize flex gap-1 font-semibold">
-              Destino: <p className="font-normal">{trip?.viaje.destino}</p>
-            </span>
-            <span className="flex gap-1 font-semibold">
-              Moneda: <p className="font-normal">${trip?.viaje.moneda}</p>
-            </span>
-            <span className="flex gap-1 font-semibold">
-              Valor total:{" "}
-              <p className="font-normal">${trip?.viaje.valor_total}</p>
-            </span>
-            <span className="flex gap-1 font-semibold">
-              Costo: <p className="font-normal">${trip?.viaje.costo}</p>
-            </span>
-            <span className="flex gap-1 font-semibold">
-              Ganancia: <p className="font-normal">${trip?.viaje.ganancia}</p>
-            </span>
-            <div className="capitalize">
-              <span className="font-semibold">Servicios:</span>
-              {trip?.viaje.servicios.map((s) => (
-                <div key={s.id} className="flex gap-7">
-                  <span>{s.nombre}</span>
-                  <span>Valor: ${s.valor}</span>
-                  <span>Pagado por: {s.pagado_por}</span>
-                </div>
-              ))}
-            </div>
+        Fecha creación:
+        <p className="font-normal ml-3">
+          {trip?.viaje.fecha &&
+            new Date(trip.viaje.fecha).toLocaleDateString()}
+        </p>
+      </span>
+    </div>
+
+    <div className="border border-gray-300 rounded-xl p-4">
+      <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">Detalle económico: </h1>
+      <span className="flex gap-1 font-semibold">
+        Moneda: <p className="font-normal ml-3">${trip?.viaje.moneda}</p>
+      </span>
+      <span className="flex gap-1 font-semibold">
+        Valor total: <p className="font-normal ml-3">${trip?.viaje.valor_total}</p>
+      </span>
+      <span className="flex gap-1 font-semibold">
+        Costo: <p className="font-normal ml-3">${trip?.viaje.costo}</p>
+      </span>
+      <span className="flex gap-1 font-semibold">
+        Ganancia: <p className="font-normal ml-3">${trip?.viaje.ganancia}</p>
+      </span>
+    </div>
+
+    <div className="border border-gray-300 rounded-xl p-4 col-span-full">
+      <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-2">Servicios:</h1>
+      {trip?.viaje.servicios?.length ? (
+        trip.viaje.servicios.map((s) => (
+          <div key={s.id} className="flex flex-wrap gap-7 pl-2 border-l-4 border-blue-400 mb-2">
+            <span>{s.nombre}</span>
+            <span>Valor: ${s.valor}</span>
+            <span>Pagado por: {s.pagado_por}</span>
           </div>
-        </section>
+        ))
+      ) : (
+        <p className="text-gray-500">No hay servicios cargados.</p>
+      )}
+    </div>
+  </div>
+</section>
+
       )}
     </div>
   );

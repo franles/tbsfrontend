@@ -33,7 +33,7 @@ export function TripsTable({
       headers={headers}
       data={filteredTrips || []}
       renderRow={(trip) => (
-        <tr key={trip.id} className="capitalize border-b border-gray-200">
+        <tr key={trip.id} className="capitalize border-b border-gray-200 hover:bg-gray-100">
           <td className="p-2">{trip.id}</td>
           <td className="p-2">{trip.apellido}</td>
           <td className="p-2">
@@ -46,25 +46,27 @@ export function TripsTable({
           >
             {trip.estado}
           </td>
-          <td className="flex items-center p-2">
-            <button
-              className="text-blue-600 border-none rounded cursor-pointer hover:text-blue-400"
-              onClick={() => {
-                setTripId(trip.id);
-                setIsOpen(true);
-              }}
-              title="Ver"
-            >
-              <IoIosInformationCircleOutline size={30} />
-            </button>
-            <button
-              className="text-red-600 border-none rounded cursor-pointer hover:text-red-400"
-              onClick={() => handleDelete(trip.id)}
-              title="Eliminar"
-            >
-              <MdDeleteForever size={30} />
-            </button>
-          </td>
+<td className="p-2">
+  <div className="flex items-center space-x-4 mr">
+    <button
+      className="text-blue-500 border-none rounded cursor-pointer hover:text-blue-700"
+      onClick={() => {
+        setTripId(trip.id);
+        setIsOpen(true);
+      }}
+      title="Ver"
+    >
+      <IoIosInformationCircleOutline size={30} />
+    </button>
+    <button
+      className="text-red-600 border-none rounded cursor-pointer hover:text-red-700"
+      onClick={() => handleDelete(trip.id)}
+      title="Eliminar"
+    >
+      <MdDeleteForever size={30} />
+    </button>
+  </div>
+</td>
         </tr>
       )}
     />
