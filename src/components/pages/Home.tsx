@@ -74,10 +74,7 @@ function Home() {
 
         <TripsTable filteredTrips={filteredTrips} />
 <div className="flex justify-between items-center mt-4">
-  {/* Paginación a la izquierda */}
   <Pagination page={page} setPage={setPage} />
-
-  {/* Botones con rutas a la derecha */}
   <div className="flex gap-2">
     <Link to="/ResumenMensual">
       <button className="px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
