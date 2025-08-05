@@ -1,6 +1,6 @@
 import { Table } from "../layout/Table";
-import { IoIosInformationCircleOutline } from "react-icons/io";
-import { MdDeleteForever } from "react-icons/md";
+import { IoInformationCircle } from "react-icons/io5";
+import { IoCloseCircle } from "react-icons/io5";
 import type { Trip } from "../types/types";
 import { tripsStore } from "../store/tripsStore";
 import { modalStore } from "../store/modalStore";
@@ -56,14 +56,14 @@ export function TripsTable({
       }}
       title="Ver"
     >
-      <IoIosInformationCircleOutline size={30} />
+      <IoInformationCircle size={30} />
     </button>
     <button
       className="text-red-600 border-none rounded cursor-pointer hover:text-red-700"
       onClick={() => handleDelete(trip.id)}
       title="Eliminar"
     >
-      <MdDeleteForever size={30} />
+      <IoCloseCircle size={30} />
     </button>
   </div>
 </td>

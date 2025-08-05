@@ -10,6 +10,12 @@ import { TripEditModal } from "../common/TripEditModal";
 import { Pagination } from "../common/Pagination";
 import { TripsTable } from "../common/TripsTable";
 import { Link } from "react-router-dom";
+import { IoAddCircle } from "react-icons/io5";
+import { IoSearch } from "react-icons/io5";
+import { IoFunnelOutline } from "react-icons/io5";
+import { IoListCircle } from "react-icons/io5";
+
+
 
 
 function Home() {
@@ -47,20 +53,25 @@ function Home() {
         ></div>
         <div className="relative z-20 h-full flex items-center justify-center">
           <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10">
-            Paquetes Turísticos
+            Historial de Reservas
           </h1>
         </div>
       </div>
 
       <section className="max-w-[900px] mx-auto">
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
+        <div className="flex flex-wrap justify-between items-center mb-4">
+          <IoSearch size={30} className="text-gray-400 mr-2" />
+
           <input
             type="text"
             placeholder="Buscar por legajo o nombre"
             value={searchTerm}
             onChange={searchHandleChange}
-            className="px-3 py-2 rounded border border-gray-300 shadow-sm min-w-[200px] flex-grow"
+
+            className="px-3 py-2 mr-3 rounded border border-gray-300 shadow-sm min-w-[200px] flex-grow"
           />
+
+          <IoFunnelOutline size={30} className="text-gray-400 mr-2 ml-6" />
 
           <Filter
             filter={filter}
@@ -73,21 +84,23 @@ function Home() {
         </div>
 
         <TripsTable filteredTrips={filteredTrips} />
-<div className="flex justify-between items-center mt-4">
-  <Pagination page={page} setPage={setPage} />
-  <div className="flex gap-2">
-    <Link to="/ResumenMensual">
-      <button className="px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
-        Resumen Mensual
-      </button>
-    </Link>
-    <Link to="/ResumenAnual">
-      <button className="px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
-        Resumen Anual
-      </button>
-    </Link>
-  </div>
-</div>
+        <div className="flex justify-between items-center mt-4">
+          <Pagination page={page} setPage={setPage} />
+          <div className="flex gap-2">
+            <Link to="/ResumenMensual">
+              <button className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow">
+                <IoAddCircle size={24} />
+                Añadir reserva
+              </button>
+            </Link>
+            <Link to="/ResumenAnual">
+              <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
+                <IoListCircle size={24} />
+                Resumen Anual
+              </button>
+            </Link>
+          </div>
+        </div>
 
       </section>
 

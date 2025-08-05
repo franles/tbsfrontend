@@ -1,5 +1,4 @@
 import { useUser } from "../hooks/useUser";
-import { AnnualTable } from "../common/AnnualTable";
 
 
 function Annual() {
@@ -22,9 +21,7 @@ function Annual() {
             Resumen Anual
           </h1>
         </div>
-<AnnualTable>
-  
-</AnnualTable>
+
       </div>
     </>
   );
