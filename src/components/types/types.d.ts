@@ -40,7 +40,6 @@ export type GetAccessTokenResponse = {
 
 export type CreateTripResponse = {
   trip: string;
-
 };
 
 export type LogOutResponse = {
@@ -52,14 +51,12 @@ export type DeleteTripResponse = {
   trip: string;
 };
 
-
 export type CreateTripData = {
   servicios: {
     id: number;
     valor: number;
-    nombre: string;
-    pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-  }[]
+    pagado_por: "pendiente";
+  }[];
   apellido: string;
   valor_total: number;
   destino: "internacional" | "nacional" | "";

@@ -20,10 +20,7 @@ export const TripEditModal = () => {
   }, [trip]);
 
   const handleAgregarServicio = () => {
-    setServicios([
-      ...servicios,
-      { nombre: "", valor: 0, pagado_por: "" }
-    ]);
+    setServicios([...servicios, { nombre: "", valor: 0, pagado_por: "" }]);
   };
 
   const handleEliminarServicio = (index: number) => {
@@ -32,15 +29,17 @@ export const TripEditModal = () => {
     setServicios(nuevos);
   };
 
-const handleCambioServicio = (
-  index: number,
-  campo: "nombre" | "valor" | "pagado_por",
-  valor: string
-) => {
-  const nuevos = [...servicios];
-  {/*nuevos[index][campo] = campo === "valor" ? parseFloat(valor) || 0 : valor;*/}
-  setServicios(nuevos);
-};
+  const handleCambioServicio = (
+    index: number,
+    campo: "nombre" | "valor" | "pagado_por",
+    valor: string
+  ) => {
+    const nuevos = [...servicios];
+    {
+      /*nuevos[index][campo] = campo === "valor" ? parseFloat(valor) || 0 : valor;*/
+    }
+    setServicios(nuevos);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -60,13 +59,16 @@ const handleCambioServicio = (
 
         <section className="flex flex-col items-center gap-10">
           <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2">
-            MODIFICAR LEGAJO Nº <span className="underline">{trip?.viaje.id}</span>
+            MODIFICAR LEGAJO Nº{" "}
+            <span className="underline">{trip?.viaje.id}</span>
           </h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
             {/* info */}
             <div className="border border-gray-300 rounded-xl p-4">
-              <h1 className="font-bold text-xl text-blue-600 mb-3">Información:</h1>
+              <h1 className="font-bold text-xl text-blue-600 mb-3">
+                Información:
+              </h1>
               <div className="mb-3">
                 <label className="block font-semibold mb-1">Apellido</label>
                 <input
@@ -85,7 +87,9 @@ const handleCambioServicio = (
                 </select>
               </div>
               <div>
-                <label className="block font-semibold mb-1">Fecha creación</label>
+                <label className="block font-semibold mb-1">
+                  Fecha creación
+                </label>
                 <input
                   type="date"
                   className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed"
@@ -101,7 +105,9 @@ const handleCambioServicio = (
 
             {/* detalle económico */}
             <div className="border border-gray-300 rounded-xl p-4">
-              <h1 className="font-bold text-xl text-blue-600 mb-3">Detalle económico:</h1>
+              <h1 className="font-bold text-xl text-blue-600 mb-3">
+                Detalle económico:
+              </h1>
               <div className="mb-3">
                 <label className="block font-semibold mb-1">Moneda</label>
                 <input
@@ -140,7 +146,9 @@ const handleCambioServicio = (
 
             {/* servicios */}
             <div className="border border-gray-300 rounded-xl p-4 col-span-full">
-              <h1 className="font-bold text-xl text-blue-600 mb-4">Servicios:</h1>
+              <h1 className="font-bold text-xl text-blue-600 mb-4">
+                Servicios:
+              </h1>
 
               {/* columnas */}
               <div className="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-1">
@@ -167,8 +175,12 @@ const handleCambioServicio = (
                     <option value="Equipaje">Equipaje</option>
                     <option value="Escursiones">Escursiones</option>
                     <option value="Alquiler de ropa">Alquiler de ropa</option>
-                    <option value="Alquiler de vehículos">Alquiler de vehículos</option>
-                    <option value="Asistencia al viajero">Asistencia al viajero</option>
+                    <option value="Alquiler de vehículos">
+                      Alquiler de vehículos
+                    </option>
+                    <option value="Asistencia al viajero">
+                      Asistencia al viajero
+                    </option>
                     <option value="Traslados">Traslados</option>
                   </select>
                   <input

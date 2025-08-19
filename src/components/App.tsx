@@ -14,6 +14,7 @@ import { AuthProvider } from "./provider/AuthProvider.tsx";
 import { ProtectedRoutes } from "./config/ProtectedRoutes.tsx";
 import { Toaster } from "sonner";
 import Home from "./pages/Home.tsx";
+import { TripEdit } from "./pages/TripEdit.tsx";
 function App() {
   return (
     <Router>
@@ -27,6 +28,7 @@ function App() {
           <Route element={<ProtectedRoutes />}>
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Home />} />
+              <Route path="/trip/:id" element={<TripEdit />} />
               <Route path="/ResumenMensual" element={<Monthly />} />
               <Route path="/ResumenAnual" element={<Annual />} />
             </Route>

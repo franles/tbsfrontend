@@ -48,7 +48,7 @@ export const useCreateTrip = () => {
     onSuccess: () => {
       toast.success("Viaje creado exitosamente");
       queryClient.invalidateQueries({
-        queryKey: ["trips", { year, month, filter, page }],
+        queryKey: ["trips"],
       });
     },
 
@@ -71,6 +71,7 @@ export const useDeleteTrip = () => {
   return useMutation({
     mutationFn: deleteTrip,
     onSuccess: () => {
+      toast.success("Viaje eliminado exitosamente");
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
   });

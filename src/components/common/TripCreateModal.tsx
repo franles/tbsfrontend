@@ -15,7 +15,20 @@ export const TripCreateModal = () => {
       apellido: "",
       servicios: [],
     } as CreateTripData,
-    
+    onSubmit: ({ value, formApi }) => {
+      const trip: CreateTripData = {
+        destino: value.destino,
+        apellido: value.apellido,
+        valor_total: value.valor_total,
+        servicios: value.servicios.map((s) => ({
+          id: s.id,
+          valor: 0,
+          pagado_por: "pendiente",
+        })),
+      };
+      createTrip(trip);
+      formApi.reset();
+    },
   });
 
   console.log(services);
@@ -82,31 +95,29 @@ export const TripCreateModal = () => {
               )}
             </form.Field>
 
-{/* 
             <form.Field name="servicios">
               {(fieldArray) => {
-                const selectedIds = fieldArray.state.value.map(
-                  (s) => s.servicio_id
-                );
+                const selectedIds = fieldArray.state.value.map((s) => s.id);
 
                 const toggleService = (serviceId: number) => {
-                  const exists = selectedIds.includes(serviceId);
+                  const currentValues = fieldArray.state.value;
+                  const exists = currentValues.some((s) => s.id === serviceId);
 
                   if (exists) {
-                    // quitar servicio
-                    const indexToRemove = fieldArray.state.value.findIndex(
-                      (s) => s.servicio_id === serviceId
+                    const indexToRemove = currentValues.findIndex(
+                      (s) => s.id === serviceId
                     );
                     if (indexToRemove !== -1) {
                       fieldArray.removeValue(indexToRemove);
                     }
                   } else {
                     fieldArray.pushValue({
-                      servicio_id: serviceId,
+                      id: serviceId,
+                      valor: 0,
+                      pagado_por: "pendiente",
                     });
                   }
                 };
-
 
                 return (
                   <div>
@@ -127,7 +138,6 @@ export const TripCreateModal = () => {
                 );
               }}
             </form.Field>
-*/}
           </div>
 
           <button type="submit">Crear viaje</button>

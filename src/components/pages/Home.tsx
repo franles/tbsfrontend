@@ -6,7 +6,6 @@ import { Filter } from "../common/Filter";
 import { Spinner } from "../common/widget/Spinner";
 import { Modal } from "../layout/Modal";
 import { TripModal } from "../common/TripModal";
-import { TripEditModal } from "../common/TripEditModal";
 import { Pagination } from "../common/Pagination";
 import { TripsTable } from "../common/TripsTable";
 import { Link } from "react-router-dom";
@@ -20,7 +19,7 @@ function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
     tripsStore();
 
-  const { isOpen, isEditOpen, isCreate, setIsCreate } = modalStore();
+  const { isOpen, isCreate, setIsCreate } = modalStore();
   const { data: trips, isLoading } = useTrips();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -80,20 +79,18 @@ function Home() {
           />
         </div>
 
-        <button className="p-2 bg-blue-400" onClick={() => setIsCreate(true)}>
-          Crear viaje
-        </button>
-
         <TripsTable filteredTrips={filteredTrips} />
         <div className="flex justify-between items-center mt-4">
           <Pagination page={page} setPage={setPage} />
           <div className="flex gap-2">
-            <Link to="/ResumenMensual">
-              <button className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow">
-                <IoAddCircle size={24} />
-                Añadir reserva
-              </button>
-            </Link>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow"
+              onClick={() => setIsCreate(true)}
+            >
+              <IoAddCircle size={24} />
+              Añadir reserva
+            </button>
+
             <Link to="/ResumenAnual">
               <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
                 <IoListCircle size={24} />
@@ -107,12 +104,6 @@ function Home() {
       {isOpen && (
         <Modal>
           <TripModal />
-        </Modal>
-      )}
-
-      {isEditOpen && (
-        <Modal>
-          <TripEditModal />
         </Modal>
       )}
 

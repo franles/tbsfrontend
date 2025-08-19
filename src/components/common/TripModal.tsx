@@ -4,11 +4,13 @@ import { tripsStore } from "../store/tripsStore";
 import { Spinner } from "./widget/Spinner";
 import { IoPencil } from "react-icons/io5";
 import { BtnCloseModal } from "./BtnCloseModal";
+import { useNavigate } from "react-router-dom";
 
 export const TripModal = () => {
   const { tripId, setTripId } = tripsStore();
   const { data: trip, isLoading } = useTrip(tripId!);
-  const { setIsOpen, setIsEditOpen } = modalStore();
+  const { setIsOpen } = modalStore();
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-black">
       <BtnCloseModal
@@ -21,7 +23,7 @@ export const TripModal = () => {
         onClick={() => {
           setTripId(tripId);
           setIsOpen(false);
-          setIsEditOpen(true);
+          navigate(`/trip/${tripId}`);
         }}
         className="absolute top-3 right-14 text-blue-600 transition"
       >
