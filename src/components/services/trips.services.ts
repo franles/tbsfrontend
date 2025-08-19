@@ -7,6 +7,8 @@ import type {
   GetTripsResponse,
 } from "../types/types";
 
+const API_ENDPOINT = `${API_URL}/trips`;
+
 export async function getTrips(
   filter: string,
   limit: number,
@@ -24,7 +26,7 @@ export async function getTrips(
     if (month !== null) params.append("month", month.toString());
 
     const { data } = await api.get<GetTripsResponse>(
-      `${API_URL}/trips?${params.toString()}`
+      `${API_ENDPOINT}?${params.toString()}`
     );
     return data;
   } catch (error) {
@@ -34,7 +36,7 @@ export async function getTrips(
 
 export async function getTrip(id: string): Promise<GetTripResponse | null> {
   try {
-    const { data } = await api.get<GetTripResponse>(`${API_URL}/trips/${id}`);
+    const { data } = await api.get<GetTripResponse>(`${API_ENDPOINT}/${id}`);
 
     return data;
   } catch (error) {
@@ -46,11 +48,12 @@ export async function getTrip(id: string): Promise<GetTripResponse | null> {
 
 export async function createTrip(
   tripData: CreateTripData
-): Promise<number | null> {
+): Promise<string | null> {
   try {
-    const { data } = await api.post<CreateTripResponse>(`${API_URL}/trips`, {
-      tripData,
-    });
+    const { data } = await api.post<CreateTripResponse>(
+      `${API_ENDPOINT}`,
+      tripData
+    );
 
     return data.trip;
   } catch (error) {
@@ -62,7 +65,7 @@ export async function createTrip(
 export async function deleteTrip(id: string) {
   try {
     const { data } = await api.delete<DeleteTripResponse>(
-      `${API_URL}/trips/${id}`
+      `${API_ENDPOINT}/${id}`
     );
     return data;
   } catch (error) {

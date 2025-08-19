@@ -12,10 +12,12 @@ import { Failure } from "./pages/Failure.tsx";
 import { ProtectedLayout } from "./config/ProtectedLayout.tsx";
 import { AuthProvider } from "./provider/AuthProvider.tsx";
 import { ProtectedRoutes } from "./config/ProtectedRoutes.tsx";
+import { Toaster } from "sonner";
 import Home from "./pages/Home.tsx";
 function App() {
   return (
     <Router>
+      <Toaster richColors duration={2500} closeButton />
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />

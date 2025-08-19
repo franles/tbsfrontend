@@ -27,12 +27,19 @@ export type GetTripResponse = {
   };
 };
 
+export type GetServicesResponse = {
+  servicios: {
+    id: number;
+    nombre: string;
+  }[];
+};
+
 export type GetAccessTokenResponse = {
   accessToken: string;
 };
 
 export type CreateTripResponse = {
-  trip: number;
+  trip: string;
 };
 
 export type LogOutResponse = {
@@ -43,10 +50,21 @@ export type DeleteTripResponse = {
   message: string;
   trip: string;
 };
+
+export type CreateTripForm = CreateTripData & {
+  servicios: {
+    servicio_id: number | undefined;
+  }[];
+};
 export type CreateTripData = {
   apellido: string;
-  valor_total: number;
-  destino: "internacional" | "nacional";
+  valor_total: number | undefined;
+  destino: "internacional" | "nacional" | "";
+};
+
+export type CreateServiceTripData = {
+  viaje_id: string | "";
+  servicio_id: number | undefined;
 };
 
 export type User = {

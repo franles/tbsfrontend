@@ -14,15 +14,13 @@ import { IoAddCircle } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
 import { IoFunnelOutline } from "react-icons/io5";
 import { IoListCircle } from "react-icons/io5";
-
-
-
+import { TripCreateModal } from "../common/TripCreateModal";
 
 function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
     tripsStore();
 
-  const { isOpen, isEditOpen } = modalStore();
+  const { isOpen, isEditOpen, isCreate, setIsCreate } = modalStore();
   const { data: trips, isLoading } = useTrips();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -67,7 +65,6 @@ function Home() {
             placeholder="Buscar por legajo o nombre"
             value={searchTerm}
             onChange={searchHandleChange}
-
             className="px-3 py-2 mr-3 rounded border border-gray-300 shadow-sm min-w-[200px] flex-grow"
           />
 
@@ -82,6 +79,10 @@ function Home() {
             setMonth={setMonth}
           />
         </div>
+
+        <button className="p-2 bg-blue-400" onClick={() => setIsCreate(true)}>
+          Crear viaje
+        </button>
 
         <TripsTable filteredTrips={filteredTrips} />
         <div className="flex justify-between items-center mt-4">
@@ -101,7 +102,6 @@ function Home() {
             </Link>
           </div>
         </div>
-
       </section>
 
       {isOpen && (
@@ -113,6 +113,12 @@ function Home() {
       {isEditOpen && (
         <Modal>
           <TripEditModal />
+        </Modal>
+      )}
+
+      {isCreate && (
+        <Modal>
+          <TripCreateModal />
         </Modal>
       )}
     </>

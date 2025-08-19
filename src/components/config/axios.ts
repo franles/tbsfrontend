@@ -18,12 +18,18 @@ api.interceptors.request.use(
     }
 
     if (token && isTokenNearExpiry(token, 30)) {
+      console.log(
+        "[Interceptor] Token cerca de expirar. Intentando refrescar..."
+      );
       const { data } = await api.post(`${API_URL}/auth/refresh`);
       token = data.accessToken;
       userStore.getState().setAccessToken(token!);
+      console.log("[Interceptor] Token refrescado exitosamente");
     }
 
     if (token) {
+      console.log("token actual", token);
+
       config.headers.Authorization = `Bearer ${token}`;
     }
 
