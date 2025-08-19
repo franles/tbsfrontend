@@ -38,7 +38,7 @@ const handleCambioServicio = (
   valor: string
 ) => {
   const nuevos = [...servicios];
-  nuevos[index][campo] = campo === "valor" ? parseFloat(valor) || 0 : valor;
+  {/*nuevos[index][campo] = campo === "valor" ? parseFloat(valor) || 0 : valor;*/}
   setServicios(nuevos);
 };
 

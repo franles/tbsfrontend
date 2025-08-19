@@ -1,51 +1,21 @@
-import { useCreateServices, useServices } from "../hooks/useServices";
+import { useServices } from "../hooks/useServices";
 import { useCreateTrip } from "../hooks/useTrips";
 import { modalStore } from "../store/modalStore";
-import type { CreateTripForm } from "../types/types";
+import type { CreateTripData } from "../types/types";
 import { BtnCloseModal } from "./BtnCloseModal";
 import { useForm } from "@tanstack/react-form";
 export const TripCreateModal = () => {
   const { setIsCreate } = modalStore();
   const { data: services } = useServices();
-  const { mutate: createServiceTrip } = useCreateServices();
   const { mutateAsync: createTrip } = useCreateTrip();
   const form = useForm({
     defaultValues: {
-      valor_total: undefined,
+      valor_total: 0,
       destino: "",
       apellido: "",
       servicios: [],
-    } as CreateTripForm,
-    onSubmit: async ({ value, formApi }) => {
-      const trip = {
-        valor_total: value.valor_total,
-        destino: value.destino,
-        apellido: value.apellido,
-      };
-
-      console.log("value.servicios:", value.servicios);
-
-      try {
-        const tripId = await createTrip(trip);
-        if (!tripId) {
-          throw new Error("Error: no se pudo crear el viaje");
-        }
-        const servicesValue = value.servicios.map((s) => ({
-          servicio_id: s.servicio_id,
-          viaje_id: tripId,
-        }));
-
-        console.log("Servicios a crear:", servicesValue);
-
-        await Promise.all(
-          servicesValue.map((service) => createServiceTrip(service))
-        );
-
-        formApi.reset();
-      } catch (error) {
-        console.error("Error creando viaje y servicio:", error);
-      }
-    },
+    } as CreateTripData,
+    
   });
 
   console.log(services);
@@ -112,6 +82,7 @@ export const TripCreateModal = () => {
               )}
             </form.Field>
 
+{/* 
             <form.Field name="servicios">
               {(fieldArray) => {
                 const selectedIds = fieldArray.state.value.map(
@@ -136,6 +107,7 @@ export const TripCreateModal = () => {
                   }
                 };
 
+
                 return (
                   <div>
                     {services?.servicios.map((service) => (
@@ -155,6 +127,7 @@ export const TripCreateModal = () => {
                 );
               }}
             </form.Field>
+*/}
           </div>
 
           <button type="submit">Crear viaje</button>
