@@ -4,13 +4,13 @@ import { tripsStore } from "../store/tripsStore";
 import { Spinner } from "./widget/Spinner";
 import { IoPencil } from "react-icons/io5";
 import { BtnCloseModal } from "./BtnCloseModal";
-import { useNavigate } from "react-router-dom";
+import { formattedAmount } from "../utils/utils";
+import { renderEstado } from "../utils/utilsTsx";
 
 export const TripModal = () => {
   const { tripId, setTripId } = tripsStore();
   const { data: trip, isLoading } = useTrip(tripId!);
-  const { setIsOpen } = modalStore();
-  const navigate = useNavigate();
+  const { setIsOpen, setIsEdit } = modalStore();
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-black">
       <BtnCloseModal
@@ -23,7 +23,7 @@ export const TripModal = () => {
         onClick={() => {
           setTripId(tripId);
           setIsOpen(false);
-          navigate(`/trip/${tripId}`);
+          setIsEdit(true);
         }}
         className="absolute top-3 right-14 text-blue-600 transition"
       >
@@ -45,7 +45,7 @@ export const TripModal = () => {
               <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
                 Información:
               </h1>
-              <span className="flex gap-1 font-semibold">
+              <span className=" capitalize flex gap-1 font-semibold">
                 Apellido:{" "}
                 <p className="font-normal ml-3">{trip?.viaje.apellido}</p>
               </span>
@@ -60,6 +60,13 @@ export const TripModal = () => {
                     new Date(trip.viaje.fecha).toLocaleDateString()}
                 </p>
               </span>
+              <span className="flex gap-1 font-semibold">
+                Estado:
+                <p className="font-normal ml-3">
+                  {" "}
+                  {trip?.viaje.estado && renderEstado(trip.viaje.estado)}
+                </p>
+              </span>
             </div>
 
             <div className="border border-gray-300 rounded-xl p-4">
@@ -72,14 +79,24 @@ export const TripModal = () => {
               </span>
               <span className="flex gap-1 font-semibold">
                 Valor total:{" "}
-                <p className="font-normal ml-3">${trip?.viaje.valor_total}</p>
+                <p className="font-normal ml-3">
+                  $
+                  {trip?.viaje.valor_total &&
+                    formattedAmount(trip.viaje.valor_total)}
+                </p>
               </span>
               <span className="flex gap-1 font-semibold">
-                Costo: <p className="font-normal ml-3">${trip?.viaje.costo}</p>
+                Costo:{" "}
+                <p className="font-normal ml-3">
+                  ${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}
+                </p>
               </span>
               <span className="flex gap-1 font-semibold">
                 Ganancia:{" "}
-                <p className="font-normal ml-3">${trip?.viaje.ganancia}</p>
+                <p className="font-normal ml-3">
+                  $
+                  {trip?.viaje.ganancia && formattedAmount(trip.viaje.ganancia)}
+                </p>
               </span>
             </div>
 
@@ -105,7 +122,11 @@ export const TripModal = () => {
                     >
                       <span className="col-span-4">{s.nombre}</span>
                       <span className="col-span-3">${s.valor}</span>
-                      <span className="col-span-4">{s.pagado_por}</span>
+                      <span className="col-span-4">
+                        {s.pagado_por === "pendiente"
+                          ? renderEstado(s.pagado_por)
+                          : s.pagado_por}
+                      </span>
                     </div>
                   ))}
                 </div>

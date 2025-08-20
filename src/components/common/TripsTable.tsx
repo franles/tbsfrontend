@@ -6,6 +6,7 @@ import { tripsStore } from "../store/tripsStore";
 import { modalStore } from "../store/modalStore";
 import { useDeleteTrip } from "../hooks/useTrips";
 import { toast } from "sonner";
+import { renderEstado } from "../utils/utilsTsx";
 
 const headers = [
   { label: "Legajo", key: "id" },
@@ -41,12 +42,8 @@ export function TripsTable({
           <td className="p-2">
             {new Date(trip.fecha).toLocaleDateString("es-AR")}
           </td>
-          <td
-            className={`p-2 font-bold capitalize ${
-              trip.estado === "pendiente" ? "text-orange-500" : "text-green-500"
-            }`}
-          >
-            {trip.estado}
+          <td className={`p-2 font-bold capitalize`}>
+            {renderEstado(trip.estado)}
           </td>
           <td className="p-2">
             <div className="flex items-center space-x-4 mr">

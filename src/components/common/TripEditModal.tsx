@@ -3,9 +3,10 @@ import { modalStore } from "../store/modalStore";
 import { tripsStore } from "../store/tripsStore";
 import { IoClose, IoCloseCircle, IoAddCircleOutline } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import { renderEstado } from "../utils/utilsTsx";
 
 export const TripEditModal = () => {
-  const { setIsEditOpen } = modalStore();
+  const { setIsEdit } = modalStore();
   const { setTripId, tripId } = tripsStore();
   const { data: trip } = useTrip(tripId!);
 
@@ -50,7 +51,7 @@ export const TripEditModal = () => {
         <button
           onClick={() => {
             setTripId(null);
-            setIsEditOpen(false);
+            setIsEdit(false);
           }}
           className="absolute top-2 right-3 text-red-500 transition"
         >
@@ -86,7 +87,7 @@ export const TripEditModal = () => {
                   <option value="internacional">Internacional</option>
                 </select>
               </div>
-              <div>
+              <div className="mb-3">
                 <label className="block font-semibold mb-1">
                   Fecha creación
                 </label>
@@ -100,6 +101,10 @@ export const TripEditModal = () => {
                   }
                   disabled
                 />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Estado</label>
+                <p>{trip?.viaje.estado && renderEstado(trip.viaje.estado)}</p>
               </div>
             </div>
 

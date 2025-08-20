@@ -14,12 +14,13 @@ import { IoSearch } from "react-icons/io5";
 import { IoFunnelOutline } from "react-icons/io5";
 import { IoListCircle } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
+import { TripEditModal } from "../common/TripEditModal";
 
 function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
     tripsStore();
 
-  const { isOpen, isCreate, setIsCreate } = modalStore();
+  const { isOpen, isCreate, setIsCreate, isEdit } = modalStore();
   const { data: trips, isLoading } = useTrips();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -107,6 +108,11 @@ function Home() {
         </Modal>
       )}
 
+      {isEdit && (
+        <Modal>
+          <TripEditModal />
+        </Modal>
+      )}
       {isCreate && (
         <Modal>
           <TripCreateModal />
