@@ -1,8 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createServiceForTrip,
+  deleteServiceForTrip,
   getServices,
+  updateServiceForTrip,
 } from "../services/servicesTrip.services";
+import { toast } from "sonner";
+import type { CreateServiceTripData, UpdateServiceData } from "../types/types";
 
 export const useServices = () => {
   return useQuery({
@@ -22,4 +26,59 @@ export const useCreateServices = () => {
       });
     },
   });
+};
+
+export const useDeleteService = () => {
+  const queryClient = useQueryClient();
+  const { mutate: deleteServiceMutate } = useMutation({
+    mutationFn: ({
+      serviceId,
+      tripId,
+    }: {
+      serviceId: number;
+      tripId: string;
+    }) => deleteServiceForTrip(serviceId, tripId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
+      toast.success("Servicio eliminado del viaje");
+    },
+  });
+
+  return { deleteServiceMutate };
+};
+
+export const useCreateService = () => {
+  const queryClient = useQueryClient();
+  const { mutate: createServiceMutate } = useMutation({
+    mutationFn: (serviceData: CreateServiceTripData) =>
+      createServiceForTrip(serviceData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trip", variables.viaje_id] });
+      toast.success("Servicio agregado al viaje");
+    },
+  });
+
+  return { createServiceMutate };
+};
+
+export const useUpdateService = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate: updateServiceMutate } = useMutation({
+    mutationFn: ({
+      tripId,
+      serviceId,
+      dataUpdated,
+    }: {
+      tripId: string;
+      serviceId: number;
+      dataUpdated: UpdateServiceData;
+    }) => updateServiceForTrip(serviceId, tripId, dataUpdated),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
+      toast.success("Servicio actualizado exitosamente");
+    },
+  });
+
+  return { updateServiceMutate };
 };

@@ -46,9 +46,23 @@ export type LogOutResponse = {
   message: string;
 };
 
-export type DeleteTripResponse = {
+export type UpdateDeleteTripResponse = {
   message: string;
   trip: string;
+};
+
+export type CreateServiceTripData = {
+  viaje_id: string;
+  servicio_id: number;
+  valor: number;
+  pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+};
+export type UpdateServiceData = {
+  servicios: {
+    pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+    valor: number;
+    id?: number;
+  }[];
 };
 
 export type CreateTripData = {
@@ -60,6 +74,12 @@ export type CreateTripData = {
   apellido: string;
   valor_total: number;
   destino: "internacional" | "nacional" | "";
+};
+
+export type UpdateTripData = {
+  valor_total?: number;
+  destino?: "internacional" | "nacional";
+  apellido?: string;
 };
 
 export type User = {

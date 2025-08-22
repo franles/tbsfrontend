@@ -5,8 +5,10 @@ import {
   deleteTrip,
   getTrip,
   getTrips,
+  updateTrip,
 } from "../services/trips.services";
 import { toast } from "sonner";
+import type { UpdateTripData } from "../types/types";
 
 export const useTrips = () => {
   const { filter, year, month, page } = tripsStore();
@@ -75,4 +77,25 @@ export const useDeleteTrip = () => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
   });
+};
+
+export const useUpdateTrip = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate: updateTripMutate } = useMutation({
+    mutationFn: ({
+      tripId,
+      dataUpdated,
+    }: {
+      tripId: string;
+      dataUpdated: UpdateTripData;
+    }) => updateTrip(tripId, dataUpdated),
+    onSuccess: (_, variables) => {
+      toast.success("Viaje actualizado exitosamente");
+      queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+    },
+  });
+
+  return { updateTripMutate };
 };
