@@ -65,6 +65,18 @@ export type UpdateServiceData = {
   }[];
 };
 
+export type FinanceSummaryResponse = {
+  resumen_financiero: {
+    mes: string;
+    mes_num: number;
+    resumen: {
+      moneda: "ARS" | "USD";
+      ingreso: string;
+      egreso: string;
+      ganancia: string;
+    }[];
+  }[];
+};
 export type CreateTripData = {
   servicios: {
     id: number;

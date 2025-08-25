@@ -17,7 +17,7 @@ api.interceptors.request.use(
       return config;
     }
 
-    if (token && isTokenNearExpiry(token, 30)) {
+    if (token && isTokenNearExpiry(token, 90)) {
       console.log(
         "[Interceptor] Token cerca de expirar. Intentando refrescar..."
       );
