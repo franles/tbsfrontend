@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
 interface FinanceStore {
-  year: number;
+  year: number | null; 
   month: number | null;
   currency: "ARS" | "USD" | null;
-  setYear: (year: number) => void;
+  setYear: (year: number | null) => void;
   setMonthFinance: (month: number | null) => void;
   setCurrency: (currency: "ARS" | "USD" | null) => void;
 }
@@ -17,5 +17,5 @@ export const financeStore = create<FinanceStore>((set) => ({
   currency: null,
   setCurrency: (currency) => set({ currency }),
   setMonthFinance: (month) => set({ month }),
-  setYear: (year) => set({ year }),
+  setYear: (year: number | null) => set({ year }),
 }));

@@ -70,14 +70,15 @@ function Home() {
 
           <IoFunnelOutline size={30} className="text-gray-400 mr-2 ml-6" />
 
-          <Filter
-            filter={filter}
-            setFilter={setFilter}
-            year={year}
-            setYear={setYear}
-            month={month}
-            setMonth={setMonth}
-          />
+<Filter
+  filter={filter}
+  setFilter={setFilter}
+  year={year}
+  setYear={setYear}
+  month={month}
+  setMonth={setMonth}
+/>
+
         </div>
 
         <TripsTable filteredTrips={filteredTrips} />
