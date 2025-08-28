@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
 type FinanceStore = {
-  year: number | null;
-  setYear: (year: number | null) => void;
+  year: number;
+  setYear: (year: number) => void;
   month: number | null;
   setMonthFinance: (month: number | null) => void;
   currency: "ARS" | "USD" | null;
