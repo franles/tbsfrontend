@@ -15,8 +15,8 @@ export const Filter = ({
   month,
   currency,
   setFilter,
-  setMonth,
   setYear,
+  setMonth,
   setCurrency,
 }: Props) => {
   return (
@@ -32,32 +32,13 @@ export const Filter = ({
             setYear && setYear(null);
           }}
           value={filter ?? "desc"}
-          className="w-[120px] border border-gray-300 rounded px-2 py-1 shadow-sm "
+          className="w-[120px] border border-gray-300 rounded px-2 py-1 shadow-sm"
         >
           <option value={""}>Tipo</option>
           <option value="asc">Antiguos</option>
           <option value="desc">Recientes</option>
           <option value="pendiente">Pendiente</option>
           <option value="finalizado">Finalizado</option>
-        </select>
-      )}
-
-      {/* Mes */}
-      {setMonth && (
-        <select
-          onChange={(e) => {
-            const val = e.target.value;
-            setMonth(val === "" ? null : Number(val));
-          }}
-          value={month ?? ""}
-          className="w-[100px] border border-gray-300 rounded px-2 py-1 shadow-sm"
-        >
-          <option value={""}>Mes</option>
-          {Array.from({ length: 12 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {new Date(0, i).toLocaleString("es-AR", { month: "long" })}
-            </option>
-          ))}
         </select>
       )}
 
@@ -69,11 +50,30 @@ export const Filter = ({
             setYear(val === "" ? null : Number(val));
           }}
           value={year ?? ""}
-          className="w-[90px] border border-gray-300 rounded px-2 py-1 shadow-sm "
+          className="w-[90px] border border-gray-300 rounded px-2 py-1 shadow-sm"
         >
           <option value={""}>Año</option>
           <option value={2025}>2025</option>
           <option value={2026}>2026</option>
+        </select>
+      )}
+
+      {/* Mes */}
+      {setMonth && (
+        <select
+          value={month ?? ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            setMonth(val === "" ? null : Number(val));
+          }}
+          className="w-[100px] border border-gray-300 rounded px-2 py-1 shadow-sm"
+        >
+          <option value={""}>Mes</option>
+          {Array.from({ length: 12 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {new Date(0, i).toLocaleString("es-AR", { month: "long" })}
+            </option>
+          ))}
         </select>
       )}
 
@@ -85,7 +85,7 @@ export const Filter = ({
             setCurrency(val === "" ? null : (val as "ARS" | "USD"));
           }}
           value={currency ?? ""}
-          className="w-[100px] border border-gray-300 rounded px-2 py-1 shadow-sm "
+          className="w-[100px] border border-gray-300 rounded px-2 py-1 shadow-sm"
         >
           <option value={""}>Moneda</option>
           <option value="ARS">ARS</option>

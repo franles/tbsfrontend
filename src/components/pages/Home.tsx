@@ -9,10 +9,7 @@ import { TripModal } from "../common/TripModal";
 import { Pagination } from "../common/Pagination";
 import { TripsTable } from "../common/TripsTable";
 import { Link } from "react-router-dom";
-import { IoAddCircle } from "react-icons/io5";
-import { IoSearch } from "react-icons/io5";
-import { IoFunnelOutline } from "react-icons/io5";
-import { IoListCircle } from "react-icons/io5";
+import { IoAddCircle, IoFunnelOutline, IoSearch, IoListCircle} from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
 
@@ -70,14 +67,14 @@ function Home() {
 
           <IoFunnelOutline size={30} className="text-gray-400 mr-2 ml-6" />
 
-<Filter
-  filter={filter}
-  setFilter={setFilter}
-  year={year}
-  setYear={setYear}
-  month={month}
-  setMonth={setMonth}
-/>
+          <Filter
+            filter={filter}
+            setFilter={setFilter}
+            year={year}
+            setYear={setYear}
+            month={month}
+            setMonth={setMonth}
+          />
 
         </div>
 
