@@ -5,7 +5,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./pages/Login.tsx";
-import Monthly from "./pages/Monthly.tsx";
 import Annual from "./pages/Annual.tsx";
 import { AuthSuccess } from "./pages/AuthSuccess.tsx";
 import { Failure } from "./pages/Failure.tsx";
@@ -27,8 +26,7 @@ function App() {
           <Route element={<ProtectedRoutes />}>
             <Route element={<ProtectedLayout />}>
               <Route path="/home" element={<Home />} />
-              <Route path="/ResumenMensual" element={<Monthly />} />
-              <Route path="/ResumenAnual" element={<Annual />} />
+              <Route path="/finance" element={<Annual />} />
             </Route>
           </Route>
         </Routes>

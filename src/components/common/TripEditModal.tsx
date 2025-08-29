@@ -5,30 +5,55 @@ import { IoClose } from "react-icons/io5";
 import { renderEstado } from "../utils/utilsTsx";
 import { useForm } from "@tanstack/react-form";
 import type { UpdateTripData } from "../types/types";
+import { useDeleteService } from "../hooks/useServices";
+import { formattedAmount } from "../utils/utils";
 
 export const TripEditModal = () => {
   const { setIsEdit } = modalStore();
   const { setTripId, tripId } = tripsStore();
   const { data: trip } = useTrip(tripId!);
   const { updateTripMutate } = useUpdateTrip();
+  const { deleteServiceMutate } = useDeleteService();
 
   const form = useForm({
     defaultValues: {
       destino: trip?.viaje.destino,
       apellido: trip?.viaje.apellido,
       valor_total: trip?.viaje.valor_total,
+      servicios: trip?.viaje.servicios.map((s) => ({
+        id: s.id,
+        pagado_por: s.pagado_por,
+        valor: s.valor,
+      })),
     } as UpdateTripData,
     onSubmit: ({ value }) => {
+      const serviciosOriginales = trip?.viaje.servicios ?? [];
+
+      // Buscar solo los servicios que cambiaron
+      const serviciosActualizados = value.servicios
+        .filter((s) => {
+          const original = serviciosOriginales.find((o) => o.id === s.id);
+          return (
+            original &&
+            (s.valor !== original.valor || s.pagado_por !== original.pagado_por)
+          );
+        })
+        .map((s) => ({
+          id: s.id,
+          valor: Number(s.valor),
+          pagado_por: s.pagado_por,
+        }));
+
       const dataUpdated = {
         apellido: value.apellido ?? trip?.viaje.apellido,
-        valor_total: value.valor_total ?? trip?.viaje.valor_total,
+        valor_total: Number(value.valor_total ?? trip?.viaje.valor_total),
         destino: value.destino ?? trip?.viaje.destino,
+        servicios: serviciosActualizados, // 👈 solo modificados
       };
-      console.log("Data", dataUpdated);
+
       updateTripMutate({ tripId: tripId!, dataUpdated });
     },
   });
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div
@@ -51,18 +76,18 @@ export const TripEditModal = () => {
             <span className="underline">{trip?.viaje.id}</span>
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
-            {/* info */}
-            <div className="border border-gray-300 rounded-xl p-4 w-full">
-              <h1 className="font-bold text-xl text-blue-600 mb-3">
-                Información:
-              </h1>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  form.handleSubmit();
-                }}
-              >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+            className="w-full"
+          >
+            <div className="flex gap-10">
+              <div className="border border-gray-300 rounded-xl p-4 w-full">
+                <h1 className="font-bold text-xl text-blue-600 mb-3">
+                  Información:
+                </h1>
                 <form.Field name="apellido">
                   {(field) => (
                     <div className="mb-3">
@@ -78,31 +103,6 @@ export const TripEditModal = () => {
                   )}
                 </form.Field>
 
-                <form.Field name="valor_total">
-                  {(field) => (
-                    <div className="mb-3">
-                      <label className="block font-semibold mb-1">
-                        Valor total
-                      </label>
-                      <input
-                        type="text"
-                        value={
-                          field.state.value
-                            ? new Intl.NumberFormat("es-AR", {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              }).format(field.state.value)
-                            : ""
-                        }
-                        onChange={(e) => {
-                          const soloNumeros = e.target.value.replace(/\D/g, "");
-                          field.handleChange(Number(soloNumeros));
-                        }}
-                        className="border p-2  rounded w-1/2"
-                      />
-                    </div>
-                  )}
-                </form.Field>
                 <form.Field name="destino">
                   {(field) => (
                     <div className="mb-3">
@@ -144,46 +144,55 @@ export const TripEditModal = () => {
                   <label className="block font-semibold mb-1">Estado</label>
                   <p>{trip?.viaje.estado && renderEstado(trip.viaje.estado)}</p>
                 </div>
-
-                <button
-                  type="submit"
-                  className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Actualizar
-                </button>
-              </form>
-            </div>
-
-            {/* detalle económico */}
-            <div className="border border-gray-300 rounded-xl p-4 ">
-              <h1 className="font-bold text-xl text-blue-600 mb-3">
-                Detalle económico:
-              </h1>
-              <div className="mb-3">
-                <label className="block font-semibold mb-1">Moneda</label>
-                <input
-                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed"
-                  value={trip?.viaje.moneda}
-                  disabled
-                />
               </div>
-              <div className="mb-3">
-                <label className="block font-semibold mb-1">Costo</label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed"
-                  value={trip?.viaje.costo}
-                  disabled
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Ganancia</label>
-                <input
-                  type="number"
-                  className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed"
-                  value={trip?.viaje.ganancia}
-                  disabled
-                />
+
+              <div className="border border-gray-300 rounded-xl p-4 w-full">
+                <h1 className="font-bold text-xl text-blue-600 mb-3">
+                  Detalle económico:
+                </h1>
+                <div className="mb-3">
+                  <label className="block font-semibold mb-1">Moneda</label>
+                  <p>{trip?.viaje.moneda}</p>
+                </div>
+                <form.Field name="valor_total">
+                  {(field) => (
+                    <div className="mb-3">
+                      <label className="block font-semibold mb-1">
+                        Valor total
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          field.state.value
+                            ? new Intl.NumberFormat("es-AR", {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              }).format(field.state.value)
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const soloNumeros = e.target.value.replace(/\D/g, "");
+                          field.handleChange(Number(soloNumeros));
+                        }}
+                        className="border p-2  rounded w-1/2"
+                      />
+                    </div>
+                  )}
+                </form.Field>
+                <div className="mb-3">
+                  <label className="block font-semibold mb-1">Costo</label>
+                  <p>
+                    ${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}
+                  </p>
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1">Ganancia</label>
+                  <p>
+                    $
+                    {trip?.viaje.ganancia &&
+                      formattedAmount(trip.viaje.ganancia)}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -191,23 +200,81 @@ export const TripEditModal = () => {
               <h1 className="font-bold text-xl text-blue-600 mb-4">
                 Servicios:
               </h1>
+
+              <form.Field name="servicios">
+                {(field) => (
+                  <div className="flex flex-col gap-3">
+                    {field.state.value?.map((s, index) => (
+                      <div
+                        key={s.id}
+                        className="flex items-center gap-3 border p-3 rounded-md"
+                      >
+                        <input
+                          type="number"
+                          className="border p-2 rounded w-32"
+                          value={s.valor}
+                          onChange={(e) => {
+                            const newServicios = [...field.state.value];
+                            newServicios[index] = {
+                              ...s,
+                              valor: Number(e.target.value),
+                            };
+                            field.handleChange(newServicios);
+                          }}
+                        />
+
+                        <select
+                          className="border p-2 rounded"
+                          value={s.pagado_por}
+                          onChange={(e) => {
+                            const newServicios = [...field.state.value];
+                            newServicios[index] = {
+                              ...s,
+                              pagado_por: e.target.value as
+                                | "pendiente"
+                                | "pablo"
+                                | "soledad"
+                                | "mariana",
+                            };
+                            field.handleChange(newServicios);
+                          }}
+                        >
+                          <option value="pendiente">Pendiente</option>
+                          <option value="mariana">Mariana</option>
+                          <option value="pablo">Pablo</option>
+                          <option value="soledad">Soledad</option>
+                        </select>
+
+                        {/* Botón eliminar */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            deleteServiceMutate({
+                              serviceId: s.id,
+                              tripId: trip!.viaje.id,
+                            });
+                            const newServicios = field.state.value.filter(
+                              (serv) => serv.id !== s.id
+                            );
+                            field.handleChange(newServicios);
+                          }}
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </form.Field>
             </div>
-            {/* <button
-              type="button"
-              className="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
-              onClick={() =>
-                createServiceMutate({
-                  viaje_id: tripId!,
-                  servicio_id: s.id,
-                  valor: 0,
-                  pagado_por: "pendiente",
-                })
-              }
+            <button
+              type="submit"
+              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              <IoAddCircleOutline size={20} />
-              Agregar servicio
-            </button> */}
-          </div>
+              Actualizar
+            </button>
+          </form>
         </section>
       </div>
     </div>

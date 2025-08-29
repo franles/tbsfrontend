@@ -21,9 +21,9 @@ export function Table<T>({
   return (
     <table className="w-full border-collapse">
       <thead>
-        <tr className="bg-[#007bff] text-white">
+        <tr className="bg-[#007bff] text-white ">
           {headers.map((header) => (
-            <th key={header.key} className="text-left p-3">
+            <th key={header.key} className=" p-3 text-center">
               {header.label}
             </th>
           ))}

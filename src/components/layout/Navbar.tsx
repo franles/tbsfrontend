@@ -1,7 +1,15 @@
 import { MdLogout } from "react-icons/md";
 import { logOut } from "../services/auth.services";
 import { useNavigate } from "react-router-dom";
-import { IoExitOutline, IoMenu, IoChatboxSharp, IoAirplane, IoEarth, IoHeartSharp, IoSnow } from "react-icons/io5";
+import {
+  IoExitOutline,
+  IoMenu,
+  IoChatboxSharp,
+  IoAirplane,
+  IoEarth,
+  IoHeartSharp,
+  IoSnow,
+} from "react-icons/io5";
 import { useUser } from "../hooks/useUser";
 import { useState } from "react";
 import Swal from "sweetalert2";
@@ -108,7 +116,7 @@ function Navbar() {
               </button>
               <button
                 onClick={() => {
-                  navigate("/ResumenAnual");
+                  navigate("/finance");
                   setOpenMenu(false); // cierra el menú
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"

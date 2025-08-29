@@ -3,7 +3,7 @@ import { financeStore } from "../store/financeStore";
 import { Filter } from "../common/Filter";
 import { FinanceTable } from "../common/FinanceTable";
 import { Link } from "react-router-dom";
-import { IoArrowBackCircle, IoFunnelOutline } from "react-icons/io5";
+import { IoArrowBackCircle } from "react-icons/io5";
 
 function Annual() {
   const { year, month, currency, setYear, setMonthFinance, setCurrency } =
@@ -31,8 +31,6 @@ function Annual() {
 
       <section className="max-w-[900px] mx-auto mt-6">
         <div className="flex items-center mb-4 ml-6 justify-end">
-          <IoFunnelOutline size={30} className="text-gray-400 mr-2" />
-
           <Filter
             year={year}
             setYear={setYear}

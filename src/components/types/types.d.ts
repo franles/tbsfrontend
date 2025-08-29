@@ -58,11 +58,9 @@ export type CreateServiceTripData = {
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
 };
 export type UpdateServiceData = {
-  servicios: {
-    pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-    valor: number;
-    id?: number;
-  }[];
+  pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+  valor: number;
+  id?: number;
 };
 
 export type FinanceSummaryResponse = {
@@ -77,6 +75,8 @@ export type FinanceSummaryResponse = {
     }[];
   }[];
 };
+
+export type Resumen = FinanceSummaryResponse["resumen_financiero"];
 
 export type CreateTripData = {
   servicios: {
@@ -93,6 +93,11 @@ export type UpdateTripData = {
   valor_total?: number;
   destino?: "internacional" | "nacional";
   apellido?: string;
+  servicios: {
+    id: number;
+    valor: number;
+    pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+  }[];
 };
 
 export type User = {

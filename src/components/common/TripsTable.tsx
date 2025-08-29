@@ -35,47 +35,50 @@ export function TripsTable({
       renderRow={(trip) => (
         <tr
           key={trip.id}
-          className="capitalize border-b border-gray-200 hover:bg-gray-100"
+          className="capitalize border-b border-gray-200 hover:bg-gray-100 cursor-pointer text-center"
+          onClick={() => {
+            setIsOpen(true);
+            setTripId(trip.id);
+          }}
         >
-          <td className="p-2">{trip.id}</td>
-          <td className="p-2">{trip.apellido}</td>
-          <td className="p-2">
+          <td className="p-1">{trip.id}</td>
+          <td className="p-1">{trip.apellido}</td>
+          <td className="p-1">
             {new Date(trip.fecha).toLocaleDateString("es-AR")}
           </td>
-          <td className={`p-2 font-bold capitalize`}>
+          <td className={`p-1 font-bold capitalize`}>
             {renderEstado(trip.estado)}
           </td>
-          <td className="p-2">
-            <div className="flex items-center space-x-4 mr">
-              <button
-                className="text-blue-500 border-none rounded cursor-pointer hover:text-blue-700"
-                onClick={() => {
-                  setTripId(trip.id);
-                  setIsOpen(true);
-                }}
-                title="Ver"
-              >
-                <IoInformationCircle size={30} />
-              </button>
-              <button
-                className="text-red-600 border-none rounded cursor-pointer hover:text-red-700"
-                onClick={() => {
-                  toast.warning(
-                    `¿Estás seguro de que quieres eliminar el viaje ${trip.id}?`,
-                    {
-                      duration: 2200,
-                      action: {
-                        label: "Eliminar",
-                        onClick: () => handleDelete(trip.id),
-                      },
-                    }
-                  );
-                }}
-                title="Eliminar"
-              >
-                <IoCloseCircle size={30} />
-              </button>
-            </div>
+          <td className="p-1">
+            <button
+              className="text-blue-500 border-none rounded cursor-pointer hover:text-blue-700"
+              onClick={() => {
+                setTripId(trip.id);
+                setIsOpen(true);
+              }}
+              title="Ver"
+            >
+              <IoInformationCircle size={30} />
+            </button>
+            <button
+              className="text-red-600 border-none rounded cursor-pointer hover:text-red-700"
+              onClick={(e) => {
+                e.stopPropagation();
+                toast.warning(
+                  `¿Estás seguro de que quieres eliminar el viaje ${trip.id}?`,
+                  {
+                    duration: 2200,
+                    action: {
+                      label: "Eliminar",
+                      onClick: () => handleDelete(trip.id),
+                    },
+                  }
+                );
+              }}
+              title="Eliminar"
+            >
+              <IoCloseCircle size={30} />
+            </button>
           </td>
         </tr>
       )}

@@ -9,7 +9,7 @@ import { TripModal } from "../common/TripModal";
 import { Pagination } from "../common/Pagination";
 import { TripsTable } from "../common/TripsTable";
 import { Link } from "react-router-dom";
-import { IoAddCircle, IoFunnelOutline, IoSearch, IoListCircle} from "react-icons/io5";
+import { IoAddCircle, IoSearch, IoListCircle } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
 
@@ -65,8 +65,6 @@ function Home() {
             className="px-3 py-2 mr-3 rounded border border-gray-300 shadow-sm min-w-[200px] flex-grow"
           />
 
-          <IoFunnelOutline size={30} className="text-gray-400 mr-2 ml-6" />
-
           <Filter
             filter={filter}
             setFilter={setFilter}
@@ -75,7 +73,6 @@ function Home() {
             month={month}
             setMonth={setMonth}
           />
-
         </div>
 
         <TripsTable filteredTrips={filteredTrips} />
@@ -90,7 +87,7 @@ function Home() {
               Añadir reserva
             </button>
 
-            <Link to="/ResumenAnual">
+            <Link to="/finance">
               <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
                 <IoListCircle size={24} />
                 Resumen Anual

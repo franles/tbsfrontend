@@ -11,8 +11,9 @@ export const TripModal = () => {
   const { tripId, setTripId } = tripsStore();
   const { data: trip, isLoading } = useTrip(tripId!);
   const { setIsOpen, setIsEdit } = modalStore();
+  console.log(trip);
   return (
-    <div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-black">
+    <div className="bg-white rounded-2xl shadow-lg w-[720px] p-6 relative animate-fadeIn text-black">
       <BtnCloseModal
         onCLick={() => {
           setTripId(null);
@@ -47,22 +48,22 @@ export const TripModal = () => {
               </h1>
               <span className=" capitalize flex gap-1 font-semibold">
                 Apellido:{" "}
-                <p className="font-normal ml-3">{trip?.viaje.apellido}</p>
+                <p className="font-normal ml-2">{trip?.viaje.apellido}</p>
               </span>
               <span className="capitalize flex gap-1 font-semibold">
                 Destino:{" "}
-                <p className="font-normal ml-3">{trip?.viaje.destino}</p>
+                <p className="font-normal ml-2">{trip?.viaje.destino}</p>
               </span>
               <span className="flex gap-1 font-semibold">
                 Fecha creación:
-                <p className="font-normal ml-3">
+                <p className="font-normal ml-2">
                   {trip?.viaje.fecha &&
                     new Date(trip.viaje.fecha).toLocaleDateString()}
                 </p>
               </span>
               <span className="flex gap-1 font-semibold">
                 Estado:
-                <p className="font-normal ml-3">
+                <p className="font-normal ml-2">
                   {" "}
                   {trip?.viaje.estado && renderEstado(trip.viaje.estado)}
                 </p>
@@ -74,12 +75,11 @@ export const TripModal = () => {
                 Detalle económico:{" "}
               </h1>
               <span className="flex gap-1 font-semibold">
-                Moneda:{" "}
-                <p className="font-normal ml-3">${trip?.viaje.moneda}</p>
+                Moneda: <p className="font-normal ml-2">{trip?.viaje.moneda}</p>
               </span>
               <span className="flex gap-1 font-semibold">
                 Valor total:{" "}
-                <p className="font-normal ml-3">
+                <p className="font-normal ml-2">
                   $
                   {trip?.viaje.valor_total &&
                     formattedAmount(trip.viaje.valor_total)}
@@ -87,13 +87,13 @@ export const TripModal = () => {
               </span>
               <span className="flex gap-1 font-semibold">
                 Costo:{" "}
-                <p className="font-normal ml-3">
+                <p className="font-normal ml-2">
                   ${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}
                 </p>
               </span>
               <span className="flex gap-1 font-semibold">
                 Ganancia:{" "}
-                <p className="font-normal ml-3">
+                <p className="font-normal ml-2">
                   $
                   {trip?.viaje.ganancia && formattedAmount(trip.viaje.ganancia)}
                 </p>
@@ -114,15 +114,17 @@ export const TripModal = () => {
 
               {/* Servicios */}
               {trip?.viaje.servicios?.length ? (
-                <div className="flex flex-col gap-2 border-l-4 border-blue-400 px-1">
+                <div className="flex flex-col gap-2  ">
                   {trip.viaje.servicios.map((s) => (
                     <div
                       key={s.id}
-                      className="grid grid-cols-12 gap-2 items-center"
+                      className="grid grid-cols-12 gap-2 items-center border-l-4  px-1 border-blue-400"
                     >
-                      <span className="col-span-4">{s.nombre}</span>
-                      <span className="col-span-3">${s.valor}</span>
-                      <span className="col-span-4">
+                      <span className="col-span-4 capitalize">{s.nombre}</span>
+                      <span className="col-span-3">
+                        ${formattedAmount(s.valor)}
+                      </span>
+                      <span className="col-span-4 capitalize">
                         {s.pagado_por === "pendiente"
                           ? renderEstado(s.pagado_por)
                           : s.pagado_por}

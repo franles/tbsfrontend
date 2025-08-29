@@ -1,6 +1,7 @@
 import React from "react";
 import { Table } from "../layout/Table";
-import type { MesResumen } from "../types/types";
+import type { Resumen } from "../types/types";
+import { formattedAmount } from "../utils/utils";
 
 const headers = [
   { label: "Mes", key: "mes" },
@@ -10,11 +11,7 @@ const headers = [
   { label: "Ganancia", key: "ganancia" },
 ];
 
-export function FinanceTable({
-  financeData,
-}: {
-  financeData: MesResumen[] | undefined;
-}) {
+export function FinanceTable({ financeData }: { financeData: Resumen }) {
   return (
     <Table
       headers={headers}
@@ -23,25 +20,24 @@ export function FinanceTable({
         <React.Fragment key={item.mes_num}>
           {item.resumen.map((r, idx) => {
             const isFirst = idx === 0;
-            const isLast = idx === item.resumen.length - 1;
             return (
               <tr
                 key={`${item.mes_num}-${r.moneda}`}
-                className={`${isLast ? "border-b border-gray-200" : ""} hover:bg-gray-50`}
+                className={"border-b border-gray-200 text-center"}
               >
                 {isFirst && (
                   <td
                     rowSpan={item.resumen.length}
-                    className="p-3 align-middle font-medium"
+                    className="p-3 align-middle font-medium capitalize border-r"
                   >
                     {item.mes}
                   </td>
                 )}
 
                 <td className="p-1">{r.moneda}</td>
-                <td className="p-1">{r.ingreso}</td>
-                <td className="p-1">{r.egreso}</td>
-                <td className="p-1">{r.ganancia}</td>
+                <td className="p-1">${formattedAmount(Number(r.ingreso))}</td>
+                <td className="p-1">${formattedAmount(Number(r.egreso))}</td>
+                <td className="p-1">${formattedAmount(Number(r.ganancia))}</td>
               </tr>
             );
           })}
