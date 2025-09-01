@@ -65,7 +65,7 @@ export async function createTrip(
 
 export async function updateTrip(tripId: string, dataUpdated: UpdateTripData) {
   try {
-    const { data } = await api.put<UpdateDeleteTripResponse>(
+    const { data } = await api.patch<UpdateDeleteTripResponse>(
       `${API_ENDPOINT}/${tripId}`,
       dataUpdated
     );

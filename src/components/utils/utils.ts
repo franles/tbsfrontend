@@ -3,7 +3,7 @@ import type { User } from "../types/types";
 
 export function isTokenNearExpiry(
   token: string,
-  seconds: number = 30
+  seconds: number = 90
 ): boolean {
   try {
     const { exp } = jwtDecode<{ exp: number }>(token);

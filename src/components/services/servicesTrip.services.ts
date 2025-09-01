@@ -43,7 +43,7 @@ export async function updateServiceForTrip(
   dataUpdated: UpdateServiceData
 ) {
   try {
-    const { data } = await api.patch(
+    const { data } = await api.put(
       `${API_ENDPOINT}/${serviceId}/trip/${tripId}`,
       dataUpdated
     );
