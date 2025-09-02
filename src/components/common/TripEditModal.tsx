@@ -5,7 +5,7 @@ import { IoClose, IoCloseCircle } from "react-icons/io5";
 import { renderEstado } from "../utils/utilsTsx";
 import { useForm } from "@tanstack/react-form";
 import type { UpdateTripData } from "../types/types";
-import { IoIosAdd } from "react-icons/io";
+import { IoIosAdd, IoIosRemove } from "react-icons/io";
 
 import {
   useCreateService,
@@ -286,7 +286,11 @@ export const TripEditModal = () => {
                   ))}
 
                   {add && (
-                    <div className="flex items-center justify-between gap-3 border p-3 rounded-md">
+                    <div
+                      className={`flex items-center justify-between gap-3 border p-3 rounded-md ${
+                        add && "border-blue-500 shadow-sm"
+                      }`}
+                    >
                       <select
                         className="border p-2 rounded w-40 capitalize"
                         onChange={(e) => {
@@ -346,9 +350,9 @@ export const TripEditModal = () => {
                   <button
                     type="button"
                     className="border-blue-500 border-2  text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
-                    onClick={() => setAdd(true)}
+                    onClick={add ? () => setAdd(false) : () => setAdd(true)}
                   >
-                    <IoIosAdd size={27} />
+                    {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
                   </button>
                 </div>
               )}
