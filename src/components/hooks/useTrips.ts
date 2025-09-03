@@ -9,6 +9,7 @@ import {
 } from "../services/trips.services";
 import { toast } from "sonner";
 import type { UpdateTripData } from "../types/types";
+import { modalStore } from "../store/modalStore";
 
 export const useTrips = () => {
   const { filter, year, month, page } = tripsStore();
@@ -54,7 +55,7 @@ export const useCreateTrip = () => {
       });
     },
 
-    onError: (err, newTripData, context) => {
+    onError: (err, _, context) => {
       console.error("Error al crear el viaje", err);
 
       if (context?.previousTrips) {
@@ -81,6 +82,8 @@ export const useDeleteTrip = () => {
 
 export const useUpdateTrip = () => {
   const queryClient = useQueryClient();
+  const { setIsEdit, setIsOpen } = modalStore();
+  const { setTripId } = tripsStore();
 
   const { mutate: updateTripMutate } = useMutation({
     mutationFn: ({
@@ -94,6 +97,9 @@ export const useUpdateTrip = () => {
       toast.success("Reserva actualizada exitosamente");
       queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
+      setIsEdit(false);
+      setIsOpen(true);
+      setTripId(variables.tripId);
     },
   });
 

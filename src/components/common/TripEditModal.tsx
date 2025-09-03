@@ -8,7 +8,6 @@ import type { UpdateTripData } from "../types/types";
 import { IoIosAdd, IoIosRemove } from "react-icons/io";
 import { toast } from "sonner";
 
-
 import {
   useCreateService,
   useDeleteService,
@@ -62,15 +61,7 @@ export const TripEditModal = () => {
         servicios: serviciosActualizados,
       };
 
-      updateTripMutate(
-        { tripId: tripId!, dataUpdated },
-        {
-          onSuccess: () => {
-            setIsEdit(false);
-            setTripId(null);
-          },
-        }
-      );
+      updateTripMutate({ tripId: tripId!, dataUpdated });
     },
   });
   return (
@@ -174,9 +165,9 @@ export const TripEditModal = () => {
                       value={
                         field.state.value
                           ? new Intl.NumberFormat("es-AR", {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0,
-                          }).format(field.state.value)
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(field.state.value)
                           : ""
                       }
                       onChange={(e) => {
@@ -203,183 +194,198 @@ export const TripEditModal = () => {
           </div>
 
           <div className="border border-gray-300 rounded-xl p-4">
-  <h1 className="font-bold text-xl text-blue-600 mb-4">Servicios:</h1>
+            <h1 className="font-bold text-xl text-blue-600 mb-4">Servicios:</h1>
 
-  <form.Field name="servicios">
-    {(field) => (
-      <div className="flex flex-col gap-3 px-10">
-        {field.state.value?.map((s, index) => (
-          <div
-            key={s.id}
-            className="flex items-center justify-between gap-3 border p-3 rounded-md"
-          >
-            <div className="capitalize w-40 font-semibold">
-              {services?.servicios.find((service) => service.id === s.id)?.nombre}
-            </div>
+            <form.Field name="servicios">
+              {(field) => (
+                <div className="flex flex-col gap-3 px-10">
+                  {field.state.value?.map((s, index) => (
+                    <div
+                      key={s.id}
+                      className="flex items-center justify-between gap-3 border p-3 rounded-md"
+                    >
+                      <div className="capitalize w-40 font-semibold">
+                        {
+                          services?.servicios.find(
+                            (service) => service.id === s.id
+                          )?.nombre
+                        }
+                      </div>
 
-            <div className="flex items-center gap-1">
-              <span className="text-xl font-semibold">$</span>
-              <input
-                type="text"
-                className="border py-2 px-4 rounded w-32"
-                value={
-                  s.valor
-                    ? new Intl.NumberFormat("es-AR", {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      }).format(s.valor)
-                    : ""
-                }
-                onChange={(e) => {
-                  const newServicios = [...field.state.value];
-                  const soloNumeros = e.target.value.replace(/\D/g, "");
-                  newServicios[index] = { ...s, valor: Number(soloNumeros) };
-                  field.handleChange(newServicios);
-                }}
-              />
-            </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xl font-semibold">$</span>
+                        <input
+                          type="text"
+                          className="border py-2 px-4 rounded w-32"
+                          value={
+                            s.valor
+                              ? new Intl.NumberFormat("es-AR", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(s.valor)
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const newServicios = [...field.state.value];
+                            const soloNumeros = e.target.value.replace(
+                              /\D/g,
+                              ""
+                            );
+                            newServicios[index] = {
+                              ...s,
+                              valor: Number(soloNumeros),
+                            };
+                            field.handleChange(newServicios);
+                          }}
+                        />
+                      </div>
 
-            <select
-              className="border p-2 rounded"
-              value={s.pagado_por}
-              onChange={(e) => {
-                const newServicios = [...field.state.value];
-                newServicios[index] = {
-                  ...s,
-                  pagado_por: e.target.value as
-                    | "pendiente"
-                    | "pablo"
-                    | "soledad"
-                    | "mariana",
-                };
-                field.handleChange(newServicios);
-              }}
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="mariana">Mariana</option>
-              <option value="pablo">Pablo</option>
-              <option value="soledad">Soledad</option>
-            </select>
+                      <select
+                        className="border p-2 rounded"
+                        value={s.pagado_por}
+                        onChange={(e) => {
+                          const newServicios = [...field.state.value];
+                          newServicios[index] = {
+                            ...s,
+                            pagado_por: e.target.value as
+                              | "pendiente"
+                              | "pablo"
+                              | "soledad"
+                              | "mariana",
+                          };
+                          field.handleChange(newServicios);
+                        }}
+                      >
+                        <option value="pendiente">Pendiente</option>
+                        <option value="mariana">Mariana</option>
+                        <option value="pablo">Pablo</option>
+                        <option value="soledad">Soledad</option>
+                      </select>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                const nombreServicio = services?.servicios.find(
-                  (service) => service.id === s.id
-                )?.nombre;
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const nombreServicio = services?.servicios.find(
+                            (service) => service.id === s.id
+                          )?.nombre;
 
-                toast.warning(
-                  `¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`,
-                  {
-                    duration: 2200,
-                    action: {
-                      label: "Eliminar",
-                      onClick: () => {
-                        deleteServiceMutate({
-                          serviceId: s.id,
-                          tripId: trip!.viaje.id,
-                        });
+                          toast.warning(
+                            `¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`,
+                            {
+                              duration: 2200,
+                              action: {
+                                label: "Eliminar",
+                                onClick: () => {
+                                  deleteServiceMutate({
+                                    serviceId: s.id,
+                                    tripId: trip!.viaje.id,
+                                  });
 
-                        const newServicios = field.state.value.filter(
-                          (serv) => serv.id !== s.id
-                        );
-                        field.handleChange(newServicios);
-                      },
-                    },
-                  }
-                );
-              }}
-              className="text-red-500 rounded-full hover:text-red-600"
-            >
-              <IoCloseCircle size={30} />
-            </button>
-          </div>
-        ))}
-
-        {add &&
-          services?.servicios.some(
-            (s) => !field.state.value?.some((fs) => fs.id === s.id)
-          ) && (
-            <div className="flex items-center justify-between gap-3 border p-3 rounded-md border-blue-500 shadow-sm">
-              <select
-                className="border p-2 rounded w-40 capitalize"
-                onChange={(e) => {
-                  const serviceId = Number(e.target.value);
-                  if (!serviceId) return;
-
-                  const serviceToAdd = services?.servicios.find(
-                    (s) => s.id === serviceId
-                  );
-                  if (!serviceToAdd) return;
-
-                  // Actualizamos el form para mostrarlo inmediatamente
-                  field.handleChange([
-                    ...(field.state.value ?? []),
-                    {
-                      id: serviceToAdd.id,
-                      valor: 0,
-                      pagado_por: "pendiente",
-                    },
-                  ]);
-
-                  // Llamamos al mutate para guardarlo en la base
-                  createServiceMutate({
-                    viaje_id: tripId!,
-                    valor: 0,
-                    servicio_id: serviceToAdd.id,
-                    pagado_por: "pendiente",
-                  });
-
-                  setAdd(false);
-                }}
-              >
-                <option value="">Agregar servicio...</option>
-                {services?.servicios
-                  .filter(
-                    (s) => !field.state.value?.some((fs) => fs.id === s.id)
-                  )
-                  .map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.nombre}
-                    </option>
+                                  const newServicios = field.state.value.filter(
+                                    (serv) => serv.id !== s.id
+                                  );
+                                  field.handleChange(newServicios);
+                                },
+                              },
+                            }
+                          );
+                        }}
+                        className="text-red-500 rounded-full hover:text-red-600"
+                      >
+                        <IoCloseCircle size={30} />
+                      </button>
+                    </div>
                   ))}
-              </select>
 
-              <div className="flex items-center gap-1">
-                <span className="text-xl font-semibold">$</span>
-                <input type="text" className="border py-2 px-4 rounded w-32" disabled />
-              </div>
+                  {add &&
+                    services?.servicios.some(
+                      (s) => !field.state.value?.some((fs) => fs.id === s.id)
+                    ) && (
+                      <div className="flex items-center justify-between gap-3 border p-3 rounded-md border-blue-500 shadow-sm">
+                        <select
+                          className="border p-2 rounded w-40 capitalize"
+                          onChange={(e) => {
+                            const serviceId = Number(e.target.value);
+                            if (!serviceId) return;
 
-              <select className="border p-2 rounded" disabled>
-                <option>Pendiente</option>
-              </select>
+                            const serviceToAdd = services?.servicios.find(
+                              (s) => s.id === serviceId
+                            );
+                            if (!serviceToAdd) return;
 
-              <button
-                type="button"
-                onClick={() => setAdd(false)}
-                className="text-red-500 rounded-full hover:text-red-600"
-              >
-                <IoCloseCircle size={30} />
-              </button>
-            </div>
-          )}
+                            // Actualizamos el form para mostrarlo inmediatamente
+                            field.handleChange([
+                              ...(field.state.value ?? []),
+                              {
+                                id: serviceToAdd.id,
+                                valor: 0,
+                                pagado_por: "pendiente",
+                              },
+                            ]);
 
-        {services?.servicios.some(
-          (s) => !field.state.value?.some((fs) => fs.id === s.id)
-        ) && (
-          <button
-            type="button"
-            className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
-            onClick={add ? () => setAdd(false) : () => setAdd(true)}
-          >
-            {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
-          </button>
-        )}
-      </div>
-    )}
-  </form.Field>
-</div>
+                            // Llamamos al mutate para guardarlo en la base
+                            createServiceMutate({
+                              viaje_id: tripId!,
+                              valor: 0,
+                              servicio_id: serviceToAdd.id,
+                              pagado_por: "pendiente",
+                            });
+
+                            setAdd(false);
+                          }}
+                        >
+                          <option value="">Agregar servicio...</option>
+                          {services?.servicios
+                            .filter(
+                              (s) =>
+                                !field.state.value?.some((fs) => fs.id === s.id)
+                            )
+                            .map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.nombre}
+                              </option>
+                            ))}
+                        </select>
+
+                        <div className="flex items-center gap-1">
+                          <span className="text-xl font-semibold">$</span>
+                          <input
+                            type="text"
+                            className="border py-2 px-4 rounded w-32"
+                            disabled
+                          />
+                        </div>
+
+                        <select className="border p-2 rounded" disabled>
+                          <option>Pendiente</option>
+                        </select>
+
+                        <button
+                          type="button"
+                          onClick={() => setAdd(false)}
+                          className="text-red-500 rounded-full hover:text-red-600"
+                        >
+                          <IoCloseCircle size={30} />
+                        </button>
+                      </div>
+                    )}
+
+                  {services?.servicios.some(
+                    (s) => !field.state.value?.some((fs) => fs.id === s.id)
+                  ) && (
+                    <button
+                      type="button"
+                      className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
+                      onClick={add ? () => setAdd(false) : () => setAdd(true)}
+                    >
+                      {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
+                    </button>
+                  )}
+                </div>
+              )}
+            </form.Field>
+          </div>
 
           <button
             type="submit"
@@ -387,7 +393,6 @@ export const TripEditModal = () => {
           >
             Actualizar
           </button>
-
         </form>
       </section>
     </div>
