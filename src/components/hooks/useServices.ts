@@ -42,7 +42,7 @@ export const useDeleteService = () => {
       queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
 
-      toast.success("Servicio eliminado del viaje");
+      toast.success("Servicio eliminado correctamente");
     },
   });
 
@@ -58,7 +58,9 @@ export const useCreateService = () => {
       queryClient.invalidateQueries({ queryKey: ["trip", variables.viaje_id] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
 
-      toast.success("Servicio agregado al viaje");
+      
+
+      toast.success("Servicio añadido correctamente");
     },
   });
 

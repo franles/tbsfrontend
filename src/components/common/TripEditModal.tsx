@@ -6,6 +6,8 @@ import { renderEstado } from "../utils/utilsTsx";
 import { useForm } from "@tanstack/react-form";
 import type { UpdateTripData } from "../types/types";
 import { IoIosAdd, IoIosRemove } from "react-icons/io";
+import { toast } from "sonner";
+
 
 import {
   useCreateService,
@@ -60,7 +62,15 @@ export const TripEditModal = () => {
         servicios: serviciosActualizados,
       };
 
-      updateTripMutate({ tripId: tripId!, dataUpdated });
+      updateTripMutate(
+        { tripId: tripId!, dataUpdated },
+        {
+          onSuccess: () => {
+            setIsEdit(false);
+            setTripId(null);
+          },
+        }
+      );
     },
   });
   return (
@@ -164,9 +174,9 @@ export const TripEditModal = () => {
                       value={
                         field.state.value
                           ? new Intl.NumberFormat("es-AR", {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            }).format(field.state.value)
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }).format(field.state.value)
                           : ""
                       }
                       onChange={(e) => {
@@ -193,181 +203,191 @@ export const TripEditModal = () => {
           </div>
 
           <div className="border border-gray-300 rounded-xl p-4">
-            <h1 className="font-bold text-xl text-blue-600 mb-4">Servicios:</h1>
+  <h1 className="font-bold text-xl text-blue-600 mb-4">Servicios:</h1>
 
-            <form.Field name="servicios">
-              {(field) => (
-                <div className="flex flex-col gap-3 px-10">
-                  {field.state.value?.map((s, index) => (
-                    <div
-                      key={s.id}
-                      className="flex items-center justify-between gap-3 border p-3 rounded-md"
-                    >
-                      <div className="capitalize w-40 font-semibold">
-                        {services?.servicios.map(
-                          (service) =>
-                            service.id === s.id && <p>{service.nombre}</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xl font-semibold">$</span>
-                        <input
-                          type="text"
-                          className="border py-2 px-4 rounded w-32"
-                          value={
-                            s.valor
-                              ? new Intl.NumberFormat("es-AR", {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                }).format(s.valor)
-                              : ""
-                          }
-                          onChange={(e) => {
-                            const newServicios = [...field.state.value];
-                            const soloNumeros = e.target.value.replace(
-                              /\D/g,
-                              ""
-                            );
+  <form.Field name="servicios">
+    {(field) => (
+      <div className="flex flex-col gap-3 px-10">
+        {field.state.value?.map((s, index) => (
+          <div
+            key={s.id}
+            className="flex items-center justify-between gap-3 border p-3 rounded-md"
+          >
+            <div className="capitalize w-40 font-semibold">
+              {services?.servicios.find((service) => service.id === s.id)?.nombre}
+            </div>
 
-                            newServicios[index] = {
-                              ...s,
-                              valor: Number(soloNumeros),
-                            };
+            <div className="flex items-center gap-1">
+              <span className="text-xl font-semibold">$</span>
+              <input
+                type="text"
+                className="border py-2 px-4 rounded w-32"
+                value={
+                  s.valor
+                    ? new Intl.NumberFormat("es-AR", {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      }).format(s.valor)
+                    : ""
+                }
+                onChange={(e) => {
+                  const newServicios = [...field.state.value];
+                  const soloNumeros = e.target.value.replace(/\D/g, "");
+                  newServicios[index] = { ...s, valor: Number(soloNumeros) };
+                  field.handleChange(newServicios);
+                }}
+              />
+            </div>
 
-                            field.handleChange(newServicios);
-                          }}
-                        />
-                      </div>
+            <select
+              className="border p-2 rounded"
+              value={s.pagado_por}
+              onChange={(e) => {
+                const newServicios = [...field.state.value];
+                newServicios[index] = {
+                  ...s,
+                  pagado_por: e.target.value as
+                    | "pendiente"
+                    | "pablo"
+                    | "soledad"
+                    | "mariana",
+                };
+                field.handleChange(newServicios);
+              }}
+            >
+              <option value="pendiente">Pendiente</option>
+              <option value="mariana">Mariana</option>
+              <option value="pablo">Pablo</option>
+              <option value="soledad">Soledad</option>
+            </select>
 
-                      <select
-                        className="border p-2 rounded "
-                        value={s.pagado_por}
-                        onChange={(e) => {
-                          const newServicios = [...field.state.value];
-                          newServicios[index] = {
-                            ...s,
-                            pagado_por: e.target.value as
-                              | "pendiente"
-                              | "pablo"
-                              | "soledad"
-                              | "mariana",
-                          };
-                          field.handleChange(newServicios);
-                        }}
-                      >
-                        <option value="pendiente">Pendiente</option>
-                        <option value="mariana">Mariana</option>
-                        <option value="pablo">Pablo</option>
-                        <option value="soledad">Soledad</option>
-                      </select>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                const nombreServicio = services?.servicios.find(
+                  (service) => service.id === s.id
+                )?.nombre;
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          deleteServiceMutate({
-                            serviceId: s.id,
-                            tripId: trip!.viaje.id,
-                          });
-                          const newServicios = field.state.value.filter(
-                            (serv) => serv.id !== s.id
-                          );
-                          field.handleChange(newServicios);
-                        }}
-                        className="text-red-500  rounded-full hover:text-red-600"
-                      >
-                        <IoCloseCircle size={30} />
-                      </button>
-                    </div>
-                  ))}
+                toast.warning(
+                  `¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`,
+                  {
+                    duration: 2200,
+                    action: {
+                      label: "Eliminar",
+                      onClick: () => {
+                        deleteServiceMutate({
+                          serviceId: s.id,
+                          tripId: trip!.viaje.id,
+                        });
 
-                  {add &&
-                    services?.servicios.some(
-                      (s) => !field.state.value?.some((fs) => fs.id === s.id)
-                    ) && (
-                      <div
-                        className={`flex items-center justify-between gap-3 border p-3 rounded-md ${
-                          add && "border-blue-500 shadow-sm"
-                        }`}
-                      >
-                        <select
-                          className="border p-2 rounded w-40 capitalize"
-                          onChange={(e) => {
-                            const serviceId = Number(e.target.value);
-                            if (!serviceId) return;
-
-                            const serviceToAdd = services?.servicios.find(
-                              (s) => s.id === serviceId
-                            );
-                            if (!serviceToAdd) return;
-
-                            createServiceMutate({
-                              viaje_id: tripId!,
-                              valor: 0,
-                              servicio_id: serviceToAdd.id,
-                              pagado_por: "pendiente",
-                            });
-
-                            setAdd(false);
-                          }}
-                        >
-                          <option value="">Agregar servicio...</option>
-                          {services?.servicios
-                            .filter(
-                              (s) =>
-                                !field.state.value?.some((fs) => fs.id === s.id)
-                            )
-                            .map((s) => (
-                              <option key={s.id} value={s.id}>
-                                {s.nombre}
-                              </option>
-                            ))}
-                        </select>
-
-                        <div className="flex items-center gap-1">
-                          <span className="text-xl font-semibold">$</span>
-                          <input
-                            type="text"
-                            className="border py-2 px-4 rounded w-32"
-                            value=""
-                            disabled
-                          />
-                        </div>
-
-                        <select className="border p-2 rounded" disabled>
-                          <option>Pendiente</option>
-                        </select>
-
-                        <button
-                          type="button"
-                          onClick={() => setAdd(false)}
-                          className="text-red-500 rounded-full hover:text-red-600"
-                        >
-                          <IoCloseCircle size={30} />
-                        </button>
-                      </div>
-                    )}
-
-                  {services?.servicios.some(
-                    (s) => !field.state.value?.some((fs) => fs.id === s.id)
-                  ) && (
-                    <button
-                      type="button"
-                      className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
-                      onClick={add ? () => setAdd(false) : () => setAdd(true)}
-                    >
-                      {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
-                    </button>
-                  )}
-                </div>
-              )}
-            </form.Field>
+                        const newServicios = field.state.value.filter(
+                          (serv) => serv.id !== s.id
+                        );
+                        field.handleChange(newServicios);
+                      },
+                    },
+                  }
+                );
+              }}
+              className="text-red-500 rounded-full hover:text-red-600"
+            >
+              <IoCloseCircle size={30} />
+            </button>
           </div>
+        ))}
+
+        {add &&
+          services?.servicios.some(
+            (s) => !field.state.value?.some((fs) => fs.id === s.id)
+          ) && (
+            <div className="flex items-center justify-between gap-3 border p-3 rounded-md border-blue-500 shadow-sm">
+              <select
+                className="border p-2 rounded w-40 capitalize"
+                onChange={(e) => {
+                  const serviceId = Number(e.target.value);
+                  if (!serviceId) return;
+
+                  const serviceToAdd = services?.servicios.find(
+                    (s) => s.id === serviceId
+                  );
+                  if (!serviceToAdd) return;
+
+                  // Actualizamos el form para mostrarlo inmediatamente
+                  field.handleChange([
+                    ...(field.state.value ?? []),
+                    {
+                      id: serviceToAdd.id,
+                      valor: 0,
+                      pagado_por: "pendiente",
+                    },
+                  ]);
+
+                  // Llamamos al mutate para guardarlo en la base
+                  createServiceMutate({
+                    viaje_id: tripId!,
+                    valor: 0,
+                    servicio_id: serviceToAdd.id,
+                    pagado_por: "pendiente",
+                  });
+
+                  setAdd(false);
+                }}
+              >
+                <option value="">Agregar servicio...</option>
+                {services?.servicios
+                  .filter(
+                    (s) => !field.state.value?.some((fs) => fs.id === s.id)
+                  )
+                  .map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.nombre}
+                    </option>
+                  ))}
+              </select>
+
+              <div className="flex items-center gap-1">
+                <span className="text-xl font-semibold">$</span>
+                <input type="text" className="border py-2 px-4 rounded w-32" disabled />
+              </div>
+
+              <select className="border p-2 rounded" disabled>
+                <option>Pendiente</option>
+              </select>
+
+              <button
+                type="button"
+                onClick={() => setAdd(false)}
+                className="text-red-500 rounded-full hover:text-red-600"
+              >
+                <IoCloseCircle size={30} />
+              </button>
+            </div>
+          )}
+
+        {services?.servicios.some(
+          (s) => !field.state.value?.some((fs) => fs.id === s.id)
+        ) && (
+          <button
+            type="button"
+            className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
+            onClick={add ? () => setAdd(false) : () => setAdd(true)}
+          >
+            {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
+          </button>
+        )}
+      </div>
+    )}
+  </form.Field>
+</div>
+
           <button
             type="submit"
             className="w-1/4 self-center py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Actualizar
           </button>
+
         </form>
       </section>
     </div>

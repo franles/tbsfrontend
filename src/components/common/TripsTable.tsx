@@ -65,7 +65,7 @@ export function TripsTable({
               onClick={(e) => {
                 e.stopPropagation();
                 toast.warning(
-                  `¿Estás seguro de que quieres eliminar el viaje ${trip.id}?`,
+                  `¿Estás seguro de que quieres eliminar el viaje "${trip.id}"?`,
                   {
                     duration: 2200,
                     action: {

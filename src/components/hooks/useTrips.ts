@@ -48,7 +48,7 @@ export const useCreateTrip = () => {
     },
 
     onSuccess: () => {
-      toast.success("Viaje creado exitosamente");
+      toast.success("Reserva añadida correctamente");
       queryClient.invalidateQueries({
         queryKey: ["trips"],
       });
@@ -73,7 +73,7 @@ export const useDeleteTrip = () => {
   return useMutation({
     mutationFn: deleteTrip,
     onSuccess: () => {
-      toast.success("Viaje eliminado exitosamente");
+      toast.success("Reserva elmininada correctamente");
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
   });
@@ -91,7 +91,7 @@ export const useUpdateTrip = () => {
       dataUpdated: UpdateTripData;
     }) => updateTrip(tripId, dataUpdated),
     onSuccess: (_, variables) => {
-      toast.success("Viaje actualizado exitosamente");
+      toast.success("Reserva actualizada exitosamente");
       queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
