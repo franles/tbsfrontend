@@ -40,6 +40,8 @@ export const useDeleteService = () => {
     }) => deleteServiceForTrip(serviceId, tripId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+
       toast.success("Servicio eliminado del viaje");
     },
   });
@@ -54,6 +56,8 @@ export const useCreateService = () => {
       createServiceForTrip(serviceData),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trip", variables.viaje_id] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+
       toast.success("Servicio agregado al viaje");
     },
   });
@@ -76,6 +80,8 @@ export const useUpdateService = () => {
     }) => updateServiceForTrip(serviceId, tripId, dataUpdated),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+
       toast.success("Servicio actualizado exitosamente");
     },
   });

@@ -134,15 +134,10 @@ export const TripEditModal = () => {
                   Fecha creación
                 </label>
 
-                <input
-                  type="date"
-                  className="w-1/2 border rounded px-3 py-2 bg-gray-100 text-gray-600 cursor-not-allowed"
-                  value={
-                    trip?.viaje.fecha &&
-                    new Date(trip.viaje.fecha).toISOString().split("T")[0]
-                  }
-                  disabled
-                />
+                <p>
+                  {trip?.viaje.fecha &&
+                    new Date(trip.viaje.fecha).toLocaleDateString()}
+                </p>
               </div>
               <div>
                 <label className="block font-semibold mb-1">Estado</label>
@@ -285,75 +280,84 @@ export const TripEditModal = () => {
                     </div>
                   ))}
 
-                  {add && (
-                    <div
-                      className={`flex items-center justify-between gap-3 border p-3 rounded-md ${
-                        add && "border-blue-500 shadow-sm"
-                      }`}
-                    >
-                      <select
-                        className="border p-2 rounded w-40 capitalize"
-                        onChange={(e) => {
-                          const serviceId = Number(e.target.value);
-                          if (!serviceId) return;
-
-                          const serviceToAdd = services?.servicios.find(
-                            (s) => s.id === serviceId
-                          );
-                          if (!serviceToAdd) return;
-
-                          createServiceMutate({
-                            viaje_id: tripId!,
-                            valor: 0,
-                            servicio_id: serviceToAdd.id,
-                            pagado_por: "pendiente",
-                          });
-                          setAdd(false);
-                        }}
+                  {add &&
+                    services?.servicios.some(
+                      (s) => !field.state.value?.some((fs) => fs.id === s.id)
+                    ) && (
+                      <div
+                        className={`flex items-center justify-between gap-3 border p-3 rounded-md ${
+                          add && "border-blue-500 shadow-sm"
+                        }`}
                       >
-                        <option value="">Agregar servicio...</option>
-                        {services?.servicios
-                          .filter(
-                            (s) =>
-                              !field.state.value?.some((fs) => fs.id === s.id)
-                          )
-                          .map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.nombre}
-                            </option>
-                          ))}
-                      </select>
+                        <select
+                          className="border p-2 rounded w-40 capitalize"
+                          onChange={(e) => {
+                            const serviceId = Number(e.target.value);
+                            if (!serviceId) return;
 
-                      <div className="flex items-center gap-1">
-                        <span className="text-xl font-semibold">$</span>
-                        <input
-                          type="text"
-                          className="border py-2 px-4 rounded w-32"
-                          value=""
-                          disabled
-                        />
+                            const serviceToAdd = services?.servicios.find(
+                              (s) => s.id === serviceId
+                            );
+                            if (!serviceToAdd) return;
+
+                            createServiceMutate({
+                              viaje_id: tripId!,
+                              valor: 0,
+                              servicio_id: serviceToAdd.id,
+                              pagado_por: "pendiente",
+                            });
+
+                            setAdd(false);
+                          }}
+                        >
+                          <option value="">Agregar servicio...</option>
+                          {services?.servicios
+                            .filter(
+                              (s) =>
+                                !field.state.value?.some((fs) => fs.id === s.id)
+                            )
+                            .map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.nombre}
+                              </option>
+                            ))}
+                        </select>
+
+                        <div className="flex items-center gap-1">
+                          <span className="text-xl font-semibold">$</span>
+                          <input
+                            type="text"
+                            className="border py-2 px-4 rounded w-32"
+                            value=""
+                            disabled
+                          />
+                        </div>
+
+                        <select className="border p-2 rounded" disabled>
+                          <option>Pendiente</option>
+                        </select>
+
+                        <button
+                          type="button"
+                          onClick={() => setAdd(false)}
+                          className="text-red-500 rounded-full hover:text-red-600"
+                        >
+                          <IoCloseCircle size={30} />
+                        </button>
                       </div>
+                    )}
 
-                      <select className="border p-2 rounded" disabled>
-                        <option>Pendiente</option>
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => setAdd(false)}
-                        className="text-red-500  rounded-full hover:text-red-600"
-                      >
-                        <IoCloseCircle size={30} />
-                      </button>
-                    </div>
+                  {services?.servicios.some(
+                    (s) => !field.state.value?.some((fs) => fs.id === s.id)
+                  ) && (
+                    <button
+                      type="button"
+                      className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
+                      onClick={add ? () => setAdd(false) : () => setAdd(true)}
+                    >
+                      {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
+                    </button>
                   )}
-
-                  <button
-                    type="button"
-                    className="border-blue-500 border-2  text-blue-500 self-center flex items-center rounded-full hover:bg-blue-50 transition"
-                    onClick={add ? () => setAdd(false) : () => setAdd(true)}
-                  >
-                    {add ? <IoIosRemove size={27} /> : <IoIosAdd size={27} />}
-                  </button>
                 </div>
               )}
             </form.Field>

@@ -114,7 +114,7 @@ export const TripModal = () => {
 
               {/* Servicios */}
               {trip?.viaje.servicios?.length ? (
-                <div className="flex flex-col gap-2  ">
+                <div className="flex flex-col gap-3  ">
                   {trip.viaje.servicios.map((s) => (
                     <div
                       key={s.id}
