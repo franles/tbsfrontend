@@ -29,6 +29,7 @@ export function TripsTable({
     trip(id);
   };
   return (
+    <div className="select-none">
     <Table
       headers={headers}
       data={filteredTrips || []}
@@ -83,5 +84,6 @@ export function TripsTable({
         </tr>
       )}
     />
+    </div>
   );
 }

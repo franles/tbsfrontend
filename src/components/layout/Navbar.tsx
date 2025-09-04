@@ -63,19 +63,19 @@ function Navbar() {
   return (
     <nav className="w-full py-2 px-6 fixed top-0 left-0 z-50 backdrop-blur-sm bg-white/20 shadow-md flex items-center justify-between rounded-none">
       {/* Usuario */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 select-none">
         {user?.avatar ? (
           <img className="rounded-full w-10" src={user.avatar} />
         ) : (
           <IoExitOutline size={30} color="white" />
         )}
-        <span className="text-sm font-semibold text-white drop-shadow-sm capitalize">
+        <span className="text-sm font-semibold text-white drop-shadow-sm capitalize select-none">
           Hola, {user?.nombre}!
         </span>
       </div>
 
       {/* Logo y Chat Icon */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center select-none">
         <img
           src="https://res.cloudinary.com/dttpgbmdx/image/upload/v1752706284/tbs-logo_frbbyo.png"
           alt="Logo TBS"
@@ -93,8 +93,7 @@ function Navbar() {
         )}
       </div>
 
-      {/* Menús */}
-      <div className="flex items-center gap-3 relative">
+      <div className="flex items-center gap-3 relative select-none">
         <div className="relative">
           <button
             onClick={() => setOpenMenu(!openMenu)}
@@ -108,7 +107,7 @@ function Navbar() {
               <button
                 onClick={() => {
                   navigate("/home");
-                  setOpenMenu(false); // cierra el menú
+                  setOpenMenu(false); 
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"
               >
@@ -117,7 +116,7 @@ function Navbar() {
               <button
                 onClick={() => {
                   navigate("/finance");
-                  setOpenMenu(false); // cierra el menú
+                  setOpenMenu(false); 
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"
               >
@@ -129,7 +128,7 @@ function Navbar() {
 
         <button
           onClick={handleLogoutClick}
-          className="flex items-center gap-1 bg-red-600/80 hover:bg-red-700/80 text-white text-sm px-4 py-2 rounded-md shadow-sm transition-all duration-200 backdrop-blur-sm font-medium"
+          className="flex items-center gap-1 bg-red-600/80 hover:bg-red-700/80 text-white text-sm px-4 py-2 rounded-md shadow-sm transition-all duration-200 backdrop-blur-sm font-medium select-none"
         >
           <MdLogout size={21} />
           Cerrar sesión

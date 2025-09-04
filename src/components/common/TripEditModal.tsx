@@ -80,7 +80,7 @@ export const TripEditModal = () => {
       </button>
 
       <section className="flex flex-col items-center gap-10 w-full">
-        <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2">
+        <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2 select-none">
           MODIFICAR LEGAJO Nº{" "}
           <span className="underline">{trip?.viaje.id}</span>
         </h1>
@@ -94,7 +94,7 @@ export const TripEditModal = () => {
         >
           <div className="flex gap-10">
             <div className="border border-gray-300 rounded-xl p-4 w-full">
-              <h1 className="font-bold text-xl text-blue-600 mb-3">
+              <h1 className="font-bold text-xl text-blue-600 mb-3 select-none">
                 Información:
               </h1>
               <form.Field name="apellido">
@@ -113,7 +113,7 @@ export const TripEditModal = () => {
               <form.Field name="destino">
                 {(field) => (
                   <div className="mb-3">
-                    <label className="block font-semibold mb-1">Destino:</label>
+                    <label className="block font-semibold mb-1 select-none">Destino:</label>
                     <select
                       onChange={(e) =>
                         field.handleChange(
@@ -131,7 +131,7 @@ export const TripEditModal = () => {
               </form.Field>
 
               <div className="mb-3">
-                <label className="block font-semibold mb-1">
+                <label className="block font-semibold mb-1 select-none">
                   Fecha creación
                 </label>
 
@@ -141,23 +141,23 @@ export const TripEditModal = () => {
                 </p>
               </div>
               <div>
-                <label className="block font-semibold mb-1">Estado</label>
+                <label className="block font-semibold mb-1 select-none">Estado</label>
                 <p>{trip?.viaje.estado && renderEstado(trip.viaje.estado)}</p>
               </div>
             </div>
 
             <div className="border border-gray-300 rounded-xl p-4 w-full">
-              <h1 className="font-bold text-xl text-blue-600 mb-3">
+              <h1 className="font-bold text-xl text-blue-600 mb-3 select-none">
                 Detalle económico:
               </h1>
               <div className="mb-3">
-                <label className="block font-semibold mb-1">Moneda</label>
+                <label className="block font-semibold mb-1 select-none">Moneda</label>
                 <p>{trip?.viaje.moneda}</p>
               </div>
               <form.Field name="valor_total">
                 {(field) => (
                   <div className="mb-3">
-                    <label className="block font-semibold mb-1">
+                    <label className="block font-semibold mb-1 select-none">
                       Valor total
                     </label>
                     <input
@@ -180,11 +180,11 @@ export const TripEditModal = () => {
                 )}
               </form.Field>
               <div className="mb-3">
-                <label className="block font-semibold mb-1">Costo</label>
+                <label className="block font-semibold mb-1 select-none">Costo</label>
                 <p>${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}</p>
               </div>
               <div>
-                <label className="block font-semibold mb-1">Ganancia</label>
+                <label className="block font-semibold mb-1 select-none">Ganancia</label>
                 <p>
                   $
                   {trip?.viaje.ganancia && formattedAmount(trip.viaje.ganancia)}
@@ -194,7 +194,7 @@ export const TripEditModal = () => {
           </div>
 
           <div className="border border-gray-300 rounded-xl p-4">
-            <h1 className="font-bold text-xl text-blue-600 mb-4">Servicios:</h1>
+            <h1 className="font-bold text-xl text-blue-600 mb-4 select-none">Servicios:</h1>
 
             <form.Field name="servicios">
               {(field) => (
@@ -202,7 +202,7 @@ export const TripEditModal = () => {
                   {field.state.value?.map((s, index) => (
                     <div
                       key={s.id}
-                      className="flex items-center justify-between gap-3 border p-3 rounded-md"
+                      className="flex items-center justify-between gap-3 border p-3 rounded-md select-none"
                     >
                       <div className="capitalize w-40 font-semibold">
                         {
@@ -389,7 +389,7 @@ export const TripEditModal = () => {
 
           <button
             type="submit"
-            className="w-1/4 self-center py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="w-1/4 self-center py-2 bg-blue-600 text-white rounded hover:bg-blue-700 select-none"
           >
             Actualizar
           </button>

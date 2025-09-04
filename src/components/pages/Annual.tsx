@@ -23,14 +23,14 @@ function Annual() {
           }}
         ></div>
         <div className="relative z-20 h-full flex items-center justify-center">
-          <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10">
+          <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10 select-none">
             Resumen Anual
           </h1>
         </div>
       </div>
 
-      <section className="max-w-[900px] mx-auto mt-6">
-        <div className="flex items-center mb-4 ml-6 justify-end">
+      <section className="max-w-[900px] mx-auto mt-6 select-none">
+        <div className="flex items-center mb-4 ml-6 justify-end select-none">
           <Filter
             year={year}
             setYear={setYear}
@@ -53,7 +53,7 @@ function Annual() {
 
         <div className="flex justify-center mt-10">
           <Link to="/home">
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow select-none">
               <IoArrowBackCircle size={24} />
               Volver
             </button>

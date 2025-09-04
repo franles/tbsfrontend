@@ -13,6 +13,7 @@ const headers = [
 
 export function FinanceTable({ financeData }: { financeData: Resumen }) {
   return (
+    <div className="select-none">
     <Table
       headers={headers}
       data={financeData || []}
@@ -44,5 +45,6 @@ export function FinanceTable({ financeData }: { financeData: Resumen }) {
         </React.Fragment>
       )}
     />
+    </div>
   );
 }

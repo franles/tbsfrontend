@@ -39,9 +39,11 @@ export const TripCreateModal = () => {
       <BtnCloseModal onCLick={() => setIsCreate(false)} />
 
       <section>
-        <h1 className="text-center font-bold text-3xl text-blue-500 mb-6">
-          Crear viaje
+        <div className="flex flex-col items-center gap-10 w-full mb-10">
+          <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2 select-none">
+          CREAR VIAJE
         </h1>
+        </div>
 
         <form
           onSubmit={(e) => {
@@ -49,7 +51,7 @@ export const TripCreateModal = () => {
             form.handleSubmit();
           }}
         >
-          <div className="flex flex-wrap gap-5 items-center">
+          <div className="flex flex-wrap gap-5 items-center select-none">
             <form.Field
               name="apellido"
               validators={{
@@ -169,8 +171,8 @@ export const TripCreateModal = () => {
                 };
 
                 return (
-                  <div className="flex flex-col">
-                    <label className="block font-semibold mb-1">
+                  <div className="flex flex-col select-none">
+                    <label className="block font-semibold mb-3">
                       Servicios:
                     </label>
                     <div className="grid grid-cols-3 gap-3">
@@ -195,12 +197,16 @@ export const TripCreateModal = () => {
             </form.Field>
           </div>
 
-          <button
-            type="submit"
-            className="rounded-md px-2 py-1 bg-blue-500 text-white font-semibold hover:bg-blue-400"
-          >
-            Crear viaje
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="w-1/4 py-2 mt-6 bg-blue-600 text-white rounded hover:bg-blue-700 select-none"
+            >
+              Crear viaje
+            </button>
+          </div>
+
+
         </form>
       </section>
     </div>

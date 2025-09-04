@@ -13,6 +13,7 @@ import { IoAddCircle, IoSearch, IoListCircle } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
 
+
 function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
     tripsStore();
@@ -26,6 +27,7 @@ function Home() {
     const value = e.target.value;
     setSearchTerm(value);
   };
+
 
   const filteredTrips = trips?.viajes.filter(
     (item) =>
@@ -47,14 +49,14 @@ function Home() {
           }}
         ></div>
         <div className="relative z-20 h-full flex items-center justify-center">
-          <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10">
+          <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10 select-none cursor-default">
             Historial de Reservas
           </h1>
         </div>
       </div>
 
       <section className="max-w-[900px] mx-auto">
-        <div className="flex flex-wrap justify-between items-center mb-4">
+        <div className="flex flex-wrap justify-between items-center mb-4 select-none cursor-default">
           <IoSearch size={30} className="text-gray-400 mr-2" />
 
           <input
@@ -76,11 +78,11 @@ function Home() {
         </div>
 
         <TripsTable filteredTrips={filteredTrips} />
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center mt-4 select-none ">
           <Pagination page={page} setPage={setPage} />
-          <div className="flex gap-2">
+          <div className="flex gap-2 select-none cursor-default">
             <button
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow select-none "
               onClick={() => setIsCreate(true)}
             >
               <IoAddCircle size={24} />
@@ -88,7 +90,7 @@ function Home() {
             </button>
 
             <Link to="/finance">
-              <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow">
+              <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow select-none ">
                 <IoListCircle size={24} />
                 Resumen Anual
               </button>

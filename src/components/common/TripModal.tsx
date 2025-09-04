@@ -36,8 +36,8 @@ export const TripModal = () => {
           <Spinner size={40} text="Cargando..." />
         </div>
       ) : (
-        <section className="flex flex-col items-center gap-10">
-          <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2">
+        <section className="flex flex-col items-center gap-10 select-none">
+          <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2 ">
             LEGAJO Nº {trip?.viaje.id}
           </h1>
 
@@ -46,22 +46,22 @@ export const TripModal = () => {
               <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
                 Información:
               </h1>
-              <span className=" capitalize flex gap-1 font-semibold">
+              <span className=" capitalize flex gap-1 font-semibold ">
                 Apellido:{" "}
                 <p className="font-normal ml-2">{trip?.viaje.apellido}</p>
               </span>
-              <span className="capitalize flex gap-1 font-semibold">
+              <span className="capitalize flex gap-1 font-semibold ">
                 Destino:{" "}
                 <p className="font-normal ml-2">{trip?.viaje.destino}</p>
               </span>
-              <span className="flex gap-1 font-semibold">
+              <span className="flex gap-1 font-semibold ">
                 Fecha creación:
                 <p className="font-normal ml-2">
                   {trip?.viaje.fecha &&
                     new Date(trip.viaje.fecha).toLocaleDateString()}
                 </p>
               </span>
-              <span className="flex gap-1 font-semibold">
+              <span className="flex gap-1 font-semibold ">
                 Estado:
                 <p className="font-normal ml-2">
                   {" "}
@@ -70,14 +70,14 @@ export const TripModal = () => {
               </span>
             </div>
 
-            <div className="border border-gray-300 rounded-xl p-4">
+            <div className="border border-gray-300 rounded-xl p-4 select-none">
               <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
                 Detalle económico:{" "}
               </h1>
               <span className="flex gap-1 font-semibold">
                 Moneda: <p className="font-normal ml-2">{trip?.viaje.moneda}</p>
               </span>
-              <span className="flex gap-1 font-semibold">
+              <span className="flex gap-1 font-semibold ">
                 Valor total:{" "}
                 <p className="font-normal ml-2">
                   $
@@ -85,13 +85,13 @@ export const TripModal = () => {
                     formattedAmount(trip.viaje.valor_total)}
                 </p>
               </span>
-              <span className="flex gap-1 font-semibold">
+              <span className="flex gap-1 font-semibold ">
                 Costo:{" "}
                 <p className="font-normal ml-2">
                   ${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}
                 </p>
               </span>
-              <span className="flex gap-1 font-semibold">
+              <span className="flex gap-1 font-semibold ">
                 Ganancia:{" "}
                 <p className="font-normal ml-2">
                   $
@@ -101,12 +101,12 @@ export const TripModal = () => {
             </div>
 
             <div className="border border-gray-300 rounded-xl p-4 col-span-full">
-              <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-2">
+              <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-2 select-none">
                 Servicios:
               </h1>
 
               {/* Encabezado */}
-              <div className="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-1">
+              <div className="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-1 select-none">
                 <span className="col-span-4">Nombre</span>
                 <span className="col-span-3">Valor</span>
                 <span className="col-span-4">Pagado por</span>
@@ -114,7 +114,7 @@ export const TripModal = () => {
 
               {/* Servicios */}
               {trip?.viaje.servicios?.length ? (
-                <div className="flex flex-col gap-3  ">
+                <div className="flex flex-col gap-3 select-none ">
                   {trip.viaje.servicios.map((s) => (
                     <div
                       key={s.id}
