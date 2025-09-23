@@ -1,7 +1,7 @@
 import { useServices } from "../hooks/useServices";
 import { useCreateTrip } from "../hooks/useTrips";
 import { modalStore } from "../store/modalStore";
-import type { CreateTripData } from "../types/types";
+import type { CreateTripData, CreateTripFormData } from "../types/types";
 import { BtnCloseModal } from "./BtnCloseModal";
 import { useForm } from "@tanstack/react-form";
 export const TripCreateModal = () => {
@@ -16,12 +16,14 @@ export const TripCreateModal = () => {
       valor_total: 0,
       destino: "",
       apellido: "",
+      fecha_ida: "",
+      fecha_vuelta: "",
       servicios: [],
     } as CreateTripData,
     onSubmit: ({ value, formApi }) => {
-      const trip: CreateTripData = {
-        fecha_ida: value.fecha_ida,
-        fecha_vuelta: value.fecha_vuelta,
+      const trip: CreateTripFormData = {
+        fecha_ida: new Date(value.fecha_ida),
+        fecha_vuelta: new Date(value.fecha_vuelta),
         moneda: value.moneda,
         destino: value.destino,
         apellido: value.apellido,
@@ -30,6 +32,7 @@ export const TripCreateModal = () => {
           id: s.id,
           valor: 0,
           pagado_por: "pendiente",
+          moneda: value.moneda,
         })),
       };
       createTrip(trip);
@@ -68,7 +71,9 @@ export const TripCreateModal = () => {
               >
                 {(field) => (
                   <div className="mb-4 flex flex-col">
-                    <label className="block font-semibold mb-1">Apellido:</label>
+                    <label className="block font-semibold mb-1">
+                      Apellido:
+                    </label>
                     <input
                       type="text"
                       value={field.state.value}
@@ -166,9 +171,7 @@ export const TripCreateModal = () => {
                     <label className="block font-semibold mb-1">Moneda:</label>
                     <select
                       onChange={(e) =>
-                        field.handleChange(
-                          Number(e.target.value) as 1 | 2 | 0
-                        )
+                        field.handleChange(Number(e.target.value) as 1 | 2 | 0)
                       }
                       value={field.state.value ?? 0}
                       className="border p-2  rounded"
@@ -185,7 +188,7 @@ export const TripCreateModal = () => {
                   </div>
                 )}
               </form.Field>
-              <form.Field
+              {/* <form.Field
                 name="valor_usd"
                 validators={{
                   onSubmit: ({ value }) => {
@@ -218,10 +221,9 @@ export const TripCreateModal = () => {
                     )}
                   </div>
                 )}
-              </form.Field>
+              </form.Field> */}
             </div>
             <div className="flex">
-
               <form.Field
                 name="fecha_ida"
                 validators={{
@@ -232,7 +234,9 @@ export const TripCreateModal = () => {
               >
                 {(field) => (
                   <div className="mb-4 flex flex-col">
-                    <label className="block font-semibold mb-1">Fecha de ida:</label>
+                    <label className="block font-semibold mb-1">
+                      Fecha de ida:
+                    </label>
                     <input
                       type="date"
                       value={field.state.value || ""}
@@ -252,39 +256,40 @@ export const TripCreateModal = () => {
                 validators={{
                   onSubmit: ({ value, fieldApi }) => {
                     if (!value) return "La fecha de vuelta es obligatoria";
-
-                    // 👇 acá sacamos la fecha de ida
                     const fechaIda = fieldApi.form.getFieldValue("fecha_ida");
-
                     if (fechaIda && value < fechaIda) {
                       return "La vuelta no puede ser antes que la ida";
                     }
                   },
                 }}
               >
-                {(field) => (
-                  <div className="mb-4 flex flex-col">
-                    <label className="block font-semibold mb-1">Fecha de vuelta:</label>
-                    <input
-                      type="date"
-                      value={field.state.value || ""}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="border p-2 rounded"
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <em className="text-red-600 text-sm">
-                        {field.state.meta.errors.join(", ")}
-                      </em>
-                    )}
-                  </div>
-                )}
+                {(field) => {
+                  const fechaIda = field.form.getFieldValue(
+                    "fecha_ida"
+                  ) as string;
+                  return (
+                    <div className="mb-4 flex flex-col">
+                      <label className="block font-semibold mb-1">
+                        Fecha de vuelta:
+                      </label>
+                      <input
+                        type="date"
+                        value={field.state.value || ""}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="border p-2 rounded"
+                        min={fechaIda} // 👈 string YYYY-MM-DD
+                      />
+                      {field.state.meta.errors.length > 0 && (
+                        <em className="text-red-600 text-sm">
+                          {field.state.meta.errors.join(", ")}
+                        </em>
+                      )}
+                    </div>
+                  );
+                }}
               </form.Field>
-
-
-
             </div>
-            <form.Field
-              name="servicios">
+            <form.Field name="servicios">
               {(fieldArray) => {
                 const selectedIds = fieldArray.state.value.map((s) => s.id);
 
@@ -343,8 +348,6 @@ export const TripCreateModal = () => {
               Crear viaje
             </button>
           </div>
-
-
         </form>
       </section>
     </div>

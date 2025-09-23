@@ -87,6 +87,24 @@ export type CreateTripData = {
   apellido: string;
   valor_total: number;
   destino: "internacional" | "nacional" | "";
+  fecha_ida: string;
+  fecha_vuelta: string;
+  moneda: number;
+};
+
+export type CreateTripFormData = {
+  servicios: {
+    id: number;
+    valor: number;
+    pagado_por: "pendiente";
+    moneda: number;
+  }[];
+  apellido: string;
+  valor_total: number;
+  destino: "internacional" | "nacional" | "";
+  fecha_ida: Date;
+  fecha_vuelta: Date;
+  moneda: number;
 };
 
 export type UpdateTripData = {

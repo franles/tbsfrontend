@@ -1,11 +1,11 @@
 import { api, API_URL } from "../config/axios";
 import type {
-  CreateTripData,
   CreateTripResponse,
   UpdateDeleteTripResponse,
   GetTripResponse,
   GetTripsResponse,
   UpdateTripData,
+  CreateTripFormData,
 } from "../types/types";
 
 const API_ENDPOINT = `${API_URL}/trips`;
@@ -48,7 +48,7 @@ export async function getTrip(id: string): Promise<GetTripResponse | null> {
 }
 
 export async function createTrip(
-  tripData: CreateTripData
+  tripData: CreateTripFormData
 ): Promise<string | null> {
   try {
     const { data } = await api.post<CreateTripResponse>(

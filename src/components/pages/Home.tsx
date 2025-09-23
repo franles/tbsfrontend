@@ -13,7 +13,6 @@ import { IoAddCircle, IoSearch, IoListCircle } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
 
-
 function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
     tripsStore();
@@ -28,7 +27,6 @@ function Home() {
     setSearchTerm(value);
   };
 
-
   const filteredTrips = trips?.viajes.filter(
     (item) =>
       item.id.toString().includes(searchTerm) ||
@@ -36,6 +34,7 @@ function Home() {
   );
 
   if (isLoading) return <Spinner text="Cargando" />;
+
   return (
     <>
       <div className="relative h-[225px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274365/maletas_jzcjf2.webp')]">
