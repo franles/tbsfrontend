@@ -1,38 +1,55 @@
-export type GetTripsResponse = {
-  viajes: Trip[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-  };
-};
+interface Service {
+  id: number;
+  valor?: number;
+  nombre: string;
+  pagado_por?: string;
+  moneda?: number;
+  tipo_cambio_id?: number | null;
+}
 
-export type GetTripResponse = {
-  viaje: {
-    id: string;
-    estado: "pendiente" | "finalizado";
-    fecha: Date;
-    moneda: "ARS" | "USD";
-    destino: "internacional" | "nacional";
-    apellido: string;
-    valor_total: number;
-    ganancia: number;
-    costo: number;
-    servicios: {
-      id: number;
-      valor: number;
-      nombre: string;
-      pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-    }[];
-  };
-};
+export interface Trip {
+  id: string;
+  estado: string;
+  fecha: string;
+  fecha_ida: string;
+  fecha_vuelta: string;
+  moneda: string;
+  destino: "nacional" | "internacional";
+  apellido: string;
+  valor_total: number;
+  ganancia: number;
+  costo: number;
+  servicios: Service[];
+}
 
-export type GetServicesResponse = {
-  servicios: {
-    id: number;
-    nombre: string;
-  }[];
-};
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T[];
+  pagination?: Pagination;
+  timestamp: string;
+}
+
+interface ApiSingleResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  timestamp: string;
+}
+
+export type TripsApiResponse = ApiResponse<Trip>;
+export type TripApiResponse = ApiSingleResponse<Trip>;
+export type ServiceApiResponse = ApiResponse<Service>;
+export type FinanceApiResponse = ApiResponse<Finance>;
 
 export type GetAccessTokenResponse = {
   accessToken: string;
@@ -63,20 +80,22 @@ export type UpdateServiceData = {
   id?: number;
 };
 
-export type FinanceSummaryResponse = {
-  resumen_financiero: {
-    mes: string;
-    mes_num: number;
-    resumen: {
-      moneda: "ARS" | "USD";
-      ingreso: string;
-      egreso: string;
-      ganancia: string;
-    }[];
-  }[];
+type FinanceResume = {
+  moneda: "ars" | "usd";
+  ingreso: number;
+  egreso: number;
+  ganancia: number;
 };
 
-export type Resumen = FinanceSummaryResponse["resumen_financiero"];
+export type Finance = {
+  data: {
+    mes: string;
+    mes_num: number;
+    resumen: FinanceResume[];
+  };
+};
+
+export type FinanceData = Finance["data"];
 
 export type CreateTripData = {
   servicios: {
@@ -111,11 +130,7 @@ export type UpdateTripData = {
   valor_total?: number;
   destino?: "internacional" | "nacional";
   apellido?: string;
-  servicios: {
-    id: number;
-    valor: number;
-    pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-  }[];
+  servicios: Service[];
 };
 
 export type User = {
@@ -123,17 +138,4 @@ export type User = {
   nombre: string | undefined;
   email: string | undefined;
   avatar: string | undefined;
-};
-
-export type Trip = {
-  id: string;
-  estado: "pendiente" | "finalizado";
-  fecha: Date;
-  moneda: "ARS" | "USD";
-  destino: "internacional" | "nacional";
-  apellido: string;
-  valor_total: number;
-  ganancia: number;
-  costo: number;
-  servicios: { id: number; valor: number; nombre: string }[];
 };

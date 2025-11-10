@@ -34,6 +34,6 @@ export function decodeToken(token: string | undefined): User | null {
   return user;
 }
 
-export const formattedAmount = (amount: number | null) => {
+export const formattedAmount = (amount: number) => {
   return Number(amount).toLocaleString("es-AR");
 };

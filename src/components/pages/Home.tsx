@@ -27,7 +27,7 @@ function Home() {
     setSearchTerm(value);
   };
 
-  const filteredTrips = trips?.viajes.filter(
+  const filteredTrips = trips?.data.filter(
     (item) =>
       item.id.toString().includes(searchTerm) ||
       item.apellido.toLowerCase().includes(searchTerm.toLowerCase())

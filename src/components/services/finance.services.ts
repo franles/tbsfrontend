@@ -1,5 +1,5 @@
 import { api, API_URL } from "../config/axios";
-import type { FinanceSummaryResponse } from "../types/types";
+import type { FinanceApiResponse } from "../types/types";
 
 const API_ENDPOINT = `${API_URL}/finance`;
 
@@ -7,9 +7,9 @@ export async function getSummary(
   year: number,
   month: number | null,
   currency: "ARS" | "USD" | null
-) {
+): Promise<FinanceApiResponse | null> {
   try {
-    const { data } = await api.get<FinanceSummaryResponse>(API_ENDPOINT, {
+    const { data } = await api.get<FinanceApiResponse>(API_ENDPOINT, {
       params: {
         anio: year,
         mes: month ?? "",
@@ -17,9 +17,9 @@ export async function getSummary(
       },
     });
 
-    return data.resumen_financiero ?? [];
+    return data;
   } catch (error) {
     console.log(error);
-    return [];
+    return null;
   }
 }

@@ -19,51 +19,61 @@ import { useState } from "react";
 export const TripEditModal = () => {
   const { setIsEdit } = modalStore();
   const { setTripId, tripId } = tripsStore();
-  const { data: trip } = useTrip(tripId!);
+  const { data: tripResponse } = useTrip(tripId!);
   const { updateTripMutate } = useUpdateTrip();
   const { deleteServiceMutate } = useDeleteService();
   const { data: services } = useServices();
   const { createServiceMutate } = useCreateService();
   const [add, setAdd] = useState<boolean>(false);
 
+  const trip = tripResponse?.data;
+
   const form = useForm({
     defaultValues: {
-      destino: trip?.viaje.destino,
-      apellido: trip?.viaje.apellido,
-      valor_total: trip?.viaje.valor_total,
-      servicios: trip?.viaje.servicios.map((s) => ({
+      destino: trip?.destino,
+      apellido: trip?.apellido,
+      valor_total: trip?.valor_total,
+      servicios: trip?.servicios.map((s) => ({
         id: s.id,
         pagado_por: s.pagado_por,
+        moneda: s.moneda,
         valor: s.valor,
+        tipo_cambio_id: s.tipo_cambio_id ?? null,
       })),
     } as UpdateTripData,
     onSubmit: ({ value }) => {
-      const serviciosOriginales = trip?.viaje.servicios ?? [];
+      const serviciosOriginales = trip?.servicios ?? [];
 
       const serviciosActualizados = value.servicios
         .filter((s) => {
           const original = serviciosOriginales.find((o) => o.id === s.id);
           return (
             original &&
-            (s.valor !== original.valor || s.pagado_por !== original.pagado_por)
+            (s.valor !== original.valor ||
+              s.pagado_por !== original.pagado_por ||
+              s.moneda !== original.moneda ||
+              s.tipo_cambio_id !== original.tipo_cambio_id)
           );
         })
         .map((s) => ({
           id: s.id,
           valor: Number(s.valor),
           pagado_por: s.pagado_por,
+          moneda: s.moneda,
+          tipo_cambio_id: s.tipo_cambio_id ?? null,
         }));
 
       const dataUpdated = {
-        apellido: value.apellido ?? trip?.viaje.apellido,
-        valor_total: Number(value.valor_total ?? trip?.viaje.valor_total),
-        destino: value.destino ?? trip?.viaje.destino,
+        apellido: value.apellido ?? trip?.apellido,
+        valor_total: Number(value.valor_total ?? trip?.valor_total),
+        destino: value.destino ?? trip?.destino,
         servicios: serviciosActualizados,
       };
 
       updateTripMutate({ tripId: tripId!, dataUpdated });
     },
   });
+
   return (
     <div
       className="bg-white rounded-2xl shadow-lg w-full max-w-4xl p-6 relative animate-fadeIn text-black max-h-[90vh] overflow-y-auto"
@@ -81,8 +91,7 @@ export const TripEditModal = () => {
 
       <section className="flex flex-col items-center gap-10 w-full">
         <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2 select-none">
-          MODIFICAR LEGAJO Nº{" "}
-          <span className="underline">{trip?.viaje.id}</span>
+          MODIFICAR LEGAJO Nº <span className="underline">{trip?.id}</span>
         </h1>
 
         <form
@@ -93,6 +102,7 @@ export const TripEditModal = () => {
           className="w-full flex flex-col gap-10"
         >
           <div className="flex gap-10">
+            {/* Información */}
             <div className="border border-gray-300 rounded-xl p-4 w-full">
               <h1 className="font-bold text-xl text-blue-600 mb-3 select-none">
                 Información:
@@ -113,7 +123,9 @@ export const TripEditModal = () => {
               <form.Field name="destino">
                 {(field) => (
                   <div className="mb-3">
-                    <label className="block font-semibold mb-1 select-none">Destino:</label>
+                    <label className="block font-semibold mb-1 select-none">
+                      Destino:
+                    </label>
                     <select
                       onChange={(e) =>
                         field.handleChange(
@@ -134,25 +146,28 @@ export const TripEditModal = () => {
                 <label className="block font-semibold mb-1 select-none">
                   Fecha creación
                 </label>
-
                 <p>
-                  {trip?.viaje.fecha &&
-                    new Date(trip.viaje.fecha).toLocaleDateString()}
+                  {trip?.fecha && new Date(trip.fecha).toLocaleDateString()}
                 </p>
               </div>
               <div>
-                <label className="block font-semibold mb-1 select-none">Estado</label>
-                <p>{trip?.viaje.estado && renderEstado(trip.viaje.estado)}</p>
+                <label className="block font-semibold mb-1 select-none">
+                  Estado
+                </label>
+                <p>{trip?.estado && renderEstado(trip.estado)}</p>
               </div>
             </div>
 
+            {/* Detalle económico */}
             <div className="border border-gray-300 rounded-xl p-4 w-full">
               <h1 className="font-bold text-xl text-blue-600 mb-3 select-none">
                 Detalle económico:
               </h1>
               <div className="mb-3">
-                <label className="block font-semibold mb-1 select-none">Moneda</label>
-                <p>{trip?.viaje.moneda}</p>
+                <label className="block font-semibold mb-1 select-none">
+                  Moneda
+                </label>
+                <p>{trip?.moneda}</p>
               </div>
               <form.Field name="valor_total">
                 {(field) => (
@@ -174,132 +189,161 @@ export const TripEditModal = () => {
                         const soloNumeros = e.target.value.replace(/\D/g, "");
                         field.handleChange(Number(soloNumeros));
                       }}
-                      className="border p-2  rounded w-1/2"
+                      className="border p-2 rounded w-1/2"
                     />
                   </div>
                 )}
               </form.Field>
               <div className="mb-3">
-                <label className="block font-semibold mb-1 select-none">Costo</label>
-                <p>${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}</p>
+                <label className="block font-semibold mb-1 select-none">
+                  Costo
+                </label>
+                <p>${trip?.costo && formattedAmount(trip.costo)}</p>
               </div>
               <div>
-                <label className="block font-semibold mb-1 select-none">Ganancia</label>
-                <p>
-                  $
-                  {trip?.viaje.ganancia && formattedAmount(trip.viaje.ganancia)}
-                </p>
+                <label className="block font-semibold mb-1 select-none">
+                  Ganancia
+                </label>
+                <p>${trip?.ganancia && formattedAmount(trip.ganancia)}</p>
               </div>
             </div>
           </div>
 
+          {/* Servicios */}
           <div className="border border-gray-300 rounded-xl p-4">
-            <h1 className="font-bold text-xl text-blue-600 mb-4 select-none">Servicios:</h1>
+            <h1 className="font-bold text-xl text-blue-600 mb-4 select-none">
+              Servicios:
+            </h1>
 
             <form.Field name="servicios">
               {(field) => (
                 <div className="flex flex-col gap-3 px-10">
-                  {field.state.value?.map((s, index) => (
-                    <div
-                      key={s.id}
-                      className="flex items-center justify-between gap-3 border p-3 rounded-md select-none"
-                    >
-                      <div className="capitalize w-40 font-semibold">
-                        {
-                          services?.servicios.find(
-                            (service) => service.id === s.id
-                          )?.nombre
-                        }
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        <span className="text-xl font-semibold">$</span>
-                        <input
-                          type="text"
-                          className="border py-2 px-4 rounded w-32"
-                          value={
-                            s.valor
-                              ? new Intl.NumberFormat("es-AR", {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                }).format(s.valor)
-                              : ""
+                  {field.state.value?.map((s, index) => {
+                    return (
+                      <div
+                        key={s.id}
+                        className="flex flex-wrap items-center justify-between gap-3 border p-3 rounded-md select-none"
+                      >
+                        {/* Nombre */}
+                        <div className="capitalize w-40 font-semibold">
+                          {
+                            services?.data.find(
+                              (service) => service.id === s.id
+                            )?.nombre
                           }
+                        </div>
+
+                        {/* Valor */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-xl font-semibold">$</span>
+                          <input
+                            type="text"
+                            className="border py-2 px-4 rounded w-32"
+                            value={
+                              s.valor
+                                ? new Intl.NumberFormat("es-AR", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  }).format(s.valor)
+                                : ""
+                            }
+                            onChange={(e) => {
+                              const newServicios = [...field.state.value];
+                              const soloNumeros = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
+                              newServicios[index] = {
+                                ...s,
+                                valor: Number(soloNumeros),
+                              };
+                              field.handleChange(newServicios);
+                            }}
+                          />
+                        </div>
+
+                        {/* Pagado por */}
+                        <select
+                          className="border p-2 rounded"
+                          value={s.pagado_por}
                           onChange={(e) => {
                             const newServicios = [...field.state.value];
-                            const soloNumeros = e.target.value.replace(
-                              /\D/g,
-                              ""
-                            );
                             newServicios[index] = {
                               ...s,
-                              valor: Number(soloNumeros),
+                              pagado_por: e.target.value as
+                                | "pendiente"
+                                | "pablo"
+                                | "soledad"
+                                | "mariana",
                             };
                             field.handleChange(newServicios);
                           }}
-                        />
-                      </div>
+                        >
+                          <option value="pendiente">Pendiente</option>
+                          <option value="mariana">Mariana</option>
+                          <option value="pablo">Pablo</option>
+                          <option value="soledad">Soledad</option>
+                        </select>
 
-                      <select
-                        className="border p-2 rounded"
-                        value={s.pagado_por}
-                        onChange={(e) => {
-                          const newServicios = [...field.state.value];
-                          newServicios[index] = {
-                            ...s,
-                            pagado_por: e.target.value as
-                              | "pendiente"
-                              | "pablo"
-                              | "soledad"
-                              | "mariana",
-                          };
-                          field.handleChange(newServicios);
-                        }}
-                      >
-                        <option value="pendiente">Pendiente</option>
-                        <option value="mariana">Mariana</option>
-                        <option value="pablo">Pablo</option>
-                        <option value="soledad">Soledad</option>
-                      </select>
+                        {/* Moneda */}
+                        <select
+                          className="border p-2 rounded"
+                          value={s.moneda}
+                          onChange={(e) => {
+                            const newServicios = [...field.state.value];
+                            newServicios[index] = {
+                              ...s,
+                              moneda: Number(e.target.value),
+                            };
+                            field.handleChange(newServicios);
+                          }}
+                        >
+                          <option value={1}>ARS</option>
+                          <option value={2}>USD</option>
+                        </select>
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const nombreServicio = services?.servicios.find(
-                            (service) => service.id === s.id
-                          )?.nombre;
+                        {/* Botón eliminar */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const nombreServicio = services?.data.find(
+                              (service) => service.id === s.id
+                            )?.nombre;
 
-                          toast.warning(
-                            `¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`,
-                            {
-                              duration: 2200,
-                              action: {
-                                label: "Eliminar",
-                                onClick: () => {
-                                  deleteServiceMutate({
-                                    serviceId: s.id,
-                                    tripId: trip!.viaje.id,
-                                  });
+                            toast.warning(
+                              `¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`,
+                              {
+                                duration: 2200,
+                                action: {
+                                  label: "Eliminar",
+                                  onClick: () => {
+                                    deleteServiceMutate({
+                                      serviceId: s.id,
+                                      tripId: trip!.id,
+                                    });
 
-                                  const newServicios = field.state.value.filter(
-                                    (serv) => serv.id !== s.id
-                                  );
-                                  field.handleChange(newServicios);
+                                    const newServicios =
+                                      field.state.value.filter(
+                                        (serv) => serv.id !== s.id
+                                      );
+                                    field.handleChange(newServicios);
+                                  },
                                 },
-                              },
-                            }
-                          );
-                        }}
-                        className="text-red-500 rounded-full hover:text-red-600"
-                      >
-                        <IoCloseCircle size={30} />
-                      </button>
-                    </div>
-                  ))}
+                              }
+                            );
+                          }}
+                          className="text-red-500 rounded-full hover:text-red-600"
+                        >
+                          <IoCloseCircle size={30} />
+                        </button>
+                      </div>
+                    );
+                  })}
 
+                  {/* Agregar servicio */}
                   {add &&
-                    services?.servicios.some(
+                    services?.data.some(
                       (s) => !field.state.value?.some((fs) => fs.id === s.id)
                     ) && (
                       <div className="flex items-center justify-between gap-3 border p-3 rounded-md border-blue-500 shadow-sm">
@@ -309,22 +353,22 @@ export const TripEditModal = () => {
                             const serviceId = Number(e.target.value);
                             if (!serviceId) return;
 
-                            const serviceToAdd = services?.servicios.find(
+                            const serviceToAdd = services?.data.find(
                               (s) => s.id === serviceId
                             );
                             if (!serviceToAdd) return;
 
-                            // Actualizamos el form para mostrarlo inmediatamente
                             field.handleChange([
                               ...(field.state.value ?? []),
                               {
                                 id: serviceToAdd.id,
                                 valor: 0,
                                 pagado_por: "pendiente",
+                                moneda: trip?.moneda ?? 1,
+                                tipo_cambio_id: null,
                               },
                             ]);
 
-                            // Llamamos al mutate para guardarlo en la base
                             createServiceMutate({
                               viaje_id: tripId!,
                               valor: 0,
@@ -336,7 +380,7 @@ export const TripEditModal = () => {
                           }}
                         >
                           <option value="">Agregar servicio...</option>
-                          {services?.servicios
+                          {services?.data
                             .filter(
                               (s) =>
                                 !field.state.value?.some((fs) => fs.id === s.id)
@@ -371,7 +415,7 @@ export const TripEditModal = () => {
                       </div>
                     )}
 
-                  {services?.servicios.some(
+                  {services?.data.some(
                     (s) => !field.state.value?.some((fs) => fs.id === s.id)
                   ) && (
                     <button

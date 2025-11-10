@@ -1,20 +1,20 @@
 import { api, API_URL } from "../config/axios";
 import type {
   CreateServiceTripData,
-  GetServicesResponse,
+  ServiceApiResponse,
   UpdateServiceData,
 } from "../types/types";
 
 const API_ENDPOINT = `${API_URL}/services`;
 
-export async function getServices(): Promise<GetServicesResponse> {
+export async function getServices(): Promise<ServiceApiResponse | null> {
   try {
-    const { data } = await api.get<GetServicesResponse>(`${API_ENDPOINT}`);
+    const { data } = await api.get<ServiceApiResponse>(`${API_ENDPOINT}`);
     return data;
   } catch (error) {
     console.log(error);
   }
-  return { servicios: [] };
+  return null;
 }
 
 export async function createServiceForTrip(serviceData: CreateServiceTripData) {

@@ -319,7 +319,7 @@ export const TripCreateModal = () => {
                       Servicios:
                     </label>
                     <div className="grid grid-cols-3 gap-3">
-                      {services?.servicios.map((service) => (
+                      {services?.data.map((service) => (
                         <label
                           key={service.id}
                           className="flex items-center gap-2 mb-2 cursor-pointer capitalize"

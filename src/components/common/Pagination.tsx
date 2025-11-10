@@ -9,7 +9,7 @@ type Props = {
 
 export const Pagination = ({ page, setPage }: Props) => {
   const { data: trips } = useTrips();
-  const totalPages = trips?.pagination.totalPages ?? 1;
+  const totalPages = trips?.pagination?.totalPages ?? 1;
 
   return (
     <section className="flex justify-center items-center gap-4 mt-4">

@@ -2,10 +2,10 @@ import { api, API_URL } from "../config/axios";
 import type {
   CreateTripResponse,
   UpdateDeleteTripResponse,
-  GetTripResponse,
-  GetTripsResponse,
   UpdateTripData,
   CreateTripFormData,
+  TripsApiResponse,
+  TripApiResponse,
 } from "../types/types";
 
 const API_ENDPOINT = `${API_URL}/trips`;
@@ -16,7 +16,7 @@ export async function getTrips(
   page: number,
   month: number | null,
   year: number | null
-): Promise<GetTripsResponse | undefined> {
+): Promise<TripsApiResponse | undefined> {
   try {
     const params = new URLSearchParams();
     params.append("filter", filter);
@@ -26,7 +26,7 @@ export async function getTrips(
     if (year !== null) params.append("year", year.toString());
     if (month !== null) params.append("month", month.toString());
 
-    const { data } = await api.get<GetTripsResponse>(
+    const { data } = await api.get<TripsApiResponse>(
       `${API_ENDPOINT}?${params.toString()}`
     );
     return data;
@@ -35,9 +35,9 @@ export async function getTrips(
   }
 }
 
-export async function getTrip(id: string): Promise<GetTripResponse | null> {
+export async function getTrip(id: string): Promise<TripApiResponse | null> {
   try {
-    const { data } = await api.get<GetTripResponse>(`${API_ENDPOINT}/${id}`);
+    const { data } = await api.get<TripApiResponse>(`${API_ENDPOINT}/${id}`);
 
     return data;
   } catch (error) {

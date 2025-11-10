@@ -9,9 +9,11 @@ import { renderEstado } from "../utils/utilsTsx";
 
 export const TripModal = () => {
   const { tripId, setTripId } = tripsStore();
-  const { data: trip, isLoading } = useTrip(tripId!);
+  const { data: tripResponse, isLoading } = useTrip(tripId!);
   const { setIsOpen, setIsEdit } = modalStore();
-  console.log(trip);
+
+  const trip = tripResponse?.data;
+
   return (
     <div className="bg-white rounded-2xl shadow-lg w-[720px] p-6 relative animate-fadeIn text-black">
       <BtnCloseModal
@@ -38,7 +40,7 @@ export const TripModal = () => {
       ) : (
         <section className="flex flex-col items-center gap-10 select-none">
           <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2 ">
-            LEGAJO Nº {trip?.viaje.id}
+            LEGAJO Nº {trip?.id}
           </h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
@@ -47,25 +49,22 @@ export const TripModal = () => {
                 Información:
               </h1>
               <span className=" capitalize flex gap-1 font-semibold ">
-                Apellido:{" "}
-                <p className="font-normal ml-2">{trip?.viaje.apellido}</p>
+                Apellido: <p className="font-normal ml-2">{trip?.apellido}</p>
               </span>
               <span className="capitalize flex gap-1 font-semibold ">
-                Destino:{" "}
-                <p className="font-normal ml-2">{trip?.viaje.destino}</p>
+                Destino: <p className="font-normal ml-2">{trip?.destino}</p>
               </span>
               <span className="flex gap-1 font-semibold ">
                 Fecha creación:
                 <p className="font-normal ml-2">
-                  {trip?.viaje.fecha &&
-                    new Date(trip.viaje.fecha).toLocaleDateString()}
+                  {trip?.fecha && new Date(trip.fecha).toLocaleDateString()}
                 </p>
               </span>
               <span className="flex gap-1 font-semibold ">
                 Estado:
                 <p className="font-normal ml-2">
                   {" "}
-                  {trip?.viaje.estado && renderEstado(trip.viaje.estado)}
+                  {trip?.estado && renderEstado(trip.estado)}
                 </p>
               </span>
             </div>
@@ -75,27 +74,24 @@ export const TripModal = () => {
                 Detalle económico:{" "}
               </h1>
               <span className="flex gap-1 font-semibold">
-                Moneda: <p className="font-normal ml-2">{trip?.viaje.moneda}</p>
+                Moneda: <p className="font-normal ml-2">{trip?.moneda}</p>
               </span>
               <span className="flex gap-1 font-semibold ">
                 Valor total:{" "}
                 <p className="font-normal ml-2">
-                  $
-                  {trip?.viaje.valor_total &&
-                    formattedAmount(trip.viaje.valor_total)}
+                  ${trip?.valor_total && formattedAmount(trip.valor_total)}
                 </p>
               </span>
               <span className="flex gap-1 font-semibold ">
                 Costo:{" "}
                 <p className="font-normal ml-2">
-                  ${trip?.viaje.costo && formattedAmount(trip.viaje.costo)}
+                  ${trip?.costo && formattedAmount(trip.costo)}
                 </p>
               </span>
               <span className="flex gap-1 font-semibold ">
                 Ganancia:{" "}
                 <p className="font-normal ml-2">
-                  $
-                  {trip?.viaje.ganancia && formattedAmount(trip.viaje.ganancia)}
+                  ${trip?.ganancia && formattedAmount(trip.ganancia)}
                 </p>
               </span>
             </div>
@@ -113,16 +109,16 @@ export const TripModal = () => {
               </div>
 
               {/* Servicios */}
-              {trip?.viaje.servicios?.length ? (
+              {trip?.servicios?.length ? (
                 <div className="flex flex-col gap-3 select-none ">
-                  {trip.viaje.servicios.map((s) => (
+                  {trip.servicios.map((s) => (
                     <div
                       key={s.id}
                       className="grid grid-cols-12 gap-2 items-center border-l-4  px-1 border-blue-400"
                     >
                       <span className="col-span-4 capitalize">{s.nombre}</span>
                       <span className="col-span-3">
-                        ${formattedAmount(s.valor)}
+                        ${s.valor && formattedAmount(s.valor)}
                       </span>
                       <span className="col-span-4 capitalize">
                         {s.pagado_por === "pendiente"
