@@ -109,6 +109,8 @@ export type CreateTripData = {
   fecha_ida: string;
   fecha_vuelta: string;
   moneda: number;
+  valor_usd?: number | null;
+
 };
 
 export type CreateTripFormData = {

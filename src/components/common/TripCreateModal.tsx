@@ -4,6 +4,10 @@ import { modalStore } from "../store/modalStore";
 import type { CreateTripData, CreateTripFormData } from "../types/types";
 import { BtnCloseModal } from "./BtnCloseModal";
 import { useForm } from "@tanstack/react-form";
+import React, { useState, useEffect } from "react";
+
+
+
 export const TripCreateModal = () => {
   const { setIsCreate } = modalStore();
   const { data: services } = useServices();
@@ -28,6 +32,7 @@ export const TripCreateModal = () => {
         destino: value.destino,
         apellido: value.apellido,
         valor_total: value.valor_total,
+        //valor_usd: value.valor_usd,
         servicios: value.servicios.map((s) => ({
           id: s.id,
           valor: 0,
@@ -40,6 +45,18 @@ export const TripCreateModal = () => {
       setIsCreate(false);
     },
   });
+
+
+  //  🔥🔥🔥 PUNTO 2 VA EXACTAMENTE AQUÍ 🔥🔥🔥
+  const [selectedMoneda, setSelectedMoneda] = useState<number>(
+    form.getFieldValue("moneda") ?? 0
+  );
+
+  useEffect(() => {
+    const m = form.getFieldValue("moneda");
+    setSelectedMoneda(m ?? 0);
+  }, []);
+  //  🔥🔥🔥 FIN DEL PUNTO 2 🔥🔥🔥
 
   console.log(services);
   return (
@@ -170,9 +187,20 @@ export const TripCreateModal = () => {
                   <div className="mb-4 flex flex-col">
                     <label className="block font-semibold mb-1">Moneda:</label>
                     <select
-                      onChange={(e) =>
-                        field.handleChange(Number(e.target.value) as 1 | 2 | 0)
-                      }
+                      onChange={(e) => {
+                        const val = Number(e.target.value) as 0 | 1 | 2;
+                        field.handleChange(val);        // actualiza el form
+                        setSelectedMoneda(val);         // actualiza estado local
+
+                        // --- manejar el valor_usd automáticamente ---
+                        if (val === 2) {
+                          // USD → mostrar el campo y poner valor por defecto
+                          form.setFieldValue("valor_usd", 0);
+                        } else {
+                          // ARS → ocultar y borrar valor_usd
+                          form.setFieldValue("valor_usd", undefined);
+                        }
+                      }}
                       value={field.state.value ?? 0}
                       className="border p-2  rounded"
                     >
@@ -188,6 +216,51 @@ export const TripCreateModal = () => {
                   </div>
                 )}
               </form.Field>
+
+              {/* Mostrar valor usd si  moneda = USD */}
+              {selectedMoneda === 2 && (
+                <form.Field
+                  name="valor_usd"
+                  validators={{
+                    onSubmit: ({ value }) => {
+                      if (!value) return "Este campo es obligatorio cuando la moneda es USD";
+                      if (value <= 0) return "La cotización debe ser mayor a 0";
+                    },
+                  }}
+                >
+                  {(field) => (
+                    <div className="mb-4 flex flex-col ml-4">
+                      <label className="block font-semibold mb-1">
+                        Cotización USD en ARS:
+                      </label>
+
+                      <input
+                        type="number"
+                        value={
+                          typeof field.state.value === "number"
+                            ? new Intl.NumberFormat("es-AR", {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(field.state.value)
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const soloNumeros = e.target.value.replace(/\D/g, "");
+                          field.handleChange(Number(soloNumeros));
+                        }}
+                        className="border p-2 rounded"
+                      />
+
+                      {field.state.meta.errors.length > 0 && (
+                        <em className="text-red-600 text-sm">
+                          {field.state.meta.errors.join(", ")}
+                        </em>
+                      )}
+                    </div>
+                  )}
+                </form.Field>
+              )}
+
               {/* <form.Field
                 name="valor_usd"
                 validators={{
