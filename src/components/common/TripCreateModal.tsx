@@ -4,7 +4,7 @@ import { modalStore } from "../store/modalStore";
 import type { CreateTripData, CreateTripFormData } from "../types/types";
 import { BtnCloseModal } from "./BtnCloseModal";
 import { useForm } from "@tanstack/react-form";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 
 
@@ -46,8 +46,6 @@ export const TripCreateModal = () => {
     },
   });
 
-
-  //  🔥🔥🔥 PUNTO 2 VA EXACTAMENTE AQUÍ 🔥🔥🔥
   const [selectedMoneda, setSelectedMoneda] = useState<number>(
     form.getFieldValue("moneda") ?? 0
   );
@@ -56,8 +54,7 @@ export const TripCreateModal = () => {
     const m = form.getFieldValue("moneda");
     setSelectedMoneda(m ?? 0);
   }, []);
-  //  🔥🔥🔥 FIN DEL PUNTO 2 🔥🔥🔥
-
+  
   console.log(services);
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-black">
@@ -189,15 +186,12 @@ export const TripCreateModal = () => {
                     <select
                       onChange={(e) => {
                         const val = Number(e.target.value) as 0 | 1 | 2;
-                        field.handleChange(val);        // actualiza el form
-                        setSelectedMoneda(val);         // actualiza estado local
+                        field.handleChange(val);       
+                        setSelectedMoneda(val);         
 
-                        // --- manejar el valor_usd automáticamente ---
                         if (val === 2) {
-                          // USD → mostrar el campo y poner valor por defecto
                           form.setFieldValue("valor_usd", 0);
                         } else {
-                          // ARS → ocultar y borrar valor_usd
                           form.setFieldValue("valor_usd", undefined);
                         }
                       }}
@@ -217,13 +211,13 @@ export const TripCreateModal = () => {
                 )}
               </form.Field>
 
-              {/* Mostrar valor usd si  moneda = USD */}
+{/* Mostrar valor usd si  moneda = USD */}
               {selectedMoneda === 2 && (
                 <form.Field
                   name="valor_usd"
                   validators={{
                     onSubmit: ({ value }) => {
-                      if (!value) return "Este campo es obligatorio cuando la moneda es USD";
+                      if (!value) return "Este campo es obligatorio";
                       if (value <= 0) return "La cotización debe ser mayor a 0";
                     },
                   }}
@@ -260,42 +254,8 @@ export const TripCreateModal = () => {
                   )}
                 </form.Field>
               )}
-
-              {/* <form.Field
-                name="valor_usd"
-                validators={{
-                  onSubmit: ({ value }) => {
-                    if (!value) return "Este campo es obligatorio";
-                  },
-                }}
-              >
-                {(field) => (
-                  <div className="mb-4 flex flex-col">
-                    <label className="block font-semibold mb-1">Cotizacion USD en ARS:</label>
-                    <input
-                      type="text"
-                      value={
-                        field.state.value &&
-                        new Intl.NumberFormat("es-AR", {
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        }).format(field.state.value)
-                      }
-                      onChange={(e) => {
-                        const soloNumeros = e.target.value.replace(/\D/g, "");
-                        field.handleChange(Number(soloNumeros));
-                      }}
-                      className="border p-2  rounded"
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <em className="text-red-600 text-sm">
-                        {field.state.meta.errors.join(", ")}
-                      </em>
-                    )}
-                  </div>
-                )}
-              </form.Field> */}
             </div>
+            
             <div className="flex">
               <form.Field
                 name="fecha_ida"
@@ -382,6 +342,7 @@ export const TripCreateModal = () => {
                       id: serviceId,
                       valor: 0,
                       pagado_por: "pendiente",
+                      tipo_cambio_id: 0,
                     });
                   }
                 };
