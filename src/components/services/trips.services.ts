@@ -2,8 +2,8 @@ import { api, API_URL } from "../config/axios";
 import type {
   CreateTripResponse,
   UpdateDeleteTripResponse,
-  UpdateTripData,
-  CreateTripFormData,
+  UpdateTripRequest,
+  CreateTripRequest,
   TripsApiResponse,
   TripApiResponse,
 } from "../types/types";
@@ -48,13 +48,10 @@ export async function getTrip(id: string): Promise<TripApiResponse | null> {
 }
 
 export async function createTrip(
-  tripData: CreateTripFormData
+  tripData: CreateTripRequest
 ): Promise<string | null> {
   try {
-    const { data } = await api.post<CreateTripResponse>(
-      `${API_ENDPOINT}`,
-      tripData
-    );
+    const { data } = await api.post<CreateTripResponse>(API_ENDPOINT, tripData);
 
     return data.trip;
   } catch (error) {
@@ -63,7 +60,10 @@ export async function createTrip(
   return null;
 }
 
-export async function updateTrip(tripId: string, dataUpdated: UpdateTripData) {
+export async function updateTrip(
+  tripId: string,
+  dataUpdated: UpdateTripRequest
+) {
   try {
     const { data } = await api.patch<UpdateDeleteTripResponse>(
       `${API_ENDPOINT}/${tripId}`,

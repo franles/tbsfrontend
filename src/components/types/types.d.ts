@@ -1,9 +1,9 @@
 interface Service {
   id: number;
   nombre: string;
-  valor: number;          
+  valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-  moneda: number;            
+  moneda: number;
   tipo_cambio_id: number | null;
 }
 
@@ -19,7 +19,7 @@ export interface Trip {
   valor_total: number;
   ganancia: number;
   costo: number;
-  valor_usd: number | null;
+  valor_tasa_cambio: number | null;
   servicios: Service[];
 }
 
@@ -74,14 +74,14 @@ export type CreateServiceTripData = {
   servicio_id: number;
   valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-  tipo_cambio_id?: number | null;
+  valor_tasa_cambio?: number | null;
 };
 export type UpdateServiceData = {
   id: number;
   valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
   moneda: number;
-  tipo_cambio_id: number | null;
+  valor_tasa_cambio: number | null;
 };
 
 type FinanceResume = {
@@ -101,45 +101,29 @@ export type Finance = {
 
 export type FinanceData = Finance["data"];
 
-export type CreateTripData = {
-  servicios: {
-    id: number;
-    valor: number;
-    pagado_por: "pendiente";
-    tipo_cambio_id?: number;
-  }[];
-  apellido: string;
-  valor_total: number;
-  destino: "internacional" | "nacional" | "";
-  fecha_ida: string;
-  fecha_vuelta: string;
-  moneda: number;
-  valor_usd?: number | null;
-
-};
-
-export type CreateTripFormData = {
+export type CreateTripRequest = {
   servicios: {
     id: number;
     valor: number;
     pagado_por: "pendiente";
     moneda: number;
+    valor_tasa_cambio: number | null;
   }[];
   apellido: string;
   valor_total: number;
-  valor_usd?: number | null;
+  valor_tasa_cambio?: number | null;
   destino: "internacional" | "nacional" | "";
-  fecha_ida: Date;
-  fecha_vuelta: Date;
+  fecha_ida: string;
+  fecha_vuelta: string;
   moneda: number;
 };
 
-export type UpdateTripData = {
+export type UpdateTripRequest = {
   valor_total?: number;
   destino?: "internacional" | "nacional";
   apellido?: string;
-  moneda?: number;          
-  valor_usd?: number | null;
+  moneda?: number;
+  valor_tasa_cambio?: number | null;
   servicios: UpdateServiceData[];
 };
 

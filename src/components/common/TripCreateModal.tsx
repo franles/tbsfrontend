@@ -1,12 +1,10 @@
 import { useServices } from "../hooks/useServices";
 import { useCreateTrip } from "../hooks/useTrips";
 import { modalStore } from "../store/modalStore";
-import type { CreateTripData, CreateTripFormData } from "../types/types";
+import type { CreateTripRequest } from "../types/types";
 import { BtnCloseModal } from "./BtnCloseModal";
 import { useForm } from "@tanstack/react-form";
 import { useState, useEffect } from "react";
-
-
 
 export const TripCreateModal = () => {
   const { setIsCreate } = modalStore();
@@ -15,7 +13,6 @@ export const TripCreateModal = () => {
 
   const form = useForm({
     defaultValues: {
-      valor_usd: 0,
       moneda: 0,
       valor_total: 0,
       destino: "",
@@ -23,21 +20,23 @@ export const TripCreateModal = () => {
       fecha_ida: "",
       fecha_vuelta: "",
       servicios: [],
-    } as CreateTripData,
+      valor_tasa_cambio: null,
+    } as CreateTripRequest,
     onSubmit: ({ value, formApi }) => {
-      const trip: CreateTripFormData = {
-        fecha_ida: new Date(value.fecha_ida),
-        fecha_vuelta: new Date(value.fecha_vuelta),
+      const trip: CreateTripRequest = {
+        fecha_ida: new Date(value.fecha_ida).toISOString().split("T")[0],
+        fecha_vuelta: new Date(value.fecha_vuelta).toISOString().split("T")[0],
         moneda: value.moneda,
         destino: value.destino,
         apellido: value.apellido,
         valor_total: value.valor_total,
-        //valor_usd: value.valor_usd,
+        valor_tasa_cambio: value.moneda === 2 ? value.valor_tasa_cambio : null,
         servicios: value.servicios.map((s) => ({
           id: s.id,
           valor: 0,
           pagado_por: "pendiente",
           moneda: value.moneda,
+          valor_tasa_cambio: null,
         })),
       };
       createTrip(trip);
@@ -54,7 +53,7 @@ export const TripCreateModal = () => {
     const m = form.getFieldValue("moneda");
     setSelectedMoneda(m ?? 0);
   }, []);
-  
+
   console.log(services);
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-3xl  p-6 relative animate-fadeIn text-black">
@@ -186,13 +185,13 @@ export const TripCreateModal = () => {
                     <select
                       onChange={(e) => {
                         const val = Number(e.target.value) as 0 | 1 | 2;
-                        field.handleChange(val);       
-                        setSelectedMoneda(val);         
+                        field.handleChange(val);
+                        setSelectedMoneda(val);
 
                         if (val === 2) {
-                          form.setFieldValue("valor_usd", 0);
+                          form.setFieldValue("valor_tasa_cambio", 0);
                         } else {
-                          form.setFieldValue("valor_usd", undefined);
+                          form.setFieldValue("valor_tasa_cambio", null);
                         }
                       }}
                       value={field.state.value ?? 0}
@@ -211,17 +210,8 @@ export const TripCreateModal = () => {
                 )}
               </form.Field>
 
-{/* Mostrar valor usd si  moneda = USD */}
               {selectedMoneda === 2 && (
-                <form.Field
-                  name="valor_usd"
-                  validators={{
-                    onSubmit: ({ value }) => {
-                      if (!value) return "Este campo es obligatorio";
-                      if (value <= 0) return "La cotización debe ser mayor a 0";
-                    },
-                  }}
-                >
+                <form.Field name="valor_tasa_cambio">
                   {(field) => (
                     <div className="mb-4 flex flex-col ml-4">
                       <label className="block font-semibold mb-1">
@@ -229,13 +219,13 @@ export const TripCreateModal = () => {
                       </label>
 
                       <input
-                        type="number"
+                        type="text"
                         value={
                           typeof field.state.value === "number"
                             ? new Intl.NumberFormat("es-AR", {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            }).format(field.state.value)
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              }).format(field.state.value)
                             : ""
                         }
                         onChange={(e) => {
@@ -255,7 +245,7 @@ export const TripCreateModal = () => {
                 </form.Field>
               )}
             </div>
-            
+
             <div className="flex">
               <form.Field
                 name="fecha_ida"
@@ -328,21 +318,26 @@ export const TripCreateModal = () => {
 
                 const toggleService = (serviceId: number) => {
                   const currentValues = fieldArray.state.value;
+                  console.log("toggleService", serviceId, currentValues);
                   const exists = currentValues.some((s) => s.id === serviceId);
+                  console.log("exists", exists);
 
                   if (exists) {
                     const indexToRemove = currentValues.findIndex(
                       (s) => s.id === serviceId
                     );
+                    console.log("removing index", indexToRemove);
                     if (indexToRemove !== -1) {
                       fieldArray.removeValue(indexToRemove);
                     }
                   } else {
+                    console.log("adding service");
                     fieldArray.pushValue({
                       id: serviceId,
                       valor: 0,
                       pagado_por: "pendiente",
-                      tipo_cambio_id: 0,
+                      moneda: form.getFieldValue("moneda") ?? 0,
+                      valor_tasa_cambio: null,
                     });
                   }
                 };
@@ -353,7 +348,7 @@ export const TripCreateModal = () => {
                       Servicios:
                     </label>
                     <div className="grid grid-cols-3 gap-3">
-                      {services?.data.map((service) => (
+                      {services?.data?.map((service) => (
                         <label
                           key={service.id}
                           className="flex items-center gap-2 mb-2 cursor-pointer capitalize"

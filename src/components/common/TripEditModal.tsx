@@ -4,12 +4,18 @@ import { tripsStore } from "../store/tripsStore";
 import { IoClose, IoCloseCircle } from "react-icons/io5";
 import { renderEstado } from "../utils/utilsTsx";
 import { useForm } from "@tanstack/react-form";
-import type { UpdateTripData } from "../types/types";
+import type { UpdateTripRequest, UpdateServiceData } from "../types/types";
 import { IoIosAdd, IoIosRemove } from "react-icons/io";
 import { toast } from "sonner";
-import { useCreateService, useDeleteService, useServices } from "../hooks/useServices";
+import {
+  useCreateService,
+  useDeleteService,
+  useServices,
+} from "../hooks/useServices";
 import { formattedAmount } from "../utils/utils";
 import { useState, useEffect } from "react";
+
+// Local type for Form State including UI-specific fields
 
 export const TripEditModal = () => {
   const { setIsEdit } = modalStore();
@@ -25,26 +31,36 @@ export const TripEditModal = () => {
 
   const form = useForm({
     defaultValues: {
-      apellido: "",
-      destino: "internacional",
-      valor_total: 0,
-      moneda: 1,
-      valor_usd: null,
-      servicios: [],
-    } as UpdateTripData,
+      apellido: trip?.apellido,
+      destino: trip?.destino,
+      valor_total: trip?.valor_total,
+      moneda: trip?.moneda,
+      servicios:
+        trip?.servicios?.map((s) => ({
+          id: s.id,
+          valor: s.valor,
+          pagado_por: s.pagado_por,
+          moneda: s.moneda,
+          valor_tasa_cambio: s.tipo_cambio_id,
+        })) ?? [],
+      valor_tasa_cambio: trip?.valor_tasa_cambio ?? null,
+    } as UpdateTripRequest,
     onSubmit: ({ value }) => {
       const serviciosOriginales = trip?.servicios ?? [];
 
       // detectamos cambios en servicios (solo los que se modificaron)
-      const serviciosActualizados = (value.servicios ?? [])
+      const serviciosActualizados: UpdateServiceData[] = (value.servicios ?? [])
         .filter((s) => {
           const original = serviciosOriginales.find((o) => o.id === s.id);
+          // Check if original exists and compare values.
+          // Note: original.tipo_cambio_id vs s.valor_tasa_cambio
+          if (!original) return true; // New service? (Shouldn't happen here usually but safe to include)
+
           return (
-            original &&
-            (s.valor !== original.valor ||
-              s.pagado_por !== original.pagado_por ||
-              s.moneda !== original.moneda ||
-              s.tipo_cambio_id !== original.tipo_cambio_id)
+            s.valor !== original.valor ||
+            s.pagado_por !== original.pagado_por ||
+            s.moneda !== original.moneda ||
+            s.valor_tasa_cambio !== (original.tipo_cambio_id ?? null)
           );
         })
         .map((s) => ({
@@ -52,22 +68,16 @@ export const TripEditModal = () => {
           valor: Number(s.valor),
           pagado_por: s.pagado_por,
           moneda: s.moneda,
-          tipo_cambio_id: s.tipo_cambio_id ?? null,
+          valor_tasa_cambio: s.valor_tasa_cambio ?? null,
         }));
 
-      const valorUsdToSend =
-        Number(trip?.moneda) === 2
-          ? Number(value.valor_usd ?? trip?.valor_usd ?? 0)
-          : null;
-
-      const dataUpdated = {
+      const dataUpdated: UpdateTripRequest = {
         apellido: value.apellido ?? trip?.apellido,
         valor_total: Number(value.valor_total ?? trip?.valor_total),
         destino: value.destino ?? trip?.destino,
-        valor_usd: valorUsdToSend,
+        valor_tasa_cambio: value.valor_tasa_cambio,
         servicios: serviciosActualizados,
       };
-
       updateTripMutate({ tripId: tripId!, dataUpdated });
     },
   });
@@ -77,20 +87,21 @@ export const TripEditModal = () => {
     if (!trip) return;
     form.reset({
       apellido: trip.apellido ?? "",
-      destino: (trip.destino as "internacional" | "nacional") ?? "internacional",
+      destino:
+        (trip.destino as "internacional" | "nacional") ?? "internacional",
       valor_total: trip.valor_total ?? 0,
-      valor_usd: typeof trip.valor_usd !== "undefined" ? trip.valor_usd : null,
       moneda: Number(trip.moneda) ?? 1,
+      valor_tasa_cambio: trip.valor_tasa_cambio ?? null,
       servicios:
         trip.servicios?.map((s) => ({
           id: s.id,
           valor: s.valor ?? 0,
           pagado_por: s.pagado_por ?? "pendiente",
           moneda: s.moneda ?? 1,
-          tipo_cambio_id: s.tipo_cambio_id ?? null,
+          valor_tasa_cambio: s.tipo_cambio_id ?? null,
         })) ?? [],
-    } as UpdateTripData);
-  }, [trip]);
+    } as UpdateTripRequest);
+  }, [trip, form]);
 
   return (
     <div
@@ -164,7 +175,9 @@ export const TripEditModal = () => {
                 <label className="block font-semibold mb-1 select-none">
                   Fecha creación
                 </label>
-                <p>{trip?.fecha && new Date(trip.fecha).toLocaleDateString()}</p>
+                <p>
+                  {trip?.fecha && new Date(trip.fecha).toLocaleDateString()}
+                </p>
               </div>
               <div>
                 <label className="block font-semibold mb-1 select-none">
@@ -183,60 +196,40 @@ export const TripEditModal = () => {
               {/* Moneda + (si aplica) cotización USD en ARS al lado */}
               <div className="mb-3 flex items-end gap-6">
                 <div>
-                  <label className="block font-semibold mb-1 select-none">Moneda</label>
-                  <p className="font-medium">{trip?.moneda}</p>
-                </div>
-
-                {/* Mostrar input de cotización sólo si el tipo de moneda es USD*/}
-                {Number(trip?.moneda) === 2 && (
-                  <form.Field
-                    name="valor_usd"
-                    validators={{
-                      onSubmit: ({ value }) => {
-                        if (value == null) return "La cotización es obligatoria para viajes en USD";
-                        if (Number(value) <= 0) return "La cotización debe ser mayor a 0";
-                      },
-                    }}
-                  >
+                  <label className="block font-semibold mb-1 select-none">
+                    Moneda
+                  </label>
+                  <form.Field name="moneda">
                     {(field) => (
-                      <div>
-                        <label className="block font-semibold mb-1 select-none">
-                          Cotización USD en ARS
-                        </label>
-
-                        <input
-                          type="number"
-                          value={typeof field.state.value === "number" ? field.state.value : ""}
-                          onChange={(e) => {
-                            const soloNumeros = e.target.value.replace(/\D/g, "");
-                            field.handleChange(soloNumeros === "" ? null : Number(soloNumeros));
-                          }}
-                          className="border p-2 rounded w-48"
-                        />
-
-                        {field.state.meta.errors.length > 0 && (
-                          <em className="text-red-600 text-sm">
-                            {field.state.meta.errors.join(", ")}
-                          </em>
-                        )}
-                      </div>
+                      <select
+                        value={field.state.value}
+                        onChange={(e) =>
+                          field.handleChange(Number(e.target.value))
+                        }
+                        className="border p-2 rounded w-1/2"
+                      >
+                        <option value={1}>ARS</option>
+                        <option value={2}>USD</option>
+                      </select>
                     )}
                   </form.Field>
-                )}
+                </div>
               </div>
 
               <form.Field name="valor_total">
                 {(field) => (
                   <div className="mb-3">
-                    <label className="block font-semibold mb-1 select-none">Valor total</label>
+                    <label className="block font-semibold mb-1 select-none">
+                      Valor total
+                    </label>
                     <input
                       type="text"
                       value={
                         field.state.value
                           ? new Intl.NumberFormat("es-AR", {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0,
-                          }).format(field.state.value)
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(field.state.value)
                           : ""
                       }
                       onChange={(e) => {
@@ -249,13 +242,64 @@ export const TripEditModal = () => {
                 )}
               </form.Field>
 
+              {trip?.valor_tasa_cambio && (
+                <form.Field
+                  name="valor_tasa_cambio"
+                  validators={{
+                    onSubmit: ({ value }) => {
+                      if (value == null)
+                        return "La cotización es obligatoria para viajes en USD";
+                      if (Number(value) <= 0)
+                        return "La cotización debe ser mayor a 0";
+                    },
+                  }}
+                >
+                  {(field) => (
+                    <div className="mb-3">
+                      <label className="block font-semibold mb-1 select-none">
+                        Cotización USD en ARS
+                      </label>
+
+                      <input
+                        type="text"
+                        value={
+                          field.state.value
+                            ? new Intl.NumberFormat("es-AR", {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              }).format(field.state.value)
+                            : ""
+                        }
+                        onChange={(e) => {
+                          const soloNumeros = e.target.value.replace(/\D/g, "");
+                          field.handleChange(
+                            soloNumeros === "" ? null : Number(soloNumeros)
+                          );
+                        }}
+                        className="border p-2 rounded w-48"
+                      />
+
+                      {field.state.meta.errors.length > 0 && (
+                        <em className="text-red-600 text-sm">
+                          {field.state.meta.errors.join(", ")}
+                        </em>
+                      )}
+                    </div>
+                  )}
+                </form.Field>
+              )}
+
               <div className="mb-3">
-                <label className="block font-semibold mb-1 select-none">Costo</label>
+                <label className="block font-semibold mb-1 select-none">
+                  Costo
+                </label>
                 <p>${trip?.costo && formattedAmount(trip.costo)}</p>
               </div>
 
               <div>
-                <label className="block font-semibold mb-1 select-none">Ganancia</label>
+                <label className="block font-semibold mb-1 select-none">
+                  Ganancia
+                </label>
                 <p>${trip?.ganancia && formattedAmount(trip.ganancia)}</p>
               </div>
             </div>
@@ -263,7 +307,9 @@ export const TripEditModal = () => {
 
           {/* Servicios */}
           <div className="border border-gray-300 rounded-xl p-4">
-            <h1 className="font-bold text-xl text-blue-600 mb-4 select-none">Servicios:</h1>
+            <h1 className="font-bold text-xl text-blue-600 mb-4 select-none">
+              Servicios:
+            </h1>
 
             <form.Field name="servicios">
               {(field) => (
@@ -276,7 +322,11 @@ export const TripEditModal = () => {
                       >
                         {/* Nombre */}
                         <div className="capitalize w-40 font-semibold">
-                          {services?.data.find((service) => service.id === s.id)?.nombre}
+                          {
+                            services?.data?.find(
+                              (service) => service.id === s.id
+                            )?.nombre
+                          }
                         </div>
 
                         {/* Valor */}
@@ -288,15 +338,23 @@ export const TripEditModal = () => {
                             value={
                               s.valor
                                 ? new Intl.NumberFormat("es-AR", {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                }).format(s.valor)
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  }).format(s.valor)
                                 : ""
                             }
                             onChange={(e) => {
-                              const newServicios = [...(field.state.value ?? [])];
-                              const soloNumeros = e.target.value.replace(/\D/g, "");
-                              newServicios[index] = { ...s, valor: Number(soloNumeros) };
+                              const newServicios = [
+                                ...(field.state.value ?? []),
+                              ];
+                              const soloNumeros = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
+                              newServicios[index] = {
+                                ...s,
+                                valor: Number(soloNumeros),
+                              };
                               field.handleChange(newServicios);
                             }}
                           />
@@ -308,7 +366,10 @@ export const TripEditModal = () => {
                           value={s.moneda}
                           onChange={(e) => {
                             const newServicios = [...(field.state.value ?? [])];
-                            newServicios[index] = { ...s, moneda: Number(e.target.value) };
+                            newServicios[index] = {
+                              ...s,
+                              moneda: Number(e.target.value),
+                            };
                             field.handleChange(newServicios);
                           }}
                         >
@@ -324,16 +385,26 @@ export const TripEditModal = () => {
                             </label>
                             <input
                               type="number"
-                              value={field.form.getFieldValue("valor_usd") ?? ""}
+                              value={
+                                field.form.getFieldValue("valor_tasa_cambio") ??
+                                ""
+                              }
                               onChange={(e) => {
-                                const soloNumeros = e.target.value.replace(/\D/g, "");
-                                field.form.setFieldValue("valor_usd", soloNumeros === "" ? null : Number(soloNumeros));
+                                const soloNumeros = e.target.value.replace(
+                                  /\D/g,
+                                  ""
+                                );
+                                field.form.setFieldValue(
+                                  "valor_tasa_cambio",
+                                  soloNumeros === ""
+                                    ? null
+                                    : Number(soloNumeros)
+                                );
                               }}
                               className="border p-2 rounded w-24"
                             />
                           </div>
                         )}
-
 
                         {/* Pagado por */}
                         <select
@@ -343,7 +414,11 @@ export const TripEditModal = () => {
                             const newServicios = [...(field.state.value ?? [])];
                             newServicios[index] = {
                               ...s,
-                              pagado_por: e.target.value as "pendiente" | "pablo" | "soledad" | "mariana",
+                              pagado_por: e.target.value as
+                                | "pendiente"
+                                | "pablo"
+                                | "soledad"
+                                | "mariana",
                             };
                             field.handleChange(newServicios);
                           }}
@@ -354,30 +429,35 @@ export const TripEditModal = () => {
                           <option value="soledad">Soledad</option>
                         </select>
 
-
-
                         {/* Botón eliminar */}
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const nombreServicio = services?.data.find((service) => service.id === s.id)?.nombre;
+                            const nombreServicio = services?.data.find(
+                              (service) => service.id === s.id
+                            )?.nombre;
 
-                            toast.warning(`¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`, {
-                              duration: 2200,
-                              action: {
-                                label: "Eliminar",
-                                onClick: () => {
-                                  deleteServiceMutate({
-                                    serviceId: s.id!,
-                                    tripId: trip!.id,
-                                  });
+                            toast.warning(
+                              `¿Estás seguro de que quieres eliminar el servicio "${nombreServicio}"?`,
+                              {
+                                duration: 2200,
+                                action: {
+                                  label: "Eliminar",
+                                  onClick: () => {
+                                    deleteServiceMutate({
+                                      serviceId: s.id!,
+                                      tripId: trip!.id,
+                                    });
 
-                                  const newServicios = (field.state.value ?? []).filter((serv) => serv.id !== s.id);
-                                  field.handleChange(newServicios);
+                                    const newServicios = (
+                                      field.state.value ?? []
+                                    ).filter((serv) => serv.id !== s.id);
+                                    field.handleChange(newServicios);
+                                  },
                                 },
-                              },
-                            });
+                              }
+                            );
                           }}
                           className="text-red-500 rounded-full hover:text-red-600"
                         >
@@ -389,15 +469,28 @@ export const TripEditModal = () => {
 
                   {/* Agregar servicio */}
                   {add &&
-                    services?.data.some((s) => !(field.state.value ?? []).some((fs) => fs.id === s.id)) && (
+                    services?.data.some(
+                      (s) =>
+                        !(field.state.value ?? []).some((fs) => fs.id === s.id)
+                    ) && (
                       <div className="flex items-center justify-between gap-3 border p-3 rounded-md border-blue-500 shadow-sm">
                         <select
                           className="border p-2 rounded w-40 capitalize"
                           onChange={(e) => {
                             const serviceId = Number(e.target.value);
+                            console.log(
+                              "TripEditModal: selected serviceId",
+                              serviceId
+                            );
                             if (!serviceId) return;
 
-                            const serviceToAdd = services?.data.find((s) => s.id === serviceId);
+                            const serviceToAdd = services?.data?.find(
+                              (s) => s.id === serviceId
+                            );
+                            console.log(
+                              "TripEditModal: serviceToAdd",
+                              serviceToAdd
+                            );
                             if (!serviceToAdd) return;
 
                             field.handleChange([
@@ -407,7 +500,7 @@ export const TripEditModal = () => {
                                 valor: 0,
                                 pagado_por: "pendiente",
                                 moneda: Number(trip?.moneda) ?? 1,
-                                tipo_cambio_id: null,
+                                valor_tasa_cambio: null,
                               },
                             ]);
 
@@ -423,7 +516,12 @@ export const TripEditModal = () => {
                         >
                           <option value="">Agregar servicio...</option>
                           {services?.data
-                            .filter((s) => !(field.state.value ?? []).some((fs) => fs.id === s.id))
+                            ?.filter(
+                              (s) =>
+                                !(field.state.value ?? []).some(
+                                  (fs) => fs.id === s.id
+                                )
+                            )
                             .map((s) => (
                               <option key={s.id} value={s.id}>
                                 {s.nombre}
@@ -433,20 +531,31 @@ export const TripEditModal = () => {
 
                         <div className="flex items-center gap-1">
                           <span className="text-xl font-semibold">$</span>
-                          <input type="text" className="border py-2 px-4 rounded w-32" disabled />
+                          <input
+                            type="text"
+                            className="border py-2 px-4 rounded w-32"
+                            disabled
+                          />
                         </div>
 
                         <select className="border p-2 rounded" disabled>
                           <option>Pendiente</option>
                         </select>
 
-                        <button type="button" onClick={() => setAdd(false)} className="text-red-500 rounded-full hover:text-red-600">
+                        <button
+                          type="button"
+                          onClick={() => setAdd(false)}
+                          className="text-red-500 rounded-full hover:text-red-600"
+                        >
                           <IoCloseCircle size={30} />
                         </button>
                       </div>
                     )}
 
-                  {services?.data.some((s) => !(field.state.value ?? []).some((fs) => fs.id === s.id)) && (
+                  {services?.data?.some(
+                    (s) =>
+                      !(field.state.value ?? []).some((fs) => fs.id === s.id)
+                  ) && (
                     <button
                       type="button"
                       className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
@@ -481,7 +590,10 @@ export const TripEditModal = () => {
               Eliminar viaje
             </button>
 
-            <button type="submit" className="bg-green-500 text-white rounded-full py-2 px-6 font-semibold transition-all flex items-center gap-2 hover:bg-green-600">
+            <button
+              type="submit"
+              className="bg-green-500 text-white rounded-full py-2 px-6 font-semibold transition-all flex items-center gap-2 hover:bg-green-600"
+            >
               <IoIosAdd />
               Guardar cambios
             </button>
