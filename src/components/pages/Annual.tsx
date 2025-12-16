@@ -43,7 +43,7 @@ function Annual() {
         {isLoading ? (
           <p className="text-center mt-6 text-gray-600">Cargando finanzas...</p>
         ) : finance ? (
-          <FinanceTable financeData={finance.data} />
+          <FinanceTable financeData={finance.data} viewMode={currency} />
         ) : (
           <p className="text-center mt-6 text-gray-600">
             No se encontraron resultados

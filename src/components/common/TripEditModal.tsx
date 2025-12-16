@@ -41,7 +41,7 @@ export const TripEditModal = () => {
           valor: s.valor,
           pagado_por: s.pagado_por,
           moneda: s.moneda,
-          valor_tasa_cambio: s.tipo_cambio_id,
+          valor_tasa_cambio: s.valor_tasa_cambio,
         })) ?? [],
       valor_tasa_cambio: trip?.valor_tasa_cambio ?? null,
     } as UpdateTripRequest,
@@ -60,7 +60,7 @@ export const TripEditModal = () => {
             s.valor !== original.valor ||
             s.pagado_por !== original.pagado_por ||
             s.moneda !== original.moneda ||
-            s.valor_tasa_cambio !== (original.tipo_cambio_id ?? null)
+            s.valor_tasa_cambio !== (original.valor_tasa_cambio ?? null)
           );
         })
         .map((s) => ({
@@ -98,7 +98,7 @@ export const TripEditModal = () => {
           valor: s.valor ?? 0,
           pagado_por: s.pagado_por ?? "pendiente",
           moneda: s.moneda ?? 1,
-          valor_tasa_cambio: s.tipo_cambio_id ?? null,
+          valor_tasa_cambio: s.valor_tasa_cambio ?? null,
         })) ?? [],
     } as UpdateTripRequest);
   }, [trip, form]);
@@ -194,8 +194,8 @@ export const TripEditModal = () => {
               </h1>
 
               {/* Moneda + (si aplica) cotización USD en ARS al lado */}
-              <div className="mb-3 flex items-end gap-6">
-                <div>
+              <div className="mb-3 flex items-start gap-6">
+                <div className="w-1/2">
                   <label className="block font-semibold mb-1 select-none">
                     Moneda
                   </label>
@@ -206,7 +206,7 @@ export const TripEditModal = () => {
                         onChange={(e) =>
                           field.handleChange(Number(e.target.value))
                         }
-                        className="border p-2 rounded w-1/2"
+                        className="border p-2 rounded w-full"
                       >
                         <option value={1}>ARS</option>
                         <option value={2}>USD</option>
@@ -214,6 +214,68 @@ export const TripEditModal = () => {
                     )}
                   </form.Field>
                 </div>
+
+                <form.Subscribe selector={(state) => state.values.moneda}>
+                  {(moneda) =>
+                    moneda === 2 ? (
+                      <div className="w-1/2">
+                        <form.Field
+                          name="valor_tasa_cambio"
+                          validators={{
+                            onSubmit: ({ value }) => {
+                              if (Number(moneda) === 2) {
+                                if (value == null)
+                                  return "La cotización es obligatoria para viajes en USD";
+                                if (Number(value) <= 0)
+                                  return "La cotización debe ser mayor a 0";
+                              }
+                            },
+                          }}
+                        >
+                          {(field) => (
+                            <div>
+                              <label className="block font-semibold mb-1 select-none">
+                                Cotización USD en ARS
+                              </label>
+
+                              <input
+                                type="text"
+                                value={
+                                  field.state.value
+                                    ? new Intl.NumberFormat("es-AR", {
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    }).format(field.state.value)
+                                    : ""
+                                }
+                                onChange={(e) => {
+                                  const soloNumeros = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  field.handleChange(
+                                    soloNumeros === ""
+                                      ? null
+                                      : Number(soloNumeros)
+                                  );
+                                }}
+                                className="border p-2 rounded w-full"
+                              />
+
+                              {field.state.meta.errors.length > 0 && (
+                                <em className="text-red-600 text-sm">
+                                  {field.state.meta.errors.join(", ")}
+                                </em>
+                              )}
+                            </div>
+                          )}
+                        </form.Field>
+                      </div>
+                    ) : (
+                      <div className="w-1/2"></div>
+                    )
+                  }
+                </form.Subscribe>
               </div>
 
               <form.Field name="valor_total">
@@ -227,9 +289,9 @@ export const TripEditModal = () => {
                       value={
                         field.state.value
                           ? new Intl.NumberFormat("es-AR", {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            }).format(field.state.value)
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }).format(field.state.value)
                           : ""
                       }
                       onChange={(e) => {
@@ -242,52 +304,7 @@ export const TripEditModal = () => {
                 )}
               </form.Field>
 
-              {trip?.valor_tasa_cambio && (
-                <form.Field
-                  name="valor_tasa_cambio"
-                  validators={{
-                    onSubmit: ({ value }) => {
-                      if (value == null)
-                        return "La cotización es obligatoria para viajes en USD";
-                      if (Number(value) <= 0)
-                        return "La cotización debe ser mayor a 0";
-                    },
-                  }}
-                >
-                  {(field) => (
-                    <div className="mb-3">
-                      <label className="block font-semibold mb-1 select-none">
-                        Cotización USD en ARS
-                      </label>
 
-                      <input
-                        type="text"
-                        value={
-                          field.state.value
-                            ? new Intl.NumberFormat("es-AR", {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              }).format(field.state.value)
-                            : ""
-                        }
-                        onChange={(e) => {
-                          const soloNumeros = e.target.value.replace(/\D/g, "");
-                          field.handleChange(
-                            soloNumeros === "" ? null : Number(soloNumeros)
-                          );
-                        }}
-                        className="border p-2 rounded w-48"
-                      />
-
-                      {field.state.meta.errors.length > 0 && (
-                        <em className="text-red-600 text-sm">
-                          {field.state.meta.errors.join(", ")}
-                        </em>
-                      )}
-                    </div>
-                  )}
-                </form.Field>
-              )}
 
               <div className="mb-3">
                 <label className="block font-semibold mb-1 select-none">
@@ -330,52 +347,64 @@ export const TripEditModal = () => {
                         </div>
 
                         {/* Valor */}
-                        <div className="flex items-center gap-1">
-                          <span className="text-xl font-semibold">$</span>
-                          <input
-                            type="text"
-                            className="border py-2 px-4 rounded w-32"
-                            value={
-                              s.valor
-                                ? new Intl.NumberFormat("es-AR", {
+                        <div className="flex flex-col">
+                          <label className="block text-xs font-semibold mb-1 select-none">
+                            Valor:
+                          </label>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xl font-semibold">$</span>
+                            <input
+                              type="text"
+                              className="border py-2 px-4 rounded w-32"
+                              value={
+                                s.valor
+                                  ? new Intl.NumberFormat("es-AR", {
                                     minimumFractionDigits: 0,
                                     maximumFractionDigits: 0,
                                   }).format(s.valor)
-                                : ""
-                            }
+                                  : ""
+                              }
+                              onChange={(e) => {
+                                const newServicios = [
+                                  ...(field.state.value ?? []),
+                                ];
+                                const soloNumeros = e.target.value.replace(
+                                  /\D/g,
+                                  ""
+                                );
+                                newServicios[index] = {
+                                  ...s,
+                                  valor: Number(soloNumeros),
+                                };
+                                field.handleChange(newServicios);
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Moneda */}
+                        <div className="flex flex-col">
+                          <label className="block text-xs font-semibold mb-1 select-none">
+                            Moneda:
+                          </label>
+                          <select
+                            className="border p-2 rounded"
+                            value={s.moneda}
                             onChange={(e) => {
                               const newServicios = [
                                 ...(field.state.value ?? []),
                               ];
-                              const soloNumeros = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              );
                               newServicios[index] = {
                                 ...s,
-                                valor: Number(soloNumeros),
+                                moneda: Number(e.target.value),
                               };
                               field.handleChange(newServicios);
                             }}
-                          />
+                          >
+                            <option value={1}>ARS</option>
+                            <option value={2}>USD</option>
+                          </select>
                         </div>
-
-                        {/* Moneda */}
-                        <select
-                          className="border p-2 rounded"
-                          value={s.moneda}
-                          onChange={(e) => {
-                            const newServicios = [...(field.state.value ?? [])];
-                            newServicios[index] = {
-                              ...s,
-                              moneda: Number(e.target.value),
-                            };
-                            field.handleChange(newServicios);
-                          }}
-                        >
-                          <option value={1}>ARS</option>
-                          <option value={2}>USD</option>
-                        </select>
 
                         {/* Verifica si la moneda del servicio actual es USD */}
                         {s.moneda === 2 && (
@@ -407,27 +436,34 @@ export const TripEditModal = () => {
                         )}
 
                         {/* Pagado por */}
-                        <select
-                          className="border p-2 rounded"
-                          value={s.pagado_por}
-                          onChange={(e) => {
-                            const newServicios = [...(field.state.value ?? [])];
-                            newServicios[index] = {
-                              ...s,
-                              pagado_por: e.target.value as
-                                | "pendiente"
-                                | "pablo"
-                                | "soledad"
-                                | "mariana",
-                            };
-                            field.handleChange(newServicios);
-                          }}
-                        >
-                          <option value="pendiente">Pendiente</option>
-                          <option value="mariana">Mariana</option>
-                          <option value="pablo">Pablo</option>
-                          <option value="soledad">Soledad</option>
-                        </select>
+                        <div className="flex flex-col">
+                          <label className="block text-xs font-semibold mb-1 select-none">
+                            Pagado por:
+                          </label>
+                          <select
+                            className="border p-2 rounded"
+                            value={s.pagado_por}
+                            onChange={(e) => {
+                              const newServicios = [
+                                ...(field.state.value ?? []),
+                              ];
+                              newServicios[index] = {
+                                ...s,
+                                pagado_por: e.target.value as
+                                  | "pendiente"
+                                  | "pablo"
+                                  | "soledad"
+                                  | "mariana",
+                              };
+                              field.handleChange(newServicios);
+                            }}
+                          >
+                            <option value="pendiente">Pendiente</option>
+                            <option value="mariana">Mariana</option>
+                            <option value="pablo">Pablo</option>
+                            <option value="soledad">Soledad</option>
+                          </select>
+                        </div>
 
                         {/* Botón eliminar */}
                         <button
@@ -556,15 +592,15 @@ export const TripEditModal = () => {
                     (s) =>
                       !(field.state.value ?? []).some((fs) => fs.id === s.id)
                   ) && (
-                    <button
-                      type="button"
-                      className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
-                      onClick={() => setAdd(true)}
-                    >
-                      <IoIosAdd className="mr-2" />
-                      Agregar servicio
-                    </button>
-                  )}
+                      <button
+                        type="button"
+                        className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
+                        onClick={() => setAdd(true)}
+                      >
+                        <IoIosAdd className="mr-2" />
+                        Agregar servicio
+                      </button>
+                    )}
                 </div>
               )}
             </form.Field>

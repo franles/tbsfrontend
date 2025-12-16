@@ -4,7 +4,7 @@ interface Service {
   valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
   moneda: number;
-  tipo_cambio_id: number | null;
+  valor_tasa_cambio: number | null;
 }
 
 export interface Trip {
@@ -92,14 +92,12 @@ type FinanceResume = {
 };
 
 export type Finance = {
-  data: {
-    mes: string;
-    mes_num: number;
-    resumen: FinanceResume[];
-  };
+  mes: string;
+  mes_num: number;
+  resumen: FinanceResume[];
 };
 
-export type FinanceData = Finance["data"];
+export type FinanceData = Finance[];
 
 export type CreateTripRequest = {
   servicios: {

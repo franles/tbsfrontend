@@ -50,7 +50,8 @@ export const Filter = ({
           <span className="font-semibold">Año:</span>
           <select
             onChange={(e) => {
-              setYear(Number(e.target.value));
+              const val = e.target.value;
+              setYear(val === "" ? null : Number(val));
             }}
             value={year ?? ""}
             className="w-[90px] border border-gray-300 rounded px-2 py-1 shadow-sm"
@@ -87,19 +88,39 @@ export const Filter = ({
       {/* Moneda */}
       {setCurrency && (
         <div className="flex flex-col">
-          <span className="font-semibold">Moneda:</span>
-          <select
-            onChange={(e) => {
-              const val = e.target.value;
-              setCurrency(val === "" ? null : (val as "ARS" | "USD"));
-            }}
-            value={currency ?? ""}
-            className="w-[105px] border border-gray-300 rounded px-2 py-1 shadow-sm"
-          >
-            <option value={""}>ARS/USD</option>
-            <option value="ARS">ARS</option>
-            <option value="USD">USD</option>
-          </select>
+          <span className="font-semibold mb-1">Moneda:</span>
+          <div className="inline-flex rounded-md shadow-sm" role="group">
+            <button
+              type="button"
+              onClick={() => setCurrency(null)}
+              className={`px-3 py-1 text-sm font-medium border border-gray-300 rounded-l-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-gray-500 focus:text-gray-700 ${!currency
+                ? "bg-gray-100 text-gray-900 z-10 font-bold"
+                : "bg-white text-gray-700"
+                }`}
+            >
+              Todos
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrency("ARS")}
+              className={`px-3 py-1 text-sm font-medium border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-700 ${currency === "ARS"
+                ? "bg-blue-50 text-blue-700 z-10 font-bold"
+                : "bg-white text-gray-700"
+                }`}
+            >
+              ARS
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrency("USD")}
+              className={`px-3 py-1 text-sm font-medium border border-gray-300 rounded-r-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-green-500 focus:text-green-700 ${currency === "USD"
+                ? "bg-green-50 text-green-700 z-10 font-bold"
+                : "bg-white text-gray-700"
+                }`}
+            >
+              USD
+            </button>
+          </div>
         </div>
       )}
     </div>

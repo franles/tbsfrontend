@@ -19,7 +19,6 @@ function Home() {
 
   const { isOpen, isCreate, setIsCreate, isEdit } = modalStore();
   const { data: trips, isLoading } = useTrips();
-
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const searchHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
