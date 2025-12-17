@@ -4,7 +4,7 @@ type Props = {
   filter?: string;
   setFilter?: (filter: string) => void;
   year?: number | null;
-  setYear?: (year: number) => void;
+  setYear?: (year: number | null) => void;
   month?: number | null;
   setMonth?: (month: number | null) => void;
   currency?: "ARS" | "USD" | null;

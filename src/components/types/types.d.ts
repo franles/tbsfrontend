@@ -3,8 +3,8 @@ interface Service {
   nombre: string;
   valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-  moneda: number;
-  valor_tasa_cambio: number | null;
+  moneda: string;
+  cotizacion: number | null;
 }
 
 export interface Trip {
@@ -74,14 +74,14 @@ export type CreateServiceTripData = {
   servicio_id: number;
   valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
-  valor_tasa_cambio?: number | null;
+  cotizacion?: number | null;
 };
 export type UpdateServiceData = {
   id: number;
   valor: number;
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
   moneda: number;
-  valor_tasa_cambio: number | null;
+  cotizacion: number | null;
 };
 
 type FinanceResume = {
@@ -105,7 +105,7 @@ export type CreateTripRequest = {
     valor: number;
     pagado_por: "pendiente";
     moneda: number;
-    valor_tasa_cambio: number | null;
+    cotizacion: number | null;
   }[];
   apellido: string;
   valor_total: number;

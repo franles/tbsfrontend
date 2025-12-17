@@ -74,8 +74,16 @@ export const TripModal = () => {
                 Detalle económico:{" "}
               </h1>
               <span className="flex gap-1 font-semibold">
-                Moneda: <p className="font-normal ml-2">{trip?.moneda}</p>
+                Moneda: <p className="font-normal ml-2 uppercase">{trip?.moneda}</p>
               </span>
+              {trip?.moneda?.toLowerCase() === "usd" && trip.valor_tasa_cambio && (
+                <span className="flex gap-1 font-semibold">
+                  Cotizacion USD en ARS:{" "}
+                  <p className="font-normal ml-2">
+                    ${formattedAmount(trip.valor_tasa_cambio)}
+                  </p>
+                </span>
+              )}
               <span className="flex gap-1 font-semibold ">
                 Valor total:{" "}
                 <p className="font-normal ml-2">
@@ -90,7 +98,7 @@ export const TripModal = () => {
               </span>
               <span className="flex gap-1 font-semibold ">
                 Ganancia:{" "}
-                <p className="font-normal ml-2">
+                <p className="font-semibold ml-2 text-green-600">
                   ${trip?.ganancia && formattedAmount(trip.ganancia)}
                 </p>
               </span>
@@ -103,9 +111,11 @@ export const TripModal = () => {
 
               {/* Encabezado */}
               <div className="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-1 select-none">
-                <span className="col-span-4">Nombre</span>
-                <span className="col-span-3">Valor</span>
-                <span className="col-span-4">Pagado por</span>
+                <span className="col-span-3">Nombre</span>
+                <span className="col-span-2">Valor</span>
+                <span className="col-span-2">Moneda</span>
+                <span className="col-span-2">Cotización</span>
+                <span className="col-span-3">Pagado por</span>
               </div>
 
               {/* Servicios */}
@@ -116,11 +126,17 @@ export const TripModal = () => {
                       key={s.id}
                       className="grid grid-cols-12 gap-2 items-center border-l-4  px-1 border-blue-400"
                     >
-                      <span className="col-span-4 capitalize">{s.nombre}</span>
-                      <span className="col-span-3">
+                      <span className="col-span-3 capitalize">{s.nombre}</span>
+                      <span className="col-span-2">
                         ${s.valor && formattedAmount(s.valor)}
                       </span>
-                      <span className="col-span-4 capitalize">
+                      <span className="col-span-2 uppercase">{s.moneda}</span>
+                      <span className="col-span-2">
+                        {s.moneda?.toLowerCase() === "usd" && s.cotizacion
+                          ? `$${formattedAmount(s.cotizacion)}`
+                          : "-"}
+                      </span>
+                      <span className="col-span-3 capitalize">
                         {s.pagado_por === "pendiente"
                           ? renderEstado(s.pagado_por)
                           : s.pagado_por}

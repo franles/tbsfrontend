@@ -20,7 +20,7 @@ export const TripCreateModal = () => {
       fecha_ida: "",
       fecha_vuelta: "",
       servicios: [],
-      valor_tasa_cambio: null,
+      cotizacion: null,
     } as CreateTripRequest,
     onSubmit: ({ value, formApi }) => {
       const trip: CreateTripRequest = {
@@ -36,7 +36,7 @@ export const TripCreateModal = () => {
           valor: 0,
           pagado_por: "pendiente",
           moneda: value.moneda,
-          valor_tasa_cambio: value.moneda === 2 ? (value.valor_tasa_cambio ?? null) : null,
+          cotizacion: value.moneda === 2 ? (value.valor_tasa_cambio ?? null) : null,
         })),
       };
       createTrip(trip);
@@ -350,7 +350,7 @@ export const TripCreateModal = () => {
                         valor: 0,
                         pagado_por: "pendiente",
                         moneda: form.getFieldValue("moneda") ?? 0,
-                        valor_tasa_cambio: null,
+                        cotizacion: null,
                       });
                     }
                   };

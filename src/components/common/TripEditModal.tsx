@@ -28,20 +28,27 @@ export const TripEditModal = () => {
   const [add, setAdd] = useState<boolean>(false);
 
   const trip = tripResponse?.data;
+  console.log("DEBUG TRIP DATA:", trip);
+  if (trip) {
+    console.log("Trip Moneda Raw:", trip.moneda, "Type:", typeof trip.moneda);
+    trip.servicios?.forEach((s, i) => {
+      console.log(`Service ${i} Moneda Raw:`, s.moneda, "Type:", typeof s.moneda);
+    });
+  }
 
   const form = useForm({
     defaultValues: {
       apellido: trip?.apellido,
       destino: trip?.destino,
       valor_total: trip?.valor_total,
-      moneda: trip?.moneda,
+      moneda: trip?.moneda?.toLowerCase() === "usd" ? 2 : 1,
       servicios:
         trip?.servicios?.map((s) => ({
           id: s.id,
           valor: s.valor,
           pagado_por: s.pagado_por,
-          moneda: s.moneda,
-          valor_tasa_cambio: s.valor_tasa_cambio,
+          moneda: (s.moneda as unknown as string)?.toLowerCase() === "usd" ? 2 : 1,
+          cotizacion: s.cotizacion,
         })) ?? [],
       valor_tasa_cambio: trip?.valor_tasa_cambio ?? null,
     } as UpdateTripRequest,
@@ -59,8 +66,8 @@ export const TripEditModal = () => {
           return (
             s.valor !== original.valor ||
             s.pagado_por !== original.pagado_por ||
-            s.moneda !== original.moneda ||
-            s.valor_tasa_cambio !== (original.valor_tasa_cambio ?? null)
+            s.moneda !== ((original.moneda as unknown as string)?.toLowerCase() === "usd" ? 2 : 1) ||
+            s.cotizacion !== (original.cotizacion ?? null)
           );
         })
         .map((s) => ({
@@ -68,7 +75,7 @@ export const TripEditModal = () => {
           valor: Number(s.valor),
           pagado_por: s.pagado_por,
           moneda: s.moneda,
-          valor_tasa_cambio: s.valor_tasa_cambio ?? null,
+          cotizacion: s.cotizacion ?? null,
         }));
 
       const dataUpdated: UpdateTripRequest = {
@@ -90,15 +97,15 @@ export const TripEditModal = () => {
       destino:
         (trip.destino as "internacional" | "nacional") ?? "internacional",
       valor_total: trip.valor_total ?? 0,
-      moneda: Number(trip.moneda) ?? 1,
+      moneda: trip.moneda?.toLowerCase() === "usd" ? 2 : 1,
       valor_tasa_cambio: trip.valor_tasa_cambio ?? null,
       servicios:
         trip.servicios?.map((s) => ({
           id: s.id,
           valor: s.valor ?? 0,
           pagado_por: s.pagado_por ?? "pendiente",
-          moneda: s.moneda ?? 1,
-          valor_tasa_cambio: s.valor_tasa_cambio ?? null,
+          moneda: (s.moneda as unknown as string)?.toLowerCase() === "usd" ? 2 : 1,
+          cotizacion: s.cotizacion ?? null,
         })) ?? [],
     } as UpdateTripRequest);
   }, [trip, form]);
@@ -406,29 +413,31 @@ export const TripEditModal = () => {
                           </select>
                         </div>
 
-                        {/* Verifica si la moneda del servicio actual es USD */}
-                        {s.moneda === 2 && (
+
+                        {/* Verifica si aplica cotización (Mostrar SIEMPRE salvo que AMBOS sean ARS) */}
+                        {!(Number(field.form.getFieldValue("moneda")) === 1 && Number(s.moneda) === 1) && (
                           <div className="flex flex-col">
                             <label className="block text-xs font-semibold mb-1 select-none">
-                              Cotización USD:
+                              Cotización:
                             </label>
                             <input
                               type="number"
                               value={
-                                field.form.getFieldValue("valor_tasa_cambio") ??
-                                ""
+                                s.cotizacion ?? ""
                               }
                               onChange={(e) => {
+                                const newServicios = [
+                                  ...(field.state.value ?? []),
+                                ];
                                 const soloNumeros = e.target.value.replace(
                                   /\D/g,
                                   ""
                                 );
-                                field.form.setFieldValue(
-                                  "valor_tasa_cambio",
-                                  soloNumeros === ""
-                                    ? null
-                                    : Number(soloNumeros)
-                                );
+                                newServicios[index] = {
+                                  ...s,
+                                  cotizacion: soloNumeros === "" ? null : Number(soloNumeros),
+                                };
+                                field.handleChange(newServicios);
                               }}
                               className="border p-2 rounded w-24"
                             />
@@ -536,7 +545,7 @@ export const TripEditModal = () => {
                                 valor: 0,
                                 pagado_por: "pendiente",
                                 moneda: Number(trip?.moneda) ?? 1,
-                                valor_tasa_cambio: null,
+                                cotizacion: null,
                               },
                             ]);
 
