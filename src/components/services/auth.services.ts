@@ -10,7 +10,7 @@ export async function generateAccessToken(): Promise<GetAccessTokenResponse> {
     );
     return data;
   } catch (error) {
-    console.log(error);
+
   }
   return { accessToken: "" };
 }
@@ -19,7 +19,7 @@ export async function logOut(): Promise<LogOutResponse> {
     const { data } = await api.post<LogOutResponse>(`${API_ENDPOINT}/logout`);
     return data;
   } catch (error) {
-    console.log(error);
+
   }
   return { message: "" };
 }

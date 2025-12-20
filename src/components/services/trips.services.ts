@@ -42,7 +42,7 @@ export async function getTrip(id: string): Promise<TripApiResponse | null> {
 
     return data;
   } catch (error) {
-    console.log("Error al obtener el viaje", error);
+
     throw error;
   }
 }
@@ -71,7 +71,7 @@ export async function updateTrip(
     );
     return data.trip;
   } catch (error) {
-    console.log(error);
+
     throw error;
   }
 }
@@ -83,7 +83,7 @@ export async function deleteTrip(id: string) {
     );
     return data;
   } catch (error) {
-    console.log("Error al eliminar el viaje", error);
+
     throw error;
   }
 }

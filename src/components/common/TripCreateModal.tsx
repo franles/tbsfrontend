@@ -54,7 +54,7 @@ export const TripCreateModal = () => {
     setSelectedMoneda(m ?? 0);
   }, []);
 
-  console.log(services);
+
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-10 relative animate-fadeIn text-black">
       <BtnCloseModal onCLick={() => setIsCreate(false)} />

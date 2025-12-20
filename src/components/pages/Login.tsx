@@ -7,7 +7,7 @@ function Login() {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-cover bg-center relative bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274060/loginfondo_jsowfy.jpg')]">
+    <section className="min-h-screen flex items-center justify-center bg-cover bg-center relative bg-[url('/bg_login.png')]">
       <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
 
       <div className="relative z-10 bg-white/20 backdrop-blur-sm shadow-lg p-16 rounded-sm w-full max-w-lg flex flex-col items-center">

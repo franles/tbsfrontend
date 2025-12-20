@@ -28,12 +28,9 @@ export const TripEditModal = () => {
   const [add, setAdd] = useState<boolean>(false);
 
   const trip = tripResponse?.data;
-  console.log("DEBUG TRIP DATA:", trip);
+
   if (trip) {
-    console.log("Trip Moneda Raw:", trip.moneda, "Type:", typeof trip.moneda);
-    trip.servicios?.forEach((s, i) => {
-      console.log(`Service ${i} Moneda Raw:`, s.moneda, "Type:", typeof s.moneda);
-    });
+    // Trip loaded
   }
 
   const form = useForm({
@@ -523,19 +520,13 @@ export const TripEditModal = () => {
                           className="border p-2 rounded w-40 capitalize"
                           onChange={(e) => {
                             const serviceId = Number(e.target.value);
-                            console.log(
-                              "TripEditModal: selected serviceId",
-                              serviceId
-                            );
+
                             if (!serviceId) return;
 
                             const serviceToAdd = services?.data?.find(
                               (s) => s.id === serviceId
                             );
-                            console.log(
-                              "TripEditModal: serviceToAdd",
-                              serviceToAdd
-                            );
+
                             if (!serviceToAdd) return;
 
                             field.handleChange([

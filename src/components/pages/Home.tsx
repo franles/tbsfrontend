@@ -36,7 +36,7 @@ function Home() {
 
   return (
     <>
-      <div className="relative h-[225px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1753274365/maletas_jzcjf2.webp')]">
+      <div className="relative h-[225px] bg-cover bg-[center_top_0%] bg-[url('/bg_home.png')]">
         <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
 
         <div
