@@ -8,33 +8,20 @@ import type {
 const API_ENDPOINT = `${API_URL}/services`;
 
 export async function getServices(): Promise<ServiceApiResponse | null> {
-  try {
-    const { data } = await api.get<ServiceApiResponse>(`${API_ENDPOINT}`);
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-  return null;
+  const { data } = await api.get<ServiceApiResponse>(`${API_ENDPOINT}`);
+  return data;
 }
 
 export async function createServiceForTrip(serviceData: CreateServiceTripData) {
-  try {
-    const { data } = await api.post(`${API_ENDPOINT}`, serviceData);
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+  const { data } = await api.post(`${API_ENDPOINT}`, serviceData);
+  return data;
 }
 
 export async function deleteServiceForTrip(serviceId: number, tripId: string) {
-  try {
-    const { data } = await api.delete(
-      `${API_ENDPOINT}/${serviceId}/trip/${tripId}`
-    );
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+  const { data } = await api.delete(
+    `${API_ENDPOINT}/${serviceId}/trip/${tripId}`
+  );
+  return data;
 }
 
 export async function updateServiceForTrip(
@@ -42,13 +29,9 @@ export async function updateServiceForTrip(
   tripId: string,
   dataUpdated: UpdateServiceData
 ) {
-  try {
-    const { data } = await api.put(
-      `${API_ENDPOINT}/${serviceId}/trip/${tripId}`,
-      dataUpdated
-    );
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+  const { data } = await api.put(
+    `${API_ENDPOINT}/${serviceId}/trip/${tripId}`,
+    dataUpdated
+  );
+  return data;
 }

@@ -44,6 +44,9 @@ export const useDeleteService = () => {
 
       toast.success("Servicio eliminado correctamente");
     },
+    onError: () => {
+      toast.error("Error al eliminar el servicio");
+    },
   });
 
   return { deleteServiceMutate };
@@ -57,8 +60,6 @@ export const useCreateService = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trip", variables.viaje_id] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
-
-      
 
       toast.success("Servicio añadido correctamente");
     },

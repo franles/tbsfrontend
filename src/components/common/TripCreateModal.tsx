@@ -30,13 +30,13 @@ export const TripCreateModal = () => {
         destino: value.destino,
         apellido: value.apellido,
         valor_total: value.valor_total,
-        valor_tasa_cambio: value.moneda === 2 ? value.valor_tasa_cambio : null,
+        cotizacion: value.moneda === 2 ? value.cotizacion : null,
         servicios: value.servicios.map((s) => ({
           id: s.id,
           valor: 0,
           pagado_por: "pendiente",
           moneda: value.moneda,
-          cotizacion: value.moneda === 2 ? (value.valor_tasa_cambio ?? null) : null,
+          cotizacion: value.moneda === 2 ? value.cotizacion ?? null : null,
         })),
       };
       createTrip(trip);
@@ -53,7 +53,6 @@ export const TripCreateModal = () => {
     const m = form.getFieldValue("moneda");
     setSelectedMoneda(m ?? 0);
   }, []);
-
 
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-10 relative animate-fadeIn text-black">
@@ -196,9 +195,9 @@ export const TripCreateModal = () => {
                           setSelectedMoneda(val);
 
                           if (val === 2) {
-                            form.setFieldValue("valor_tasa_cambio", 0);
+                            form.setFieldValue("cotizacion", 0);
                           } else {
-                            form.setFieldValue("valor_tasa_cambio", null);
+                            form.setFieldValue("cotizacion", null);
                           }
                         }}
                         value={field.state.value ?? 0}
@@ -220,7 +219,7 @@ export const TripCreateModal = () => {
 
               {selectedMoneda === 2 && (
                 <div className="w-full">
-                  <form.Field name="valor_tasa_cambio">
+                  <form.Field name="cotizacion">
                     {(field) => (
                       <div className="flex flex-col">
                         <label className="block font-semibold mb-1 whitespace-nowrap">
@@ -231,9 +230,9 @@ export const TripCreateModal = () => {
                           value={
                             typeof field.state.value === "number"
                               ? new Intl.NumberFormat("es-AR", {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              }).format(field.state.value)
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(field.state.value)
                               : ""
                           }
                           onChange={(e) => {

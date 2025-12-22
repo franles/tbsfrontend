@@ -19,7 +19,7 @@ export interface Trip {
   valor_total: number;
   ganancia: number;
   costo: number;
-  valor_tasa_cambio: number | null;
+  cotizacion: number | null;
   servicios: Service[];
 }
 
@@ -109,7 +109,7 @@ export type CreateTripRequest = {
   }[];
   apellido: string;
   valor_total: number;
-  valor_tasa_cambio?: number | null;
+  cotizacion?: number | null;
   destino: "internacional" | "nacional" | "";
   fecha_ida: string;
   fecha_vuelta: string;
@@ -121,7 +121,7 @@ export type UpdateTripRequest = {
   destino?: "internacional" | "nacional";
   apellido?: string;
   moneda?: number;
-  valor_tasa_cambio?: number | null;
+  cotizacion?: number | null;
   servicios: UpdateServiceData[];
 };
 
