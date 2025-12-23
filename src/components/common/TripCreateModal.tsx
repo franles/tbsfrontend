@@ -1,4 +1,5 @@
 import { useServices } from "../hooks/useServices";
+import { toast } from "sonner";
 import { useCreateTrip } from "../hooks/useTrips";
 import { modalStore } from "../store/modalStore";
 import type { CreateTripRequest } from "../types/types";
@@ -44,10 +45,10 @@ export const TripCreateModal = () => {
         await createTrip(trip);
         formApi.reset();
         setIsCreate(false);
-      } catch (error) {
-        // El error ya es manejado por el hook useCreateTrip (onError)
-        // No cerramos el modal para que el usuario pueda corregir
+      } catch (error: any) {
         console.error("Error al crear viaje desde el modal:", error);
+        const errorMsg = error?.response?.data?.message || error?.message || "Error al crear el viaje";
+        toast.error(errorMsg);
       }
     },
   });
