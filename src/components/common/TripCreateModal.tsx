@@ -219,7 +219,24 @@ export const TripCreateModal = () => {
 
               {selectedMoneda === 2 && (
                 <div className="w-full">
-                  <form.Field name="cotizacion">
+                  <form.Field
+                    name="cotizacion"
+                    validators={{
+                      onChange: ({ value, fieldApi }) => {
+                        const moneda = fieldApi.form.getFieldValue("moneda");
+                        if (moneda === 2 && (!value || Number(value) <= 0)) {
+                          return "La cotización debe ser mayor a 0";
+                        }
+                        return undefined;
+                      },
+                      onSubmit: ({ value, fieldApi }) => {
+                        const moneda = fieldApi.form.getFieldValue("moneda");
+                        if (moneda === 2 && (!value || Number(value) <= 0)) {
+                          return "La cotización es obligatoria y debe ser mayor a 0";
+                        }
+                      },
+                    }}
+                  >
                     {(field) => (
                       <div className="flex flex-col">
                         <label className="block font-semibold mb-1 whitespace-nowrap">
@@ -230,9 +247,9 @@ export const TripCreateModal = () => {
                           value={
                             typeof field.state.value === "number"
                               ? new Intl.NumberFormat("es-AR", {
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                }).format(field.state.value)
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              }).format(field.state.value)
                               : ""
                           }
                           onChange={(e) => {
