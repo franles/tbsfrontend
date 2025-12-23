@@ -32,7 +32,12 @@ function Home() {
       item.apellido.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (isLoading) return <Spinner text="Cargando" />;
+  if (isLoading)
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <Spinner text="Cargando" />
+      </div>
+    );
 
   return (
     <>
