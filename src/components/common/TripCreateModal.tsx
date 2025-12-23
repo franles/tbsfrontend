@@ -22,7 +22,7 @@ export const TripCreateModal = () => {
       servicios: [],
       cotizacion: null,
     } as CreateTripRequest,
-    onSubmit: ({ value, formApi }) => {
+    onSubmit: async ({ value, formApi }) => {
       const trip: CreateTripRequest = {
         fecha_ida: new Date(value.fecha_ida).toISOString().split("T")[0],
         fecha_vuelta: new Date(value.fecha_vuelta).toISOString().split("T")[0],
@@ -39,9 +39,16 @@ export const TripCreateModal = () => {
           cotizacion: value.moneda === 2 ? value.cotizacion ?? null : null,
         })),
       };
-      createTrip(trip);
-      formApi.reset();
-      setIsCreate(false);
+
+      try {
+        await createTrip(trip);
+        formApi.reset();
+        setIsCreate(false);
+      } catch (error) {
+        // El error ya es manejado por el hook useCreateTrip (onError)
+        // No cerramos el modal para que el usuario pueda corregir
+        console.error("Error al crear viaje desde el modal:", error);
+      }
     },
   });
 
