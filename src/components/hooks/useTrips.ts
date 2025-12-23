@@ -8,7 +8,7 @@ import {
   updateTrip,
 } from "../services/trips.services";
 import { toast } from "sonner";
-import type { UpdateTripData } from "../types/types";
+import type { UpdateTripRequest } from "../types/types";
 import { modalStore } from "../store/modalStore";
 
 export const useTrips = () => {
@@ -91,7 +91,7 @@ export const useUpdateTrip = () => {
       dataUpdated,
     }: {
       tripId: string;
-      dataUpdated: UpdateTripData;
+      dataUpdated: UpdateTripRequest;
     }) => updateTrip(tripId, dataUpdated),
     onSuccess: (_, variables) => {
       toast.success("Reserva actualizada exitosamente");

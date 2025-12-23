@@ -74,13 +74,14 @@ export const TripModal = () => {
                 Detalle económico:{" "}
               </h1>
               <span className="flex gap-1 font-semibold">
-                Moneda: <p className="font-normal ml-2 uppercase">{trip?.moneda}</p>
+                Moneda:{" "}
+                <p className="font-normal ml-2 uppercase">{trip?.moneda}</p>
               </span>
-              {trip?.moneda?.toLowerCase() === "usd" && trip.valor_tasa_cambio && (
+              {trip?.moneda?.toLowerCase() === "usd" && trip.cotizacion && (
                 <span className="flex gap-1 font-semibold">
                   Cotizacion USD en ARS:{" "}
                   <p className="font-normal ml-2">
-                    ${formattedAmount(trip.valor_tasa_cambio)}
+                    ${formattedAmount(trip.cotizacion)}
                   </p>
                 </span>
               )}
