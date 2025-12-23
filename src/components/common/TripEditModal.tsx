@@ -84,6 +84,7 @@ export const TripEditModal = () => {
         valor_total: Number(value.valor_total ?? trip?.valor_total),
         destino: value.destino ?? trip?.destino,
         cotizacion: value.cotizacion,
+        moneda: value.moneda,
         servicios: serviciosActualizados,
       };
       updateTripMutate({ tripId: tripId!, dataUpdated });
