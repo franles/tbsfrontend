@@ -114,12 +114,12 @@ export const TripModal = () => {
               </h1>
 
               {/* Encabezado */}
-              <div className="grid grid-cols-12 gap-2 font-semibold text-sm mb-2 px-1 select-none">
-                <span className="col-span-3">Nombre</span>
-                <span className="col-span-2">Valor</span>
-                <span className="col-span-2">Moneda</span>
-                <span className="col-span-2">Cotización</span>
-                <span className="col-span-3">Pagado por</span>
+              <div className="grid grid-cols-12 gap-12 font-semibold text-base mb-4 px-1 select-none">
+                <span className="col-span-3">Nombre:</span>
+                <span className="col-span-2">Valor:</span>
+                <span className="col-span-2">Moneda:</span>
+                <span className="col-span-2">Cotización:</span>
+                <span className="col-span-3">Pagado por:</span>
               </div>
 
               {/* Servicios */}
@@ -128,7 +128,7 @@ export const TripModal = () => {
                   {trip.servicios.map((s) => (
                     <div
                       key={s.id}
-                      className="grid grid-cols-12 gap-2 items-center border-l-4  px-1 border-blue-400"
+                      className="grid grid-cols-12 gap-12 items-center border-l-4  px-1 border-blue-400"
                     >
                       <span className="col-span-3 capitalize">{s.nombre}</span>
                       <span className="col-span-2">
@@ -136,7 +136,10 @@ export const TripModal = () => {
                       </span>
                       <span className="col-span-2 uppercase">{s.moneda}</span>
                       <span className="col-span-2">
-                        {s.moneda?.toLowerCase() === "usd" && s.cotizacion
+                        {!(
+                          trip?.moneda?.toLowerCase() === "ars" &&
+                          s.moneda?.toLowerCase() === "ars"
+                        ) && s.cotizacion
                           ? `$${formattedAmount(s.cotizacion)}`
                           : "-"}
                       </span>
