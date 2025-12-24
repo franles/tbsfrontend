@@ -99,7 +99,10 @@ export const TripModal = () => {
               </span>
               <span className="flex gap-1 font-semibold ">
                 Ganancia:{" "}
-                <p className="font-semibold ml-2 text-green-600">
+                <p
+                  className={`font-semibold ml-2 ${(trip?.ganancia ?? 0) < 0 ? "text-red-500" : "text-green-600"
+                    }`}
+                >
                   ${trip?.ganancia && formattedAmount(trip.ganancia)}
                 </p>
               </span>

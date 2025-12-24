@@ -32,13 +32,23 @@ export const TripCreateModal = () => {
         apellido: value.apellido,
         valor_total: value.valor_total,
         cotizacion: value.moneda === 2 ? value.cotizacion : null,
-        servicios: value.servicios.map((s) => ({
-          id: s.id,
-          valor: 0,
-          pagado_por: "pendiente",
-          moneda: value.moneda,
-          cotizacion: value.moneda === 2 ? value.cotizacion ?? null : null,
-        })),
+        servicios: value.servicios.map((s) => {
+          const originalService = services?.data?.find((os) => os.id === s.id);
+          const isUSD = originalService?.moneda?.toLowerCase() === "usd";
+          return {
+            id: s.id,
+            valor: 0,
+            pagado_por: "pendiente",
+            // Si el servicio es USD, usamos moneda 2. Si no, usamos moneda del viaje o ARS (1).
+            // Pero espera, si el viaje es USD, todos los servicios se asumen USD? No necesariamente.
+            // Asumiremos que la moneda del servicio manda.
+            moneda: isUSD ? 2 : 1,
+            // Si el servicio es USD, necesitamos cotización.
+            // Si el viaje es USD, usamos value.cotizacion.
+            // Si el viaje es ARS y el servicio es USD, usamos value.cotizacion (que ahora pedimos).
+            cotizacion: isUSD ? value.cotizacion ?? null : null,
+          };
+        }),
       };
 
       try {
@@ -50,6 +60,9 @@ export const TripCreateModal = () => {
         const errorMsg = error?.response?.data?.message || error?.message || "Error al crear el viaje";
         toast.error(errorMsg);
       }
+    },
+    onSubmitInvalid: () => {
+      toast.error("Por favor revisa los campos requeridos");
     },
   });
 
@@ -225,61 +238,95 @@ export const TripCreateModal = () => {
                 </form.Field>
               </div>
 
-              {selectedMoneda === 2 && (
-                <div className="w-full">
-                  <form.Field
-                    name="cotizacion"
-                    validators={{
-                      onChange: ({ value, fieldApi }) => {
-                        const moneda = fieldApi.form.getFieldValue("moneda");
-                        if (moneda === 2 && (!value || Number(value) <= 0)) {
-                          return "La cotización debe ser mayor a 0";
-                        }
-                        return undefined;
-                      },
-                      onSubmit: ({ value, fieldApi }) => {
-                        const moneda = fieldApi.form.getFieldValue("moneda");
-                        if (moneda === 2 && (!value || Number(value) <= 0)) {
-                          return "La cotización es obligatoria y debe ser mayor a 0";
-                        }
-                      },
-                    }}
-                  >
-                    {(field) => (
-                      <div className="flex flex-col">
-                        <label className="block font-semibold mb-1 whitespace-nowrap">
-                          Cotización USD:
-                        </label>
-                        <input
-                          type="text"
-                          value={
-                            typeof field.state.value === "number"
-                              ? new Intl.NumberFormat("es-AR", {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0,
-                              }).format(field.state.value)
-                              : ""
-                          }
-                          onChange={(e) => {
-                            const soloNumeros = e.target.value.replace(
-                              /\D/g,
-                              ""
+              {(selectedMoneda === 2 ||
+                form
+                  .getFieldValue("servicios")
+                  .some(
+                    (s) =>
+                      services?.data
+                        ?.find((service) => service.id === s.id)
+                        ?.moneda?.toLowerCase() === "usd"
+                  )) && (
+                  <div className="w-full">
+                    <form.Field
+                      name="cotizacion"
+                      validators={{
+                        onChange: ({ value, fieldApi }) => {
+                          const moneda = fieldApi.form.getFieldValue("moneda");
+                          const hasUSDService = fieldApi.form
+                            .getFieldValue("servicios")
+                            .some(
+                              (s) =>
+                                services?.data
+                                  ?.find((service) => service.id === s.id)
+                                  ?.moneda?.toLowerCase() === "usd"
                             );
-                            field.handleChange(Number(soloNumeros));
-                          }}
-                          className="border p-2 rounded w-full"
-                          placeholder="$$$"
-                        />
-                        {field.state.meta.errors.length > 0 && (
-                          <em className="text-red-600 text-sm">
-                            {field.state.meta.errors.join(", ")}
-                          </em>
-                        )}
-                      </div>
-                    )}
-                  </form.Field>
-                </div>
-              )}
+
+                          if (
+                            (moneda === 2 || hasUSDService) &&
+                            (!value || Number(value) <= 0)
+                          ) {
+                            return "La cotización debe ser mayor a 0";
+                          }
+                          return undefined;
+                        },
+                        onSubmit: ({ value, fieldApi }) => {
+                          const moneda = fieldApi.form.getFieldValue("moneda");
+                          const hasUSDService = fieldApi.form
+                            .getFieldValue("servicios")
+                            .some(
+                              (s) =>
+                                services?.data
+                                  ?.find((service) => service.id === s.id)
+                                  ?.moneda?.toLowerCase() === "usd"
+                            );
+
+                          if (
+                            (moneda === 2 || hasUSDService) &&
+                            (!value || Number(value) <= 0)
+                          ) {
+                            return "La cotización es obligatoria y debe ser mayor a 0";
+                          }
+                        },
+                      }}
+                    >
+                      {(field) => (
+                        <div className="flex flex-col">
+                          <label className="block font-semibold mb-1 whitespace-nowrap">
+                            {selectedMoneda === 2
+                              ? "Cotización USD:"
+                              : "Cotización Servicios USD:"}
+                          </label>
+                          <input
+                            type="text"
+                            value={
+                              typeof field.state.value === "number"
+                                ? new Intl.NumberFormat("es-AR", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                }).format(field.state.value)
+                                : ""
+                            }
+                            onChange={(e) => {
+                              const soloNumeros = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
+                              field.handleChange(Number(soloNumeros));
+                            }}
+                            className="border p-2 rounded w-full"
+                            placeholder="$$$"
+                          />
+                          {field.state.meta.errors.length > 0 && (
+                            <em className="text-red-600 text-sm">
+                              {field.state.meta.errors.join(", ")}
+                            </em>
+                          )}
+                        </div>
+                      )}
+                    </form.Field>
+                  </div>
+                )}
             </div>
 
             {/* Row 3: Dates */}
