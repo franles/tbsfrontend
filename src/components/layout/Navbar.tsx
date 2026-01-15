@@ -107,7 +107,7 @@ function Navbar() {
               <button
                 onClick={() => {
                   navigate("/home");
-                  setOpenMenu(false); 
+                  setOpenMenu(false);
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"
               >
@@ -116,7 +116,7 @@ function Navbar() {
               <button
                 onClick={() => {
                   navigate("/finance");
-                  setOpenMenu(false); 
+                  setOpenMenu(false);
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100"
               >

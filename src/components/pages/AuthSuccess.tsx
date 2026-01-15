@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Spinner } from "../common/widget/Spinner";
 import { decodeToken } from "../utils/utils";
 import { useUser } from "../hooks/useUser";
 import { useToken } from "../hooks/useToken";
+import { Loader } from "../common/Loader";
 
 export const AuthSuccess = () => {
   const { setUser } = useUser();
@@ -12,6 +12,7 @@ export const AuthSuccess = () => {
   const location = useLocation();
 
   useEffect(() => {
+    import("./Home");
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
     if (token) {
@@ -29,9 +30,5 @@ export const AuthSuccess = () => {
       navigate("/home");
     }
   }, [location.search, navigate, setToken, setUser]);
-  return (
-    <section className="min-h-screen flex items-center justify-center">
-      <Spinner text="Iniciando sesión..." size={40} />
-    </section>
-  );
+  return <Loader text="Iniciando sesión..." />;
 };
