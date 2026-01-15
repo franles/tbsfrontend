@@ -12,7 +12,7 @@ function Annual() {
 
   return (
     <>
-      <div className="relative h-[225px] bg-cover bg-[center_top_53%] bg-[url('/bg_finance.png')]">
+      <div className="relative h-[225px] bg-cover bg-[center_top_53%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1768442823/bg_finance_o2echa.png')]">
         <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
         <div
           className="absolute inset-0 z-10"
