@@ -38,6 +38,9 @@ export const TripEditModal = () => {
       apellido: trip?.apellido,
       destino: trip?.destino,
       valor_total: trip?.valor_total,
+      fecha_ida: trip?.fecha_ida,
+      fecha_vuelta: trip?.fecha_vuelta,
+      fecha: trip?.fecha,
       moneda: trip?.moneda?.toLowerCase() === "usd" ? 2 : 1,
       servicios:
         trip?.servicios?.map((s) => ({
@@ -47,6 +50,7 @@ export const TripEditModal = () => {
           moneda:
             (s.moneda as unknown as string)?.toLowerCase() === "usd" ? 2 : 1,
           cotizacion: s.cotizacion,
+          observacion: s.observacion,
         })) ?? [],
       cotizacion: trip?.cotizacion ?? null,
     } as UpdateTripRequest,
@@ -68,7 +72,8 @@ export const TripEditModal = () => {
               ((original.moneda as unknown as string)?.toLowerCase() === "usd"
                 ? 2
                 : 1) ||
-            s.cotizacion !== (original.cotizacion ?? null)
+            s.cotizacion !== (original.cotizacion ?? null) ||
+            s.observacion !== (original.observacion ?? null)
           );
         })
         .map((s) => ({
@@ -77,6 +82,7 @@ export const TripEditModal = () => {
           pagado_por: s.pagado_por,
           moneda: s.moneda,
           cotizacion: s.cotizacion ?? null,
+          observacion: s.observacion ?? null,
         }));
 
       const dataUpdated: UpdateTripRequest = {
@@ -91,7 +97,11 @@ export const TripEditModal = () => {
     },
   });
 
-  // Cuando llega la data del viaje, resetear el form para precargar valores
+  const toDateInput = (dateStr?: string | null): string => {
+    if (!dateStr) return "";
+    return dateStr.substring(0, 10);
+  };
+
   useEffect(() => {
     if (!trip) return;
     form.reset({
@@ -99,6 +109,9 @@ export const TripEditModal = () => {
       destino:
         (trip.destino as "internacional" | "nacional") ?? "internacional",
       valor_total: trip.valor_total ?? 0,
+      fecha_ida: toDateInput(trip.fecha_ida),
+      fecha_vuelta: toDateInput(trip.fecha_vuelta),
+      fecha: toDateInput(trip.fecha),
       moneda: trip.moneda?.toLowerCase() === "usd" ? 2 : 1,
       cotizacion: trip.cotizacion ?? null,
       servicios:
@@ -168,7 +181,7 @@ export const TripEditModal = () => {
                     <select
                       onChange={(e) =>
                         field.handleChange(
-                          e.target.value as "internacional" | "nacional"
+                          e.target.value as "internacional" | "nacional",
                         )
                       }
                       value={field.state.value ?? "internacional"}
@@ -181,14 +194,90 @@ export const TripEditModal = () => {
                 )}
               </form.Field>
 
-              <div className="mb-3">
-                <label className="block font-semibold mb-1 select-none">
-                  Fecha creación
-                </label>
-                <p>
-                  {trip?.fecha && new Date(trip.fecha).toLocaleDateString()}
-                </p>
-              </div>
+              <form.Field
+                name="fecha"
+                validators={{
+                  onSubmit: ({ value }) => {
+                    if (!value) return "La fecha es obligatoria";
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="flex flex-col">
+                    <label className="block font-semibold mb-1">
+                      Fecha de ida:
+                    </label>
+                    <input
+                      type="date"
+                      value={field.state.value || ""}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      className="border p-2 rounded w-full"
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <em className="text-red-600 text-sm">
+                        {field.state.meta.errors.join(", ")}
+                      </em>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="fecha_ida"
+                validators={{
+                  onSubmit: ({ value }) => {
+                    if (!value) return "La fecha de ida es obligatoria";
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="flex flex-col">
+                    <label className="block font-semibold mb-1">
+                      Fecha de ida:
+                    </label>
+                    <input
+                      type="date"
+                      value={field.state.value || ""}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      className="border p-2 rounded w-full"
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <em className="text-red-600 text-sm">
+                        {field.state.meta.errors.join(", ")}
+                      </em>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="fecha_vuelta"
+                validators={{
+                  onSubmit: ({ value }) => {
+                    if (!value) return "La fecha de vuelta es obligatoria";
+                  },
+                }}
+              >
+                {(field) => (
+                  <div className="flex flex-col">
+                    <label className="block font-semibold mb-1">
+                      Fecha de ida:
+                    </label>
+                    <input
+                      type="date"
+                      value={field.state.value || ""}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      className="border p-2 rounded w-full"
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <em className="text-red-600 text-sm">
+                        {field.state.meta.errors.join(", ")}
+                      </em>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+
               <div>
                 <label className="block font-semibold mb-1 select-none">
                   Estado
@@ -261,12 +350,12 @@ export const TripEditModal = () => {
                                 onChange={(e) => {
                                   const soloNumeros = e.target.value.replace(
                                     /\D/g,
-                                    ""
+                                    "",
                                   );
                                   field.handleChange(
                                     soloNumeros === ""
                                       ? null
-                                      : Number(soloNumeros)
+                                      : Number(soloNumeros),
                                   );
                                 }}
                                 className="border p-2 rounded w-full"
@@ -349,7 +438,7 @@ export const TripEditModal = () => {
                         <div className="capitalize w-40 font-semibold">
                           {
                             services?.data?.find(
-                              (service) => service.id === s.id
+                              (service) => service.id === s.id,
                             )?.nombre
                           }
                         </div>
@@ -378,7 +467,7 @@ export const TripEditModal = () => {
                                 ];
                                 const soloNumeros = e.target.value.replace(
                                   /\D/g,
-                                  ""
+                                  "",
                                 );
                                 newServicios[index] = {
                                   ...s,
@@ -432,7 +521,7 @@ export const TripEditModal = () => {
                                 ];
                                 const soloNumeros = e.target.value.replace(
                                   /\D/g,
-                                  ""
+                                  "",
                                 );
                                 newServicios[index] = {
                                   ...s,
@@ -466,7 +555,8 @@ export const TripEditModal = () => {
                                   | "pendiente"
                                   | "pablo"
                                   | "soledad"
-                                  | "mariana",
+                                  | "mariana"
+                                  | "mixto",
                               };
                               field.handleChange(newServicios);
                             }}
@@ -475,7 +565,29 @@ export const TripEditModal = () => {
                             <option value="mariana">Mariana</option>
                             <option value="pablo">Pablo</option>
                             <option value="soledad">Soledad</option>
+                            <option value="mixto">Mixto</option>
                           </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold mb-1 select-none">
+                            Observación:
+                          </label>
+                          <input
+                            type="text"
+                            className="border p-2 rounded"
+                            value={s.observacion ?? ""}
+                            onChange={(e) => {
+                              const newServicios = [
+                                ...(field.state.value ?? []),
+                              ];
+                              newServicios[index] = {
+                                ...s,
+                                observacion: e.target.value,
+                              };
+                              field.handleChange(newServicios);
+                            }}
+                          />
                         </div>
 
                         {/* Botón eliminar */}
@@ -484,7 +596,7 @@ export const TripEditModal = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             const nombreServicio = services?.data.find(
-                              (service) => service.id === s.id
+                              (service) => service.id === s.id,
                             )?.nombre;
 
                             toast.warning(
@@ -505,7 +617,7 @@ export const TripEditModal = () => {
                                     field.handleChange(newServicios);
                                   },
                                 },
-                              }
+                              },
                             );
                           }}
                           className="text-red-500 rounded-full hover:text-red-600"
@@ -520,7 +632,7 @@ export const TripEditModal = () => {
                   {add &&
                     services?.data.some(
                       (s) =>
-                        !(field.state.value ?? []).some((fs) => fs.id === s.id)
+                        !(field.state.value ?? []).some((fs) => fs.id === s.id),
                     ) && (
                       <div className="flex items-center justify-between gap-3 border p-3 rounded-md border-blue-500 shadow-sm">
                         <select
@@ -531,7 +643,7 @@ export const TripEditModal = () => {
                             if (!serviceId) return;
 
                             const serviceToAdd = services?.data?.find(
-                              (s) => s.id === serviceId
+                              (s) => s.id === serviceId,
                             );
 
                             if (!serviceToAdd) return;
@@ -544,6 +656,7 @@ export const TripEditModal = () => {
                                 pagado_por: "pendiente",
                                 moneda: Number(trip?.moneda) ?? 1,
                                 cotizacion: null,
+                                observacion: null,
                               },
                             ]);
 
@@ -552,6 +665,7 @@ export const TripEditModal = () => {
                               valor: 0,
                               servicio_id: serviceToAdd.id,
                               pagado_por: "pendiente",
+                              observacion: null,
                             });
 
                             setAdd(false);
@@ -562,8 +676,8 @@ export const TripEditModal = () => {
                             ?.filter(
                               (s) =>
                                 !(field.state.value ?? []).some(
-                                  (fs) => fs.id === s.id
-                                )
+                                  (fs) => fs.id === s.id,
+                                ),
                             )
                             .map((s) => (
                               <option key={s.id} value={s.id}>
@@ -597,7 +711,7 @@ export const TripEditModal = () => {
 
                   {services?.data?.some(
                     (s) =>
-                      !(field.state.value ?? []).some((fs) => fs.id === s.id)
+                      !(field.state.value ?? []).some((fs) => fs.id === s.id),
                   ) && (
                     <button
                       type="button"

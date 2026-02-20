@@ -18,6 +18,7 @@ export const TripCreateModal = () => {
       valor_total: 0,
       destino: "",
       apellido: "",
+      fecha: "",
       fecha_ida: "",
       fecha_vuelta: "",
       servicios: [],
@@ -25,8 +26,9 @@ export const TripCreateModal = () => {
     } as CreateTripRequest,
     onSubmit: async ({ value, formApi }) => {
       const trip: CreateTripRequest = {
-        fecha_ida: new Date(value.fecha_ida).toISOString().split("T")[0],
-        fecha_vuelta: new Date(value.fecha_vuelta).toISOString().split("T")[0],
+        fecha_ida: value.fecha_ida,
+        fecha_vuelta: value.fecha_vuelta,
+        fecha: value.fecha,
         moneda: value.moneda,
         destino: value.destino,
         apellido: value.apellido,
@@ -39,14 +41,8 @@ export const TripCreateModal = () => {
             id: s.id,
             valor: 0,
             pagado_por: "pendiente",
-            // Si el servicio es USD, usamos moneda 2. Si no, usamos moneda del viaje o ARS (1).
-            // Pero espera, si el viaje es USD, todos los servicios se asumen USD? No necesariamente.
-            // Asumiremos que la moneda del servicio manda.
             moneda: isUSD ? 2 : 1,
-            // Si el servicio es USD, necesitamos cotización.
-            // Si el viaje es USD, usamos value.cotizacion.
-            // Si el viaje es ARS y el servicio es USD, usamos value.cotizacion (que ahora pedimos).
-            cotizacion: isUSD ? value.cotizacion ?? null : null,
+            cotizacion: isUSD ? (value.cotizacion ?? null) : null,
           };
         }),
       };
@@ -57,7 +53,10 @@ export const TripCreateModal = () => {
         setIsCreate(false);
       } catch (error: any) {
         console.error("Error al crear viaje desde el modal:", error);
-        const errorMsg = error?.response?.data?.message || error?.message || "Error al crear el viaje";
+        const errorMsg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Error al crear el viaje";
         toast.error(errorMsg);
       }
     },
@@ -67,7 +66,7 @@ export const TripCreateModal = () => {
   });
 
   const [selectedMoneda, setSelectedMoneda] = useState<number>(
-    form.getFieldValue("moneda") ?? 0
+    form.getFieldValue("moneda") ?? 0,
   );
 
   useEffect(() => {
@@ -134,7 +133,7 @@ export const TripCreateModal = () => {
                   <select
                     onChange={(e) =>
                       field.handleChange(
-                        e.target.value as "nacional" | "internacional" | ""
+                        e.target.value as "nacional" | "internacional" | "",
                       )
                     }
                     value={field.state.value}
@@ -245,91 +244,117 @@ export const TripCreateModal = () => {
                     (s) =>
                       services?.data
                         ?.find((service) => service.id === s.id)
-                        ?.moneda?.toLowerCase() === "usd"
+                        ?.moneda?.toLowerCase() === "usd",
                   )) && (
-                  <div className="w-full">
-                    <form.Field
-                      name="cotizacion"
-                      validators={{
-                        onChange: ({ value, fieldApi }) => {
-                          const moneda = fieldApi.form.getFieldValue("moneda");
-                          const hasUSDService = fieldApi.form
-                            .getFieldValue("servicios")
-                            .some(
-                              (s) =>
-                                services?.data
-                                  ?.find((service) => service.id === s.id)
-                                  ?.moneda?.toLowerCase() === "usd"
-                            );
+                <div className="w-full">
+                  <form.Field
+                    name="cotizacion"
+                    validators={{
+                      onChange: ({ value, fieldApi }) => {
+                        const moneda = fieldApi.form.getFieldValue("moneda");
+                        const hasUSDService = fieldApi.form
+                          .getFieldValue("servicios")
+                          .some(
+                            (s) =>
+                              services?.data
+                                ?.find((service) => service.id === s.id)
+                                ?.moneda?.toLowerCase() === "usd",
+                          );
 
-                          if (
-                            (moneda === 2 || hasUSDService) &&
-                            (!value || Number(value) <= 0)
-                          ) {
-                            return "La cotización debe ser mayor a 0";
-                          }
-                          return undefined;
-                        },
-                        onSubmit: ({ value, fieldApi }) => {
-                          const moneda = fieldApi.form.getFieldValue("moneda");
-                          const hasUSDService = fieldApi.form
-                            .getFieldValue("servicios")
-                            .some(
-                              (s) =>
-                                services?.data
-                                  ?.find((service) => service.id === s.id)
-                                  ?.moneda?.toLowerCase() === "usd"
-                            );
+                        if (
+                          (moneda === 2 || hasUSDService) &&
+                          (!value || Number(value) <= 0)
+                        ) {
+                          return "La cotización debe ser mayor a 0";
+                        }
+                        return undefined;
+                      },
+                      onSubmit: ({ value, fieldApi }) => {
+                        const moneda = fieldApi.form.getFieldValue("moneda");
+                        const hasUSDService = fieldApi.form
+                          .getFieldValue("servicios")
+                          .some(
+                            (s) =>
+                              services?.data
+                                ?.find((service) => service.id === s.id)
+                                ?.moneda?.toLowerCase() === "usd",
+                          );
 
-                          if (
-                            (moneda === 2 || hasUSDService) &&
-                            (!value || Number(value) <= 0)
-                          ) {
-                            return "La cotización es obligatoria y debe ser mayor a 0";
-                          }
-                        },
-                      }}
-                    >
-                      {(field) => (
-                        <div className="flex flex-col">
-                          <label className="block font-semibold mb-1 whitespace-nowrap">
-                            {selectedMoneda === 2
-                              ? "Cotización USD:"
-                              : "Cotización Servicios USD:"}
-                          </label>
-                          <input
-                            type="text"
-                            value={
-                              typeof field.state.value === "number"
-                                ? new Intl.NumberFormat("es-AR", {
+                        if (
+                          (moneda === 2 || hasUSDService) &&
+                          (!value || Number(value) <= 0)
+                        ) {
+                          return "La cotización es obligatoria y debe ser mayor a 0";
+                        }
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div className="flex flex-col">
+                        <label className="block font-semibold mb-1 whitespace-nowrap">
+                          {selectedMoneda === 2
+                            ? "Cotización USD:"
+                            : "Cotización Servicios USD:"}
+                        </label>
+                        <input
+                          type="text"
+                          value={
+                            typeof field.state.value === "number"
+                              ? new Intl.NumberFormat("es-AR", {
                                   minimumFractionDigits: 0,
                                   maximumFractionDigits: 0,
                                 }).format(field.state.value)
-                                : ""
-                            }
-                            onChange={(e) => {
-                              const soloNumeros = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              );
-                              field.handleChange(Number(soloNumeros));
-                            }}
-                            className="border p-2 rounded w-full"
-                            placeholder="$$$"
-                          />
-                          {field.state.meta.errors.length > 0 && (
-                            <em className="text-red-600 text-sm">
-                              {field.state.meta.errors.join(", ")}
-                            </em>
-                          )}
-                        </div>
-                      )}
-                    </form.Field>
-                  </div>
-                )}
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const soloNumeros = e.target.value.replace(
+                              /\D/g,
+                              "",
+                            );
+                            field.handleChange(Number(soloNumeros));
+                          }}
+                          className="border p-2 rounded w-full"
+                          placeholder="$$$"
+                        />
+                        {field.state.meta.errors.length > 0 && (
+                          <em className="text-red-600 text-sm">
+                            {field.state.meta.errors.join(", ")}
+                          </em>
+                        )}
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+              )}
             </div>
 
-            {/* Row 3: Dates */}
+            <form.Field
+              name="fecha"
+              validators={{
+                onSubmit: ({ value }) => {
+                  if (!value) return "La fecha es obligatoria";
+                },
+              }}
+            >
+              {(field) => (
+                <div className="flex flex-col">
+                  <label className="block font-semibold mb-1">
+                    Fecha creación:
+                  </label>
+                  <input
+                    type="date"
+                    value={field.state.value || ""}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className="border p-2 rounded w-full"
+                  />
+                  {field.state.meta.errors.length > 0 && (
+                    <em className="text-red-600 text-sm">
+                      {field.state.meta.errors.join(", ")}
+                    </em>
+                  )}
+                </div>
+              )}
+            </form.Field>
             <form.Field
               name="fecha_ida"
               validators={{
@@ -372,7 +397,7 @@ export const TripCreateModal = () => {
             >
               {(field) => {
                 const fechaIda = field.form.getFieldValue(
-                  "fecha_ida"
+                  "fecha_ida",
                 ) as string;
                 return (
                   <div className="flex flex-col">
@@ -405,12 +430,12 @@ export const TripCreateModal = () => {
                   const toggleService = (serviceId: number) => {
                     const currentValues = fieldArray.state.value;
                     const exists = currentValues.some(
-                      (s) => s.id === serviceId
+                      (s) => s.id === serviceId,
                     );
 
                     if (exists) {
                       const indexToRemove = currentValues.findIndex(
-                        (s) => s.id === serviceId
+                        (s) => s.id === serviceId,
                       );
                       if (indexToRemove !== -1) {
                         fieldArray.removeValue(indexToRemove);

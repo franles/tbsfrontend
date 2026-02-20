@@ -5,6 +5,7 @@ interface Service {
   pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
   moneda: string;
   cotizacion: number | null;
+  observacion: string | null;
 }
 
 export interface Trip {
@@ -73,14 +74,16 @@ export type CreateServiceTripData = {
   viaje_id: string;
   servicio_id: number;
   valor: number;
-  pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+  pagado_por: "pendiente" | "pablo" | "soledad" | "mariana" | "mixto";
+  observacion?: string | null;
   cotizacion?: number | null;
 };
 export type UpdateServiceData = {
   id: number;
   valor: number;
-  pagado_por: "pendiente" | "pablo" | "soledad" | "mariana";
+  pagado_por: "pendiente" | "pablo" | "soledad" | "mariana" | "mixto";
   moneda: number;
+  observacion: string | null;
   cotizacion: number | null;
 };
 
@@ -111,6 +114,7 @@ export type CreateTripRequest = {
   valor_total: number;
   cotizacion?: number | null;
   destino: "internacional" | "nacional" | "";
+  fecha: string;
   fecha_ida: string;
   fecha_vuelta: string;
   moneda: number;
@@ -121,6 +125,9 @@ export type UpdateTripRequest = {
   destino?: "internacional" | "nacional";
   apellido?: string;
   moneda?: number;
+  fecha_ida?: string;
+  fecha_vuelta?: string;
+  fecha?: string;
   cotizacion?: number | null;
   servicios: UpdateServiceData[];
 };
