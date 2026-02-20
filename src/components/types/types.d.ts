@@ -109,6 +109,7 @@ export type CreateTripRequest = {
     pagado_por: "pendiente";
     moneda: number;
     cotizacion: number | null;
+    observacion?: string | null;
   }[];
   apellido: string;
   valor_total: number;

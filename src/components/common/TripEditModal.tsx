@@ -69,9 +69,9 @@ export const TripEditModal = () => {
             s.valor !== original.valor ||
             s.pagado_por !== original.pagado_por ||
             s.moneda !==
-              ((original.moneda as unknown as string)?.toLowerCase() === "usd"
-                ? 2
-                : 1) ||
+            ((original.moneda as unknown as string)?.toLowerCase() === "usd"
+              ? 2
+              : 1) ||
             s.cotizacion !== (original.cotizacion ?? null) ||
             s.observacion !== (original.observacion ?? null)
           );
@@ -89,6 +89,9 @@ export const TripEditModal = () => {
         apellido: value.apellido ?? trip?.apellido,
         valor_total: Number(value.valor_total ?? trip?.valor_total),
         destino: value.destino ?? trip?.destino,
+        fecha: value.fecha ?? trip?.fecha,
+        fecha_ida: value.fecha_ida ?? trip?.fecha_ida,
+        fecha_vuelta: value.fecha_vuelta ?? trip?.fecha_vuelta,
         cotizacion: value.cotizacion,
         moneda: value.moneda,
         servicios: serviciosActualizados,
@@ -122,13 +125,14 @@ export const TripEditModal = () => {
           moneda:
             (s.moneda as unknown as string)?.toLowerCase() === "usd" ? 2 : 1,
           cotizacion: s.cotizacion ?? null,
+          observacion: s.observacion ?? null,
         })) ?? [],
     } as UpdateTripRequest);
   }, [trip, form]);
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-lg w-full max-w-4xl p-6 relative animate-fadeIn text-black max-h-[90vh] overflow-y-auto"
+      className="bg-white rounded-2xl shadow-lg w-full max-w-6xl p-6 relative animate-fadeIn text-black max-h-[90vh] overflow-y-auto"
       style={{ scrollbarWidth: "none" }}
     >
       <button
@@ -159,53 +163,60 @@ export const TripEditModal = () => {
               <h1 className="font-bold text-xl text-blue-600 mb-3 select-none">
                 Información:
               </h1>
-              <form.Field name="apellido">
-                {(field) => (
-                  <div className="mb-3">
-                    <label className="block font-semibold mb-1">Apellido</label>
-                    <input
-                      className="w-2/3 border rounded px-3 py-2"
-                      value={field.state.value ?? ""}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </div>
-                )}
-              </form.Field>
 
-              <form.Field name="destino">
-                {(field) => (
-                  <div className="mb-3">
-                    <label className="block font-semibold mb-1 select-none">
-                      Destino:
-                    </label>
-                    <select
-                      onChange={(e) =>
-                        field.handleChange(
-                          e.target.value as "internacional" | "nacional",
-                        )
-                      }
-                      value={field.state.value ?? "internacional"}
-                      className="border p-2 rounded w-1/2"
-                    >
-                      <option value="internacional">Internacional</option>
-                      <option value="nacional">Nacional</option>
-                    </select>
-                  </div>
-                )}
-              </form.Field>
+              <div className="mb-3 flex gap-6">
+                <div className="w-full">
+                  <form.Field name="apellido">
+                    {(field) => (
+                      <div className="mb-3">
+                        <label className="block font-semibold mb-1">Apellido</label>
+                        <input
+                          className="w-full border rounded px-3 py-2"
+                          value={field.state.value ?? ""}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+                <div className="w-full">
+
+                  <form.Field name="destino">
+                    {(field) => (
+                      <div className="mb-3">
+                        <label className="block font-semibold mb-1 select-none">
+                          Destino:
+                        </label>
+                        <select
+                          onChange={(e) =>
+                            field.handleChange(
+                              e.target.value as "internacional" | "nacional",
+                            )
+                          }
+                          value={field.state.value ?? "internacional"}
+                          className="border p-2 rounded w-full"
+                        >
+                          <option value="internacional">Internacional</option>
+                          <option value="nacional">Nacional</option>
+                        </select>
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+              </div>
 
               <form.Field
                 name="fecha"
                 validators={{
                   onSubmit: ({ value }) => {
-                    if (!value) return "La fecha es obligatoria";
+                    if (!value) return "La fecha de creación es obligatoria";
                   },
                 }}
               >
                 {(field) => (
-                  <div className="flex flex-col">
+                  <div className="flex flex-col mb-3">
                     <label className="block font-semibold mb-1">
-                      Fecha de ida:
+                      Fecha de creacion:
                     </label>
                     <input
                       type="date"
@@ -222,62 +233,67 @@ export const TripEditModal = () => {
                 )}
               </form.Field>
 
-              <form.Field
-                name="fecha_ida"
-                validators={{
-                  onSubmit: ({ value }) => {
-                    if (!value) return "La fecha de ida es obligatoria";
-                  },
-                }}
-              >
-                {(field) => (
-                  <div className="flex flex-col">
-                    <label className="block font-semibold mb-1">
-                      Fecha de ida:
-                    </label>
-                    <input
-                      type="date"
-                      value={field.state.value || ""}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="border p-2 rounded w-full"
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <em className="text-red-600 text-sm">
-                        {field.state.meta.errors.join(", ")}
-                      </em>
+              <div className="flex gap-4 w-full">
+                <div className="w-full">
+                  <form.Field
+                    name="fecha_ida"
+                    validators={{
+                      onSubmit: ({ value }) => {
+                        if (!value) return "La fecha de ida es obligatoria";
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div className="flex flex-col mb-3">
+                        <label className="block font-semibold mb-1">
+                          Fecha de ida:
+                        </label>
+                        <input
+                          type="date"
+                          value={field.state.value || ""}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="border p-2 rounded w-full"
+                        />
+                        {field.state.meta.errors.length > 0 && (
+                          <em className="text-red-600 text-sm">
+                            {field.state.meta.errors.join(", ")}
+                          </em>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-              </form.Field>
+                  </form.Field>
+                </div>
 
-              <form.Field
-                name="fecha_vuelta"
-                validators={{
-                  onSubmit: ({ value }) => {
-                    if (!value) return "La fecha de vuelta es obligatoria";
-                  },
-                }}
-              >
-                {(field) => (
-                  <div className="flex flex-col">
-                    <label className="block font-semibold mb-1">
-                      Fecha de ida:
-                    </label>
-                    <input
-                      type="date"
-                      value={field.state.value || ""}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="border p-2 rounded w-full"
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <em className="text-red-600 text-sm">
-                        {field.state.meta.errors.join(", ")}
-                      </em>
+                <div className="w-full">
+                  <form.Field
+                    name="fecha_vuelta"
+                    validators={{
+                      onSubmit: ({ value }) => {
+                        if (!value) return "La fecha de vuelta es obligatoria";
+                      },
+                    }}
+                  >
+                    {(field) => (
+                      <div className="flex flex-col mb-3">
+                        <label className="block font-semibold mb-1">
+                          Fecha de vuelta:
+                        </label>
+                        <input
+                          type="date"
+                          value={field.state.value || ""}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="border p-2 rounded w-full"
+                        />
+                        {field.state.meta.errors.length > 0 && (
+                          <em className="text-red-600 text-sm">
+                            {field.state.meta.errors.join(", ")}
+                          </em>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-              </form.Field>
-
+                  </form.Field>
+                </div>
+              </div>
               <div>
                 <label className="block font-semibold mb-1 select-none">
                   Estado
@@ -342,9 +358,9 @@ export const TripEditModal = () => {
                                 value={
                                   field.state.value
                                     ? new Intl.NumberFormat("es-AR", {
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0,
-                                      }).format(field.state.value)
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    }).format(field.state.value)
                                     : ""
                                 }
                                 onChange={(e) => {
@@ -388,9 +404,9 @@ export const TripEditModal = () => {
                       value={
                         field.state.value
                           ? new Intl.NumberFormat("es-AR", {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            }).format(field.state.value)
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }).format(field.state.value)
                           : ""
                       }
                       onChange={(e) => {
@@ -456,9 +472,9 @@ export const TripEditModal = () => {
                               value={
                                 s.valor
                                   ? new Intl.NumberFormat("es-AR", {
-                                      minimumFractionDigits: 0,
-                                      maximumFractionDigits: 0,
-                                    }).format(s.valor)
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  }).format(s.valor)
                                   : ""
                               }
                               onChange={(e) => {
@@ -508,34 +524,34 @@ export const TripEditModal = () => {
                           Number(field.form.getFieldValue("moneda")) === 1 &&
                           Number(s.moneda) === 1
                         ) && (
-                          <div className="flex flex-col">
-                            <label className="block text-xs font-semibold mb-1 select-none">
-                              Cotización:
-                            </label>
-                            <input
-                              type="text"
-                              value={s.cotizacion ?? ""}
-                              onChange={(e) => {
-                                const newServicios = [
-                                  ...(field.state.value ?? []),
-                                ];
-                                const soloNumeros = e.target.value.replace(
-                                  /\D/g,
-                                  "",
-                                );
-                                newServicios[index] = {
-                                  ...s,
-                                  cotizacion:
-                                    soloNumeros === ""
-                                      ? null
-                                      : Number(soloNumeros),
-                                };
-                                field.handleChange(newServicios);
-                              }}
-                              className="border p-2 rounded w-24"
-                            />
-                          </div>
-                        )}
+                            <div className="flex flex-col">
+                              <label className="block text-xs font-semibold mb-1 select-none">
+                                Cotización:
+                              </label>
+                              <input
+                                type="text"
+                                value={s.cotizacion ?? ""}
+                                onChange={(e) => {
+                                  const newServicios = [
+                                    ...(field.state.value ?? []),
+                                  ];
+                                  const soloNumeros = e.target.value.replace(
+                                    /\D/g,
+                                    "",
+                                  );
+                                  newServicios[index] = {
+                                    ...s,
+                                    cotizacion:
+                                      soloNumeros === ""
+                                        ? null
+                                        : Number(soloNumeros),
+                                  };
+                                  field.handleChange(newServicios);
+                                }}
+                                className="border p-2 rounded w-24"
+                              />
+                            </div>
+                          )}
 
                         {/* Pagado por */}
                         <div className="flex flex-col">
@@ -713,15 +729,15 @@ export const TripEditModal = () => {
                     (s) =>
                       !(field.state.value ?? []).some((fs) => fs.id === s.id),
                   ) && (
-                    <button
-                      type="button"
-                      className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
-                      onClick={() => setAdd(true)}
-                    >
-                      <IoIosAdd className="mr-2" />
-                      Agregar servicio
-                    </button>
-                  )}
+                      <button
+                        type="button"
+                        className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
+                        onClick={() => setAdd(true)}
+                      >
+                        <IoIosAdd className="mr-2" />
+                        Agregar servicio
+                      </button>
+                    )}
                 </div>
               )}
             </form.Field>
