@@ -19,27 +19,30 @@ export function Table<T>({
   noDataMessage = "No hay resultados",
 }: Props<T>) {
   return (
-    <table className="w-full border-collapse">
-      <thead>
-        <tr className="bg-[#007bff] text-white ">
-          {headers.map((header) => (
-            <th key={header.key} className=" p-3 text-center">
-              {header.label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.length === 0 ? (
-          <tr>
-            <td colSpan={headers.length} className="p-3 text-center">
-              {noDataMessage}
-            </td>
+    <div className="overflow-hidden rounded-2xl border border-black shadow-sm">
+      <table className="w-full border-collapse bg-white">
+        <thead>
+          <tr className="bg-black text-white">
+            {headers.map((header) => (
+              <th key={header.key} className="py-4 px-4 text-center text-xs font-bold uppercase tracking-wider">
+                {header.label}
+              </th>
+            ))}
           </tr>
-        ) : (
-          data.map((item) => renderRow(item))
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={headers.length} className="p-3 text-center">
+                {noDataMessage}
+              </td>
+            </tr>
+          ) : (
+            data.map((item) => renderRow(item))
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
+

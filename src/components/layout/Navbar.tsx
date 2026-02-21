@@ -1,46 +1,19 @@
-import { MdLogout } from "react-icons/md";
 import { logOut } from "../services/auth.services";
-import { useNavigate } from "react-router-dom";
-import {
-  IoExitOutline,
-  IoMenu,
-  IoChatboxSharp,
-  IoAirplane,
-  IoEarth,
-  IoHeartSharp,
-  IoSnow,
-} from "react-icons/io5";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
-import { useState } from "react";
 import Swal from "sweetalert2";
+import { PiSignOutBold } from "react-icons/pi";
+
 
 function Navbar() {
   const navigate = useNavigate();
   const { clearUser, user } = useUser();
-  const [openMenu, setOpenMenu] = useState(false);
-
-  // Para el icono que aparece temporalmente
-  const [showChatIcon, setShowChatIcon] = useState(false);
-  const [iconIndex, setIconIndex] = useState(0);
-
-  const icons = [
-    { icon: <IoAirplane size={18} color="#007BFF" />, name: "Airplane" },
-    { icon: <IoEarth size={18} color="#2ECC71" />, name: "Earth" },
-    { icon: <IoHeartSharp size={18} color="#FF4136" />, name: "Heart" },
-    { icon: <IoSnow size={18} color="#7FDBFF" />, name: "Snow" },
-  ];
 
   const handleLogOut = async () => {
     clearUser();
     sessionStorage.clear();
     await logOut();
     navigate("/login");
-  };
-
-  const handleLogoClick = () => {
-    setIconIndex((prev) => (prev + 1) % icons.length); // cambia al siguiente icono
-    setShowChatIcon(true);
-    setTimeout(() => setShowChatIcon(false), 3000); // desaparece después de 3 segundos
   };
 
   const handleLogoutClick = async () => {
@@ -60,82 +33,72 @@ function Navbar() {
     }
   };
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `px-3 py-2 text-base font-semibold transition-all duration-200 border-b-2 ${isActive ? "border-[#DB3238] text-white" : "border-transparent text-gray-400 hover:text-white hover:border-[#FFFFFF]"
+    }`;
+
   return (
-    <nav className="w-full py-2 px-6 fixed top-0 left-0 z-50 backdrop-blur-sm bg-white/20 shadow-md flex items-center justify-between rounded-none">
-      {/* Usuario */}
-      <div className="flex items-center gap-2 select-none">
-        {user?.avatar ? (
-          <img className="rounded-full w-10" src={user.avatar} />
-        ) : (
-          <IoExitOutline size={30} color="white" />
-        )}
-        <span className="text-sm font-semibold text-white drop-shadow-sm capitalize select-none">
-          Hola, {user?.nombre}!
-        </span>
-      </div>
-
-      {/* Logo y Chat Icon */}
-      <div className="relative flex items-center select-none">
-        <img
-          src="https://res.cloudinary.com/dttpgbmdx/image/upload/v1752706284/tbs-logo_frbbyo.png"
-          alt="Logo TBS"
-          className="h-12 drop-shadow-md cursor-pointer"
-          onClick={handleLogoClick}
-        />
-
-        {showChatIcon && (
-          <div className="absolute -top-4 -right-5">
-            <IoChatboxSharp size={32} color="white" />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              {icons[iconIndex].icon}
-            </div>
+    <>
+      <div className="fixed top-4 left-0 w-full z-50 px-5 flex items-center gap-4">
+        {/* Pill 1: Perfil de Usuario */}
+        <div className="bg-black rounded-full shadow-lg border border-gray-800 px-4 py-2 flex items-center gap-3 h-[60px] min-w-fit flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden flex-shrink-0 border border-gray-700">
+            {user?.avatar ? (
+              <img className="w-full h-full object-cover" src={user.avatar} alt="Avatar" />
+            ) : (
+              <span className="text-black text-sm font-bold uppercase">{user?.nombre?.charAt(0)}</span>
+            )}
           </div>
-        )}
-      </div>
-
-      <div className="flex items-center gap-3 relative select-none">
-        <div className="relative">
-          <button
-            onClick={() => setOpenMenu(!openMenu)}
-            className="gap-2 px-4 py-2 text-white rounded-md shadow-sm transition-all duration-200 backdrop-blur-sm font-medium"
-          >
-            <IoMenu size={21} />
-          </button>
-
-          {openMenu && (
-            <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50">
-              <button
-                onClick={() => {
-                  navigate("/home");
-                  setOpenMenu(false);
-                }}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                Home
-              </button>
-              <button
-                onClick={() => {
-                  navigate("/finance");
-                  setOpenMenu(false);
-                }}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                Resumen Anual
-              </button>
-            </div>
-          )}
+          <span className="text-base font-semibold text-white whitespace-nowrap pr-2">
+            ¡Hola, {user?.nombre}!
+          </span>
         </div>
 
-        <button
-          onClick={handleLogoutClick}
-          className="flex items-center gap-1 bg-red-600/80 hover:bg-red-700/80 text-white text-sm px-4 py-2 rounded-md shadow-sm transition-all duration-200 backdrop-blur-sm font-medium select-none"
-        >
-          <MdLogout size={21} />
-          Cerrar sesión
-        </button>
+        {/* Pill 2: Navegación y Acciones */}
+        <nav className="flex-grow bg-black rounded-full shadow-lg border border-gray-800 px-5 py-2 flex items-center justify-between h-[60px] relative overflow-hidden">
+          {/* Logo */}
+          <div className="flex items-center flex-shrink-0">
+            <img
+              src="https://res.cloudinary.com/dttpgbmdx/image/upload/v1752706284/tbs-logo_frbbyo.png"
+              alt="Logo"
+              className="h-10 cursor-pointer"
+              onClick={() => navigate("/home")}
+            />
+          </div>
+
+          {/* Espaciador para no pisar los links centrados */}
+          <div className="flex-grow" />
+
+          {/* Botón Logout */}
+          <div className="flex items-center flex-shrink-0">
+            <button
+              onClick={handleLogoutClick}
+              className="flex items-center gap-2 bg-[#DB3238] hover:bg-[#8B181C] text-white text-sm px-4 py-2 rounded-full font-semibold transition-all duration-200 shadow-sm whitespace-nowrap"
+            >
+              <span>Cerrar sesión</span>
+              <PiSignOutBold size={18} />
+            </button>
+          </div>
+        </nav>
       </div>
-    </nav>
+
+      {/* Links Centrales - Centrados a la PANTALLA */}
+      <div className="fixed top-4 left-0 w-full z-[51] pointer-events-none flex justify-center mt-[10px]">
+        <div className="flex items-center gap-5 pointer-events-auto h-[40px]">
+          <NavLink to="/home" className={navLinkClass}>
+            Home
+          </NavLink>
+          <NavLink to="/finance" className={navLinkClass}>
+            Finance
+          </NavLink>
+          <NavLink to="/expenses" className={navLinkClass}>
+            Expenses
+          </NavLink>
+        </div>
+      </div>
+    </>
   );
 }
+
 
 export default Navbar;

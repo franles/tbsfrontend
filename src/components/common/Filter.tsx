@@ -1,4 +1,68 @@
-import { IoFunnelOutline } from "react-icons/io5";
+import { useState, useRef, useEffect } from "react";
+import { IoChevronDown } from "react-icons/io5";
+
+type Option = {
+  label: string;
+  value: string | number | null;
+};
+
+type CustomSelectProps = {
+  label: string;
+  value: string | number | null;
+  options: Option[];
+  onChange: (value: any) => void;
+  className?: string;
+};
+
+const CustomSelect = ({ label, value, options, onChange }: CustomSelectProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value) || options[0];
+
+  return (
+    <div className="flex flex-col gap-1.5 relative select-none" ref={containerRef}>
+      <span className="text-[11px] font-black text-black uppercase tracking-widest ml-1">{label}</span>
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        className="bg-gray-100 border border-transparent hover:border-gray-200 shadow-sm rounded-full px-4 py-2 text-xs font-bold text-gray-700 flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 min-w-[125px]"
+      >
+        <span className="capitalize">{selectedOption?.label}</span>
+        <IoChevronDown className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} size={14} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute top-[calc(100%+8px)] left-0 w-full min-w-[160px] bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 z-[100] animate-in fade-in zoom-in duration-200">
+          <div className="max-h-[250px] overflow-y-auto custom-scrollbar">
+            {options.map((opt, idx) => (
+              <div
+                key={idx}
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`px-5 py-2.5 text-xs font-semibold cursor-pointer transition-colors capitalize ${opt.value === value ? "bg-black text-white" : "text-gray-600 hover:bg-gray-50 hover:text-black"
+                  }`}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 type Props = {
   filter?: string;
@@ -22,101 +86,76 @@ export const Filter = ({
   setCurrency,
 }: Props) => {
   return (
-    <div className="flex gap-3 items-center">
-      <IoFunnelOutline size={30} className="text-gray-400 mr-2 ml-6" />
+    <div className="flex flex-wrap items-center gap-4">
+      {/* Filtro Tipo */}
       {setFilter && (
-        <div className="flex flex-col">
-          <span className="font-semibold">Tipo:</span>
-          <select
-            name="filtro"
-            id="filtro"
-            onChange={(e) => {
-              setFilter(e.target.value);
-            }}
-            value={filter ?? "desc"}
-            className="w-[120px] border border-gray-300 rounded px-2 py-1 shadow-sm"
-          >
-            <option value="asc">Antiguos</option>
-            <option value="desc">Recientes</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="finalizado">Finalizado</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Tipo"
+          value={filter ?? "desc"}
+          options={[
+            { label: "Antiguos", value: "asc" },
+            { label: "Recientes", value: "desc" },
+            { label: "Pendiente", value: "pendiente" },
+            { label: "Finalizado", value: "finalizado" },
+          ]}
+          onChange={setFilter}
+        />
       )}
 
-      {/* Año */}
+      {/* Filtro Año */}
       {setYear && (
-        <div className="flex flex-col">
-          <span className="font-semibold">Año:</span>
-          <select
-            onChange={(e) => {
-              const val = e.target.value;
-              setYear(val === "" ? null : Number(val));
-            }}
-            value={year ?? ""}
-            className="w-[90px] border border-gray-300 rounded px-2 py-1 shadow-sm"
-          >
-            <option value={""}>Año</option>
-            <option value={2025}>2025</option>
-            <option value={2026}>2026</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Año"
+          value={year ?? null}
+          options={[
+            { label: "Todos", value: null },
+            { label: "2025", value: 2025 },
+            { label: "2026", value: 2026 },
+          ]}
+          onChange={setYear}
+        />
       )}
 
-      {/* Mes */}
+      {/* Filtro Mes */}
       {setMonth && (
-        <div className="flex flex-col">
-          <span className="font-semibold">Mes:</span>
-          <select
-            value={month ?? ""}
-            onChange={(e) => {
-              const val = e.target.value;
-              setMonth(val === "" ? null : Number(val));
-            }}
-            className="w-[100px] border border-gray-300 rounded px-2 py-1 shadow-sm capitalize"
-          >
-            <option value={""}>Mes</option>
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {new Date(0, i).toLocaleString("es-AR", { month: "long" })}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CustomSelect
+          label="Mes"
+          value={month ?? null}
+          options={[
+            { label: "Todos", value: null },
+            ...Array.from({ length: 12 }, (_, i) => ({
+              label: new Date(0, i).toLocaleString("es-AR", { month: "long" }),
+              value: i + 1,
+            })),
+          ]}
+          onChange={setMonth}
+        />
       )}
 
-      {/* Moneda */}
+
+      {/* Filtro Moneda */}
       {setCurrency && (
-        <div className="flex flex-col">
-          <span className="font-semibold mb-1">Moneda:</span>
-          <div className="inline-flex rounded-md shadow-sm" role="group">
+        <div className="flex flex-col gap-1.5 select-none">
+          <span className="text-[11px] font-black text-black uppercase tracking-widest ml-1">Moneda</span>
+          <div className="flex bg-gray-100 border border-transparent rounded-full p-1 shadow-sm h-[38px] items-center">
             <button
               type="button"
               onClick={() => setCurrency(null)}
-              className={`px-3 py-1 text-sm font-medium border border-gray-300 rounded-l-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-gray-500 focus:text-gray-700 ${!currency
-                ? "bg-gray-100 text-gray-900 z-10 font-bold"
-                : "bg-white text-gray-700"
-                }`}
+              className={`px-3 py-1.5 text-[10px] font-black rounded-full transition-all duration-200 h-full flex items-center ${!currency ? "bg-black text-white shadow-md" : "text-gray-400 hover:text-gray-900"}`}
             >
-              Todos
+              TODOS
             </button>
             <button
               type="button"
               onClick={() => setCurrency("ARS")}
-              className={`px-3 py-1 text-sm font-medium border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-700 ${currency === "ARS"
-                ? "bg-blue-50 text-blue-700 z-10 font-bold"
-                : "bg-white text-gray-700"
-                }`}
+              className={`px-3 py-1.5 text-[10px] font-black rounded-full transition-all duration-200 h-full flex items-center ${currency === "ARS" ? "bg-black text-white shadow-md" : "text-gray-400 hover:text-gray-900"}`}
             >
               ARS
             </button>
             <button
               type="button"
               onClick={() => setCurrency("USD")}
-              className={`px-3 py-1 text-sm font-medium border border-gray-300 rounded-r-md hover:bg-gray-50 focus:z-10 focus:ring-2 focus:ring-green-500 focus:text-green-700 ${currency === "USD"
-                ? "bg-green-50 text-green-700 z-10 font-bold"
-                : "bg-white text-gray-700"
-                }`}
+              className={`px-3 py-1.5 text-[10px] font-black rounded-full transition-all duration-200 h-full flex items-center ${currency === "USD" ? "bg-black text-white shadow-md" : "text-gray-400 hover:text-gray-900"}`}
             >
               USD
             </button>

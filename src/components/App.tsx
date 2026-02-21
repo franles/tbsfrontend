@@ -17,6 +17,7 @@ import { Failure } from "./pages/Failure.tsx";
 
 const Annual = lazy(() => import("./pages/Annual.tsx"));
 const Home = lazy(() => import("./pages/Home.tsx"));
+const Expenses = lazy(() => import("./pages/Expenses.tsx"));
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route element={<ProtectedLayout />}>
                 <Route path="/home" element={<Home />} />
                 <Route path="/finance" element={<Annual />} />
+                <Route path="/expenses" element={<Expenses />} />
               </Route>
             </Route>
           </Routes>

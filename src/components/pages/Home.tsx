@@ -8,8 +8,7 @@ import { Modal } from "../layout/Modal";
 import { TripModal } from "../common/TripModal";
 import { Pagination } from "../common/Pagination";
 import { TripsTable } from "../common/TripsTable";
-import { Link } from "react-router-dom";
-import { IoAddCircle, IoSearch, IoListCircle } from "react-icons/io5";
+import { IoAddCircle, IoSearch } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
 
@@ -41,34 +40,28 @@ function Home() {
 
   return (
     <>
-      <div className="relative h-[225px] bg-cover bg-[center_top_0%] bg-[url('https://res.cloudinary.com/dttpgbmdx/image/upload/v1768442834/bg_home_u8jakq.png')]">
-        <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
-
-        <div
-          className="absolute inset-0 z-10"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(255,255,255,0) 66%, rgba(255,255,255,1) 100%)",
-          }}
-        ></div>
-        <div className="relative z-20 h-full flex items-center justify-center">
-          <h1 className="text-6xl font-bold text-white drop-shadow-lg text-center mt-10 select-none cursor-default">
-            Historial de Reservas
-          </h1>
-        </div>
+      <div className="relative z-20 h-full flex items-center justify-center">
+        <h1 className="text-5xl font-bold text-black drop-shadow-lg text-center mt-24 mb-2 select-none cursor-default">
+          HOME
+        </h1>
       </div>
-
-      <section className="max-w-[900px] mx-auto">
-        <div className="flex flex-wrap justify-between items-center mb-4 select-none cursor-default">
-          <IoSearch size={30} className="text-gray-400 mr-2" />
-
-          <input
-            type="text"
-            placeholder="Buscar por legajo o nombre"
-            value={searchTerm}
-            onChange={searchHandleChange}
-            className="px-3 py-2 mr-3 rounded border border-gray-300 shadow-sm min-w-[200px] flex-grow"
-          />
+      <section className="max-w-[900px] mx-auto mt-2 px-2 pb-10">
+        {/* Barra de Búsqueda y Filtros */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-4 select-none">
+          {/* Buscador Estilo Pill */}
+          <div className="flex flex-col gap-1.5 flex-grow max-w-xs w-full">
+            <span className="text-[11px] font-black text-black uppercase tracking-widest ml-4"></span>
+            <div className="relative w-full group">
+              <IoSearch size={22} className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors" />
+              <input
+                type="text"
+                placeholder="Buscar por legajo o nombre..."
+                value={searchTerm}
+                onChange={searchHandleChange}
+                className="w-full pl-14 pr-6 py-3 bg-gray-100 rounded-full border border-transparent focus:border-gray-200 focus:bg-white shadow-sm focus:ring-2 focus:ring-black focus:outline-none transition-all duration-200 text-sm font-semibold text-gray-700 placeholder:text-gray-400"
+              />
+            </div>
+          </div>
 
           <Filter
             filter={filter}
@@ -80,25 +73,24 @@ function Home() {
           />
         </div>
 
-        <TripsTable filteredTrips={filteredTrips} />
-        <div className="flex justify-between items-center mt-4 select-none ">
-          <Pagination page={page} setPage={setPage} />
-          <div className="flex gap-2 select-none cursor-default">
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow select-none "
-              onClick={() => setIsCreate(true)}
-            >
-              <IoAddCircle size={24} />
-              Añadir reserva
-            </button>
 
-            <Link to="/finance">
-              <button className="flex items-center gap-2 px-4 py-2 bg-[#007bff] hover:bg-blue-600 text-white font-semibold rounded shadow select-none ">
-                <IoListCircle size={24} />
-                Resumen Anual
-              </button>
-            </Link>
-          </div>
+
+        {/* Tabla */}
+        <div className="mb-2">
+          <TripsTable filteredTrips={filteredTrips} />
+        </div>
+
+        {/* Paginación y Botón Añadir */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6  select-none">
+          <Pagination page={page} setPage={setPage} />
+
+          <button
+            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded shadow transition-colors"
+            onClick={() => setIsCreate(true)}
+          >
+            <IoAddCircle size={24} />
+            <span>Añadir reserva</span>
+          </button>
         </div>
       </section>
 

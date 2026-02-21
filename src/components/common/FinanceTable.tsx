@@ -7,65 +7,44 @@ export function FinanceTable({ financeData, viewMode = null }: { financeData: Fi
   const showArs = viewMode === null || viewMode === "ARS";
   const showUsd = viewMode === null || viewMode === "USD";
 
-  const headers = [
-    { label: "Mes", key: "mes", rowSpan: 2 },
-    // Conditionally add grouped headers
-    ...(showArs
-      ? [{ label: "ARS", colSpan: 3, className: "bg-blue-500/30 text-gray-900 border-l border-gray-300" }]
-      : []),
-    ...(showUsd
-      ? [{ label: "USD", colSpan: 3, className: "bg-green-500/30 text-gray-900 border-l border-gray-300" }]
-      : []),
-  ];
-
-  const subHeaders = [
-    ...(showArs
-      ? [
-        { label: "Ingreso", className: "text-gray-900 bg-blue-500/20 border-l border-gray-300" },
-        { label: "Egreso", className: "text-gray-900 bg-blue-500/20 border-y border-gray-300" },
-        { label: "Ganancia", className: "font-bold text-gray-900 bg-blue-500/20 border-r border-y border-gray-300" },
-      ]
-      : []),
-    ...(showUsd
-      ? [
-        { label: "Ingreso", className: "text-gray-900 bg-green-500/20 border-l border-gray-300" },
-        { label: "Egreso", className: "text-gray-900 bg-green-500/20 border-y border-gray-300" },
-        { label: "Ganancia", className: "font-bold text-gray-900 bg-green-500/20 border-r border-y border-gray-300" },
-      ]
-      : []),
-  ];
-
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-x-auto rounded-lg shadow ring-1 ring-gray-300">
-        <table className="w-full divide-y divide-gray-300 border-collapse">
-          <thead className="bg-gray-50">
-            <tr>
-              {headers.map((h, i) => (
-                <th
-                  key={i}
-                  scope="col"
-                  rowSpan={h.rowSpan}
-                  colSpan={h.colSpan}
-                  className={`py-3 px-3 text-center font-bold text-gray-900 border border-gray-300 ${h.className || ""}`}
-                >
-                  {h.label}
+      <div className="overflow-hidden rounded-2xl border border-black bg-white">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-black text-white">
+              <th rowSpan={2} className="py-1 px-6 text-lg font-bold uppercase tracking-widest text-center border-r border-b border-gray-700 ">
+                MES
+              </th>
+              {showArs && (
+                <th colSpan={3} className="py-1 px-4 text-lg font-bold uppercase tracking-widest text-center border-b-[3px] border-blue-500">
+                  ARS
                 </th>
-              ))}
+              )}
+              {showUsd && (
+                <th colSpan={3} className={`py-1 px-4 text-lg font-bold uppercase tracking-widest text-center border-b-[3px] border-green-500 border-l border-l-gray-700`}>
+                  USD
+                </th>
+              )}
             </tr>
-            <tr>
-              {subHeaders.map((h, i) => (
-                <th
-                  key={i}
-                  scope="col"
-                  className={`px-3 py-2 text-center font-semibold text-gray-900 border-t border-b border-gray-300 ${h.className || ""}`}
-                >
-                  {h.label}
-                </th>
-              ))}
+            <tr className="bg-black text-white">
+              {showArs && (
+                <>
+                  <th className="py-2 px-4 text-[13px] font-bold text-center border-b border-gray-700">INGRESO</th>
+                  <th className="py-2 px-4 text-[13px] font-bold text-center border-l border-b border-gray-700">EGRESO</th>
+                  <th className="py-2 px-4 text-[13px] font-bold text-center border-l border-b border-gray-700">GANANCIA</th>
+                </>
+              )}
+              {showUsd && (
+                <>
+                  <th className={`py-2 px-4 text-[13px] font-bold text-center border-b border-gray-700 border-l border-gray-700`}>INGRESO</th>
+                  <th className="py-2 px-4 text-[13px] font-bold text-center border-l border-b border-gray-700">EGRESO</th>
+                  <th className="py-2 px-4 text-[13px] font-bold text-center border-l border-b border-gray-700">GANANCIA</th>
+                </>
+              )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-300 bg-white">
+          <tbody className="divide-y divide-black">
             {financeData?.map((item) => {
               const ars = item.resumen.find((r) => r.moneda === "ars") || {
                 ingreso: 0,
@@ -79,38 +58,34 @@ export function FinanceTable({ financeData, viewMode = null }: { financeData: Fi
               };
 
               return (
-                <tr key={item.mes_num} className="group hover:bg-gray-100 transition-colors">
-                  <td className="whitespace-nowrap py-2 px-3 font-medium text-gray-900 capitalize border border-gray-300 bg-gray-50 text-center">
+                <tr key={item.mes_num} className="group hover:bg-gray-200 transition-colors">
+                  <td className="whitespace-nowrap py-3 px-6 text-[15px] font-semibold text-gray-900 capitalize border-b border-r border-b-gray-250 border-r-gray-700 text-center">
                     {item.mes}
                   </td>
 
-                  {(showArs) && (
+                  {showArs && (
                     <>
-                      {/* ARS Group - Left border only on first column, no vertical borders between data columns, right border on last column */}
-                      <td className="whitespace-nowrap px-3 py-2 text-gray-700 text-center border-y border-l border-gray-300 bg-transparent group-hover:bg-gray-100">
+                      <td className="whitespace-nowrap px-4 py-3 text-gray-700 text-center border-b border-b-gray-250 group-hover:bg-gray-200">
                         ${formattedAmount(Number(ars.ingreso))}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2 text-gray-700 text-center border-y border-gray-300 bg-transparent group-hover:bg-gray-100">
+                      <td className="whitespace-nowrap px-4 py-3 text-gray-700 text-center  border-b border-b-gray-250 group-hover:bg-gray-200">
                         ${formattedAmount(Number(ars.egreso))}
                       </td>
-                      <td className={`whitespace-nowrap px-3 py-2 font-bold text-center border-y border-r border-gray-300 bg-transparent group-hover:bg-gray-100 ${Number(ars.ganancia) >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
+                      <td className={`whitespace-nowrap px-4 py-3 font-semibold text-center border-r border-b border-r-black border-b-gray-250 group-hover:bg-gray-200 ${Number(ars.ganancia) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         ${formattedAmount(Number(ars.ganancia))}
                       </td>
                     </>
                   )}
 
-                  {(showUsd) && (
+                  {showUsd && (
                     <>
-                      {/* USD Group - Left border to separate from ARS, no internal verticals, right border on last */}
-                      <td className="whitespace-nowrap px-3 py-2 text-gray-700 text-center border-y border-l border-gray-300 bg-transparent group-hover:bg-gray-100">
+                      <td className={`whitespace-nowrap px-4 py-3 text-gray-700 text-center border-b border-b-gray-250 group-hover:bg-gray-200 ${showArs ? '' : ''}`}>
                         ${formattedAmount(Number(usd.ingreso))}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2 text-gray-700 text-center border-y border-gray-300 bg-transparent group-hover:bg-gray-100">
+                      <td className="whitespace-nowrap px-4 py-3 text-gray-700 text-center border-b border-b-gray-250 group-hover:bg-gray-200">
                         ${formattedAmount(Number(usd.egreso))}
                       </td>
-                      <td className={`whitespace-nowrap px-3 py-2 font-bold text-center border-y border-r border-gray-300 bg-transparent group-hover:bg-gray-100 ${Number(usd.ganancia) >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
+                      <td className={`whitespace-nowrap px-4 py-3 font-semibold text-center border-b border-b-gray-250 group-hover:bg-gray-200 ${Number(usd.ganancia) >= 0 ? 'text-green-600' : 'text-red-700'}`}>
                         ${formattedAmount(Number(usd.ganancia))}
                       </td>
                     </>
@@ -120,8 +95,8 @@ export function FinanceTable({ financeData, viewMode = null }: { financeData: Fi
             })}
             {(!financeData || financeData.length === 0) && (
               <tr>
-                <td colSpan={viewMode === null ? 7 : 4} className="p-3 text-center text-gray-500 border border-gray-300">
-                  No hay datos disponibles
+                <td colSpan={viewMode === null ? 7 : 4} className="p-12 text-center text-sm font-medium text-gray-400 italic">
+                  No hay datos financieros disponibles para este período.
                 </td>
               </tr>
             )}
@@ -131,3 +106,4 @@ export function FinanceTable({ financeData, viewMode = null }: { financeData: Fi
     </div>
   );
 }
+
