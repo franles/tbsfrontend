@@ -1,4 +1,5 @@
 
+
 function CreateTrip() {
     return (
         <>
@@ -9,7 +10,10 @@ function CreateTrip() {
             </div>
 
             <section className="max-w-[900px] mx-auto mt-6 px-4">
-                {/* Contenido de Expenses aquí */}
+
+
+
+
             </section>
 
 
