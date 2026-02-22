@@ -11,6 +11,8 @@ import { TripsTable } from "../common/TripsTable";
 import { IoAddCircle, IoSearch } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
+import { useNavigate, NavLink } from "react-router-dom";
+
 
 function Home() {
   const { filter, page, setFilter, setMonth, setPage, year, setYear, month } =
@@ -24,6 +26,9 @@ function Home() {
     const value = e.target.value;
     setSearchTerm(value);
   };
+
+
+
 
   const filteredTrips = trips?.data.filter(
     (item) =>
@@ -81,15 +86,17 @@ function Home() {
         </div>
 
         {/* Paginación y Botón Añadir */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6  select-none">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4  select-none">
           <Pagination page={page} setPage={setPage} />
 
           <button
-            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded shadow transition-colors"
+            className="flex items-center gap-2 px-6 py-2 mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-2xl shadow transition-colors"
             onClick={() => setIsCreate(true)}
           >
             <IoAddCircle size={24} />
-            <span>Añadir reserva</span>
+            <NavLink to="/createtrip">
+              Añadir reserva
+            </NavLink>
           </button>
         </div>
       </section>

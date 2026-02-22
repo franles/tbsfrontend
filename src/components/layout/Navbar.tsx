@@ -89,10 +89,10 @@ function Navbar() {
             Home
           </NavLink>
           <NavLink to="/finance" className={navLinkClass}>
-            Finance
+            Finanzas
           </NavLink>
           <NavLink to="/expenses" className={navLinkClass}>
-            Expenses
+            Expensas
           </NavLink>
         </div>
       </div>

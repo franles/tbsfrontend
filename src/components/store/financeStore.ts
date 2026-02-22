@@ -10,7 +10,7 @@ type FinanceStore = {
 };
 
 export const financeStore = create<FinanceStore>((set) => ({
-  year: 2025, // por defecto
+  year: 2026, // por defecto
   setYear: (year) => set({ year }),
   month: null,
   setMonthFinance: (month) => set({ month }),

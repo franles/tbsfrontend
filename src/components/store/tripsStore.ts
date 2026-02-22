@@ -15,7 +15,7 @@ interface TripsStore {
 
 export const tripsStore = create<TripsStore>((set) => ({
   filter: "desc",
-  year: null,
+  year: 2026,
   month: null,
   page: 1,
   tripId: null,

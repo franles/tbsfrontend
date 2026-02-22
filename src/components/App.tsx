@@ -14,6 +14,7 @@ import { Loader } from "./common/Loader.tsx";
 import Login from "./pages/Login.tsx";
 import { AuthSuccess } from "./pages/AuthSuccess.tsx";
 import { Failure } from "./pages/Failure.tsx";
+import CreateTrip from "./pages/CreateTrip.tsx";
 
 const Annual = lazy(() => import("./pages/Annual.tsx"));
 const Home = lazy(() => import("./pages/Home.tsx"));
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/finance" element={<Annual />} />
                 <Route path="/expenses" element={<Expenses />} />
+                <Route path="/createtrip" element={<CreateTrip />} />
               </Route>
             </Route>
           </Routes>

@@ -1,161 +1,185 @@
-import { useTrip } from "../hooks/useTrips";
+import { useTrip, useDeleteTrip } from "../hooks/useTrips";
 import { modalStore } from "../store/modalStore";
 import { tripsStore } from "../store/tripsStore";
 import { Spinner } from "./widget/Spinner";
-import { IoPencil } from "react-icons/io5";
-import { BtnCloseModal } from "./BtnCloseModal";
 import { formattedAmount } from "../utils/utils";
 import { renderEstado } from "../utils/utilsTsx";
+import { toast } from "sonner";
+import { PiXBold } from "react-icons/pi";
+
 
 export const TripModal = () => {
   const { tripId, setTripId } = tripsStore();
   const { data: tripResponse, isLoading } = useTrip(tripId!);
   const { setIsOpen, setIsEdit } = modalStore();
+  const { mutate: deleteTrip } = useDeleteTrip();
 
   const trip = tripResponse?.data;
 
-  return (
-    <div className="bg-white rounded-2xl shadow-lg w-[1070px] p-6 relative animate-fadeIn text-black">
-      <BtnCloseModal
-        onCLick={() => {
-          setTripId(null);
-          setIsOpen(false);
-        }}
-      />
-      <button
-        onClick={() => {
-          setTripId(tripId);
-          setIsOpen(false);
-          setIsEdit(true);
-        }}
-        className="absolute top-3 right-14 text-blue-600 transition"
-      >
-        <IoPencil size={30} />
-      </button>
+  const handleClose = () => {
+    setTripId(null);
+    setIsOpen(false);
+  };
 
+  const handleEdit = () => {
+    setIsEdit(true);
+    setIsOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (!tripId) return;
+    toast.warning(`¿Estás seguro de que quieres eliminar el viaje "${tripId}"?`, {
+      duration: 3000,
+      action: {
+        label: "Eliminar",
+        onClick: () => {
+          deleteTrip(tripId);
+          handleClose();
+        },
+      },
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-[2rem] shadow-2xl w-[1100px] relative animate-in fade-in zoom-in duration-300 text-black border border-black overflow-hidden">
       {isLoading ? (
-        <div className="text-center text-gray-500 ">
-          <Spinner size={40} text="Cargando..." />
+        <div className="flex justify-center items-center p-20">
+          <Spinner size={50} text="Cargando detalles..." />
         </div>
       ) : (
-        <section className="flex flex-col items-center gap-10 select-none">
-          <h1 className="font-bold text-4xl text-blue-600 flex items-center gap-2 ">
-            LEGAJO Nº {trip?.id}
-          </h1>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
-            <div className="border border-gray-300 rounded-xl p-4">
-              <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
-                Información:
-              </h1>
-              <span className=" capitalize flex gap-1 font-semibold ">
-                Apellido: <p className="font-normal ml-2">{trip?.apellido}</p>
-              </span>
-              <span className="capitalize flex gap-1 font-semibold ">
-                Destino: <p className="font-normal ml-2">{trip?.destino}</p>
-              </span>
-              <span className="flex gap-1 font-semibold ">
-                Fecha creación:
-                <p className="font-normal ml-2">
-                  {trip?.fecha && new Date(trip.fecha).toLocaleDateString()}
-                </p>
-              </span>
-              <span className="flex gap-1 font-semibold ">
-                Estado:
-                <p className="font-normal ml-2">
-                  {" "}
-                  {trip?.estado && renderEstado(trip.estado)}
-                </p>
-              </span>
+        <section className="flex flex-col select-none">
+          {/* Header Bar - Now at the very top */}
+          <div className="bg-black text-white p-5 px-8 flex justify-between items-center shadow-md">
+            <h1 className="font-bold text-3xl tracking-tight overflow-hidden">
+              LEGAJO Nº <span className="underline decoration-2 underline-offset-8 font-black uppercase">{trip?.id}</span>
+            </h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleEdit}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1.5 px-5 rounded-xl text-sm transition-all duration-200 active:scale-95 shadow-lg"
+              >
+                Modificar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-5 rounded-xl text-sm transition-all duration-200 active:scale-95 shadow-lg"
+              >
+                Eliminar
+              </button>
+              <button
+                onClick={handleClose}
+                className="text-white hover:text-gray-300 transition-colors ml-2"
+              >
+                <PiXBold size={28} />
+              </button>
             </div>
+          </div>
 
-            <div className="border border-gray-300 rounded-xl p-4 select-none">
-              <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
-                Detalle económico:{" "}
-              </h1>
-              <span className="flex gap-1 font-semibold">
-                Moneda:{" "}
-                <p className="font-normal ml-2 uppercase">{trip?.moneda}</p>
-              </span>
-              {trip?.moneda?.toLowerCase() === "usd" && trip.cotizacion && (
-                <span className="flex gap-1 font-semibold">
-                  Cotizacion USD en ARS:{" "}
-                  <p className="font-normal ml-2">
-                    ${formattedAmount(trip.cotizacion)}
-                  </p>
-                </span>
-              )}
-              <span className="flex gap-1 font-semibold ">
-                Valor total:{" "}
-                <p className="font-normal ml-2">
-                  ${trip?.valor_total && formattedAmount(trip.valor_total)}
-                </p>
-              </span>
-              <span className="flex gap-1 font-semibold ">
-                Costo:{" "}
-                <p className="font-normal ml-2">
-                  ${trip?.costo && formattedAmount(trip.costo)}
-                </p>
-              </span>
-              <span className="flex gap-1 font-semibold ">
-                Ganancia:{" "}
-                <p
-                  className={`font-semibold ml-2 ${(trip?.ganancia ?? 0) < 0 ? "text-red-500" : "text-green-600"
-                    }`}
-                >
-                  ${trip?.ganancia && formattedAmount(trip.ganancia)}
-                </p>
-              </span>
-            </div>
-
-            <div className="border border-gray-300 rounded-xl p-4 col-span-full">
-              <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-2 select-none">
-                Servicios:
-              </h1>
-
-              {/* Encabezado */}
-              <div className="grid grid-cols-12 gap-4 font-semibold text-base mb-4 px-1 select-none">
-                <span className="col-span-2">Nombre:</span>
-                <span className="col-span-1">Valor:</span>
-                <span className="col-span-1">Moneda:</span>
-                <span className="col-span-2">Cotización:</span>
-                <span className="col-span-1">Pago:</span>
-                <span className="col-span-5">Observación:</span>
+          {/* Content Wrapper with padding */}
+          <div className="p-8 flex flex-col gap-8">
+            <div className="grid grid-cols-2 gap-8">
+              {/* Info Card */}
+              <div className="flex flex-col border border-gray-200 rounded-3xl overflow-hidden bg-white shadow-sm min-h-[220px]">
+                <div className="bg-black text-white px-6 py-2 font-bold text-lg">
+                  Informacion :
+                </div>
+                <div className="p-6 flex flex-col gap-2.5">
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <span className="font-bold min-w-[80px]">Apellido:</span>
+                    <p className="text-gray-600 font-medium capitalize">{trip?.apellido}</p>
+                  </div>
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <span className="font-bold min-w-[80px]">Destino:</span>
+                    <p className="text-gray-600 font-medium capitalize">{trip?.destino}</p>
+                  </div>
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <span className="font-bold min-w-[80px]">Fecha creación:</span>
+                    <p className="text-gray-600 font-medium">
+                      {trip?.fecha && new Date(trip.fecha).toLocaleDateString("es-AR")}
+                    </p>
+                  </div>
+                  <div className="flex gap-4 items-center text-[15px] mt-1">
+                    <span className="font-bold min-w-[80px]">Estado:</span>
+                    <div>{trip?.estado && renderEstado(trip.estado)}</div>
+                  </div>
+                </div>
               </div>
 
-              {/* Servicios */}
-              {trip?.servicios?.length ? (
-                <div className="flex flex-col gap-3 select-none ">
-                  {trip.servicios.map((s) => (
-                    <div
-                      key={s.id}
-                      className="grid grid-cols-12 gap-4 items-center border-l-4 px-1 border-blue-400"
-                    >
-                      <span className="col-span-2 capitalize text-sm">{s.nombre}</span>
-                      <span className="col-span-1 text-sm">${s.valor && formattedAmount(s.valor)}</span>
-                      <span className="col-span-1 uppercase text-sm">{s.moneda}</span>
-                      <span className="col-span-2 text-sm">
-                        {!(
-                          trip?.moneda?.toLowerCase() === "ars" &&
-                          s.moneda?.toLowerCase() === "ars"
-                        ) && s.cotizacion
-                          ? `$${formattedAmount(s.cotizacion)}`
-                          : "-"}
-                      </span>
-                      <span className="col-span-1 capitalize text-sm">
-                        {s.pagado_por === "pendiente"
-                          ? renderEstado(s.pagado_por)
-                          : s.pagado_por}
-                      </span>
-                      <span className="col-span-5 text-sm italic text-gray-600 truncate">
-                        {s.observacion || "-"}
-                      </span>
-                    </div>
-                  ))}
+              {/* Economic Card */}
+              <div className="flex flex-col border border-gray-200 rounded-3xl overflow-hidden bg-white shadow-sm min-h-[220px]">
+                <div className="bg-black text-white px-6 py-2 font-bold text-lg">
+                  Detalle economico:
                 </div>
-              ) : (
-                <p className="text-gray-500">No hay servicios cargados.</p>
-              )}
+                <div className="p-6 flex flex-col gap-2.5">
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <span className="font-bold min-w-[100px]">Moneda:</span>
+                    <p className="text-gray-600 font-medium uppercase">{trip?.moneda}</p>
+                  </div>
+                  <div className="flex gap-2 items-center text-[15px] mt-0.5">
+                    <span className="font-bold min-w-[100px]">Valor total:</span>
+                    <p className="text-gray-600 font-semibold">${trip?.valor_total && formattedAmount(trip.valor_total)}</p>
+                  </div>
+                  <div className="flex gap-2 items-center text-[15px]">
+                    <span className="font-bold min-w-[100px]">Costo:</span>
+                    <p className="text-gray-600 font-semibold">${trip?.costo && formattedAmount(trip.costo)}</p>
+                  </div>
+                  <div className="flex gap-2 items-center text-[15px] mt-1">
+                    <span className="font-bold min-w-[100px]">Ganancia:</span>
+                    <p className={`font-black ${(trip?.ganancia ?? 0) < 0 ? "text-red-700" : "text-green-600"}`}>
+                      ${trip?.ganancia && formattedAmount(trip.ganancia)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Services Section */}
+            <div className="flex flex-col border border-gray-200 rounded-3xl overflow-hidden bg-white shadow-sm">
+              <div className="bg-black text-white px-6 py-2 font-bold text-lg w-full">
+                Servicios :
+              </div>
+              <div className="p-8">
+                <div className="grid grid-cols-[2fr,1fr,1fr,1fr,1fr,2fr] gap-6 font-bold text-sm mb-6 pb-2 border-b border-gray-100">
+                  <span>Nombre:</span>
+                  <span className="text-center">Valor:</span>
+                  <span className="text-center">Moneda:</span>
+                  <span className="text-center">Cotización:</span>
+                  <span className="text-center">Pago:</span>
+                  <span className="text-center">Observación:</span>
+                </div>
+
+                {trip?.servicios?.length ? (
+                  <div className="flex flex-col gap-5">
+                    {trip.servicios.map((s) => (
+                      <div
+                        key={s.id}
+                        className="grid grid-cols-[2fr,1fr,1fr,1fr,1fr,2fr] gap-6 items-center border-l-[3.5px] border-blue-400 pl-4 transition-all hover:bg-gray-50/50 py-1"
+                      >
+                        <span className="capitalize text-[15px] font-semibold text-gray-700">{s.nombre}</span>
+                        <span className="text-[15px] font-medium text-gray-700 text-center">${s.valor && formattedAmount(s.valor)}</span>
+                        <span className="uppercase text-[15px] font-medium text-gray-700 text-center">{s.moneda}</span>
+                        <span className="text-sm font-medium text-gray-500 text-center">
+                          {!(trip?.moneda?.toLowerCase() === "ars" && s.moneda?.toLowerCase() === "ars") && s.cotizacion
+                            ? `$${formattedAmount(s.cotizacion)}`
+                            : "-"}
+                        </span>
+                        <div className="flex justify-center">
+                          {s.pagado_por === "pendiente" ? renderEstado(s.pagado_por) : (
+                            <span className="text-[15px] font-medium text-gray-700">{s.pagado_por}</span>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-500 italic truncate text-center">
+                          {s.observacion || "-"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-10 text-center">
+                    <p className="text-gray-400 font-medium italic">No hay servicios asociados a este viaje.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>

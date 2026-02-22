@@ -106,9 +106,8 @@ export const Filter = ({
       {setYear && (
         <CustomSelect
           label="Año"
-          value={year ?? null}
+          value={year ?? 2026}
           options={[
-            { label: "Todos", value: null },
             { label: "2025", value: 2025 },
             { label: "2026", value: 2026 },
           ]}
