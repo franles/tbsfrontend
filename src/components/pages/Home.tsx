@@ -11,7 +11,8 @@ import { TripsTable } from "../common/TripsTable";
 import { IoAddCircle, IoSearch } from "react-icons/io5";
 import { TripCreateModal } from "../common/TripCreateModal";
 import { TripEditModal } from "../common/TripEditModal";
-import { useNavigate, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+
 
 
 function Home() {

@@ -16,7 +16,7 @@ export function Table<T>({
   headers,
   data,
   renderRow,
-  noDataMessage = "No hay resultados",
+  noDataMessage = "No hay reservas añadidas para este período.",
 }: Props<T>) {
   return (
     <div className="overflow-hidden rounded-2xl border border-black shadow-sm">
@@ -33,7 +33,7 @@ export function Table<T>({
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={headers.length} className="p-3 text-center">
+              <td colSpan={headers.length} className="p-3 text-center p-12 text-center text-sm font-medium text-gray-400 italic">
                 {noDataMessage}
               </td>
             </tr>
