@@ -12,8 +12,8 @@ import {
   useDeleteService,
   useServices,
 } from "../hooks/useServices";
-import { formattedAmount } from "../utils/utils";
 import { useState, useEffect } from "react";
+
 
 // Local type for Form State including UI-specific fields
 
@@ -41,7 +41,8 @@ export const TripEditModal = () => {
       fecha_ida: trip?.fecha_ida,
       fecha_vuelta: trip?.fecha_vuelta,
       fecha: trip?.fecha,
-      moneda: trip?.moneda?.toLowerCase() === "usd" ? 2 : 1,
+      moneda: trip?.moneda?.toLowerCase() === "usd" ? 2 : (trip?.moneda?.toLowerCase() === "mixto" ? 3 : 1),
+      valor_total_usd: trip?.valor_total_usd ?? 0,
       servicios:
         trip?.servicios?.map((s) => ({
           id: s.id,
@@ -87,13 +88,14 @@ export const TripEditModal = () => {
 
       const dataUpdated: UpdateTripRequest = {
         apellido: value.apellido ?? trip?.apellido,
-        valor_total: Number(value.valor_total ?? trip?.valor_total),
         destino: value.destino ?? trip?.destino,
         fecha: value.fecha ?? trip?.fecha,
         fecha_ida: value.fecha_ida ?? trip?.fecha_ida,
         fecha_vuelta: value.fecha_vuelta ?? trip?.fecha_vuelta,
         cotizacion: value.cotizacion,
         moneda: value.moneda,
+        valor_total_usd: value.moneda === 2 ? (value.valor_total_usd || value.valor_total) : (value.moneda === 3 ? value.valor_total_usd : 0),
+        valor_total: value.moneda === 2 ? 0 : value.valor_total,
         servicios: serviciosActualizados,
       };
       updateTripMutate({ tripId: tripId!, dataUpdated });
@@ -115,7 +117,8 @@ export const TripEditModal = () => {
       fecha_ida: toDateInput(trip.fecha_ida),
       fecha_vuelta: toDateInput(trip.fecha_vuelta),
       fecha: toDateInput(trip.fecha),
-      moneda: trip.moneda?.toLowerCase() === "usd" ? 2 : 1,
+      moneda: trip.moneda?.toLowerCase() === "usd" ? 2 : (trip.moneda?.toLowerCase() === "mixto" ? 3 : 1),
+      valor_total_usd: trip.valor_total_usd ?? 0,
       cotizacion: trip.cotizacion ?? null,
       servicios:
         trip.servicios?.map((s) => ({
@@ -308,51 +311,43 @@ export const TripEditModal = () => {
                 Detalle económico:
               </h1>
 
-              {/* Moneda + (si aplica) cotización USD en ARS al lado */}
-              <div className="mb-3 flex items-start gap-6">
-                <div className="w-1/2">
-                  <label className="block font-semibold mb-1 select-none">
-                    Moneda
-                  </label>
-                  <form.Field name="moneda">
-                    {(field) => (
-                      <select
-                        value={field.state.value}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
-                        className="border p-2 rounded w-full"
-                      >
-                        <option value={1}>ARS</option>
-                        <option value={2}>USD</option>
-                      </select>
-                    )}
-                  </form.Field>
-                </div>
+              {/* Moneda */}
+              <div className="mb-4">
+                <label className="block font-semibold mb-1 select-none">
+                  Moneda
+                </label>
+                <form.Field name="moneda">
+                  {(field) => (
+                    <select
+                      value={field.state.value}
+                      onChange={(e) =>
+                        field.handleChange(Number(e.target.value))
+                      }
+                      className="border p-2 rounded w-full"
+                    >
+                      <option value={1}>ARS</option>
+                      <option value={2}>USD</option>
+                      <option value={3}>Mixto</option>
+                    </select>
+                  )}
+                </form.Field>
+              </div>
 
-                <form.Subscribe selector={(state) => state.values.moneda}>
-                  {(moneda) =>
-                    moneda === 2 ? (
-                      <div className="w-1/2">
-                        <form.Field
-                          name="cotizacion"
-                          validators={{
-                            onSubmit: ({ value }) => {
-                              if (Number(moneda) === 2) {
-                                if (value == null)
-                                  return "La cotización es obligatoria para viajes en USD";
-                                if (Number(value) <= 0)
-                                  return "La cotización debe ser mayor a 0";
-                              }
-                            },
-                          }}
-                        >
+              {/* Dos columnas: ARS | USD */}
+              <form.Subscribe selector={(state) => state.values.moneda}>
+                {(moneda) => (
+                  <div className="flex gap-4">
+                    {/* Columna ARS (visible si moneda = ARS o Mixto) */}
+                    {(moneda === 1 || moneda === 3) && (
+                      <div className="flex-1 border border-blue-200 rounded-lg p-3 bg-blue-50">
+                        <h2 className="font-bold text-blue-600 mb-3 text-center">ARS:</h2>
+
+                        <form.Field name="valor_total">
                           {(field) => (
-                            <div>
-                              <label className="block font-semibold mb-1 select-none">
-                                Cotización USD en ARS
+                            <div className="mb-3">
+                              <label className="block font-semibold mb-1 select-none text-sm">
+                                Valor ARS
                               </label>
-
                               <input
                                 type="text"
                                 value={
@@ -364,74 +359,129 @@ export const TripEditModal = () => {
                                     : ""
                                 }
                                 onChange={(e) => {
-                                  const soloNumeros = e.target.value.replace(
-                                    /\D/g,
-                                    "",
-                                  );
-                                  field.handleChange(
-                                    soloNumeros === ""
-                                      ? null
-                                      : Number(soloNumeros),
-                                  );
+                                  const soloNumeros = e.target.value.replace(/\D/g, "");
+                                  field.handleChange(Number(soloNumeros));
                                 }}
                                 className="border p-2 rounded w-full"
                               />
-
-                              {field.state.meta.errors.length > 0 && (
-                                <em className="text-red-600 text-sm">
-                                  {field.state.meta.errors.join(", ")}
-                                </em>
-                              )}
                             </div>
                           )}
                         </form.Field>
-                      </div>
-                    ) : (
-                      <div className="w-1/2"></div>
-                    )
-                  }
-                </form.Subscribe>
-              </div>
 
-              <form.Field name="valor_total">
-                {(field) => (
-                  <div className="mb-3">
-                    <label className="block font-semibold mb-1 select-none">
-                      Valor total
-                    </label>
-                    <input
-                      type="text"
-                      value={
-                        field.state.value
-                          ? new Intl.NumberFormat("es-AR", {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0,
-                          }).format(field.state.value)
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const soloNumeros = e.target.value.replace(/\D/g, "");
-                        field.handleChange(Number(soloNumeros));
-                      }}
-                      className="border p-2 rounded w-1/2"
-                    />
+                        <div className="mb-3">
+                          <label className="block font-semibold mb-1 select-none text-sm">
+                            Costo ARS
+                          </label>
+                          <p className="font-semibold">${trip?.costo !== undefined ? new Intl.NumberFormat("es-AR").format(trip.costo) : "0"}</p>
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold mb-1 select-none text-sm">
+                            Ganancia ARS
+                          </label>
+                          <p className={`font-semibold ${(trip?.ganancia ?? 0) < 0 ? "text-red-500" : "text-green-600"}`}>
+                            ${trip?.ganancia !== undefined ? new Intl.NumberFormat("es-AR").format(trip.ganancia) : "0"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Columna USD (visible si moneda = USD o Mixto) */}
+                    {(moneda === 2 || moneda === 3) && (
+                      <div className="flex-1 border border-blue-200 rounded-lg p-3 bg-blue-50">
+                        <h2 className="font-bold text-blue-600 mb-3 text-center">USD:</h2>
+
+                        <div className="flex gap-2 mb-3">
+                          <form.Field name="valor_total_usd">
+                            {(field) => (
+                              <div className="flex-1">
+                                <label className="block font-semibold mb-1 select-none text-sm">
+                                  Valor USD
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    field.state.value
+                                      ? new Intl.NumberFormat("es-AR", {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      }).format(field.state.value)
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const soloNumeros = e.target.value.replace(/\D/g, "");
+                                    field.handleChange(Number(soloNumeros));
+                                  }}
+                                  className="border p-2 rounded w-full"
+                                />
+                              </div>
+                            )}
+                          </form.Field>
+
+                          <form.Field
+                            name="cotizacion"
+                            validators={{
+                              onSubmit: ({ value }) => {
+                                if (moneda === 2 || moneda === 3) {
+                                  if (value == null || Number(value) <= 0)
+                                    return "La cotización es obligatoria";
+                                }
+                              },
+                            }}
+                          >
+                            {(field) => (
+                              <div className="flex-1">
+                                <label className="block font-semibold mb-1 select-none text-sm">
+                                  Cotización USD
+                                </label>
+                                <input
+                                  type="text"
+                                  value={
+                                    field.state.value
+                                      ? new Intl.NumberFormat("es-AR", {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      }).format(field.state.value)
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const soloNumeros = e.target.value.replace(/\D/g, "");
+                                    field.handleChange(
+                                      soloNumeros === "" ? null : Number(soloNumeros),
+                                    );
+                                  }}
+                                  className="border p-2 rounded w-full"
+                                />
+                                {field.state.meta.errors.length > 0 && (
+                                  <em className="text-red-600 text-sm">
+                                    {field.state.meta.errors.join(", ")}
+                                  </em>
+                                )}
+                              </div>
+                            )}
+                          </form.Field>
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="block font-semibold mb-1 select-none text-sm">
+                            Costo USD
+                          </label>
+                          <p className="font-semibold">U$D {trip?.costo_usd !== undefined ? new Intl.NumberFormat("es-AR").format(trip.costo_usd) : "0"}</p>
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold mb-1 select-none text-sm">
+                            Ganancia USD
+                          </label>
+                          <p className={`font-semibold ${(trip?.ganancia_usd ?? 0) < 0 ? "text-red-500" : "text-green-600"}`}>
+                            U$D {trip?.ganancia_usd !== undefined ? new Intl.NumberFormat("es-AR").format(trip.ganancia_usd) : "0"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
-              </form.Field>
-
-              <div className="mb-3">
-                <label className="block font-semibold mb-1 select-none">
-                  Costo
-                </label>
-                <p>${trip?.costo && formattedAmount(trip.costo)}</p>
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-1 select-none">
-                  Ganancia
-                </label>
-                <p>${trip?.ganancia && formattedAmount(trip.ganancia)}</p>
-              </div>
+              </form.Subscribe>
             </div>
           </div>
 

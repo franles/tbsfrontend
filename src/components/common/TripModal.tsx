@@ -43,24 +43,25 @@ export const TripModal = () => {
             LEGAJO Nº {trip?.id}
           </h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
-            <div className="border border-gray-300 rounded-xl p-4">
+          <div className="grid grid-cols-3 gap-5 w-full">
+            {/* Columna 1: Información */}
+            <div className="border border-gray-300 rounded-xl p-4 bg-gray-50">
               <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
                 Información:
               </h1>
-              <span className=" capitalize flex gap-1 font-semibold ">
+              <span className="capitalize flex gap-1 font-semibold">
                 Apellido: <p className="font-normal ml-2">{trip?.apellido}</p>
               </span>
-              <span className="capitalize flex gap-1 font-semibold ">
+              <span className="capitalize flex gap-1 font-semibold">
                 Destino: <p className="font-normal ml-2">{trip?.destino}</p>
               </span>
-              <span className="flex gap-1 font-semibold ">
+              <span className="flex gap-1 font-semibold">
                 Fecha creación:
                 <p className="font-normal ml-2">
                   {trip?.fecha && new Date(trip.fecha).toLocaleDateString()}
                 </p>
               </span>
-              <span className="flex gap-1 font-semibold ">
+              <span className="flex gap-1 font-semibold">
                 Estado:
                 <p className="font-normal ml-2">
                   {" "}
@@ -69,44 +70,120 @@ export const TripModal = () => {
               </span>
             </div>
 
-            <div className="border border-gray-300 rounded-xl p-4 select-none">
-              <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
-                Detalle económico:{" "}
-              </h1>
-              <span className="flex gap-1 font-semibold">
-                Moneda:{" "}
-                <p className="font-normal ml-2 uppercase">{trip?.moneda}</p>
-              </span>
-              {trip?.moneda?.toLowerCase() === "usd" && trip.cotizacion && (
+            {/* Columna 2: Detalle económico ARS */}
+            {(trip?.moneda?.toLowerCase() === "ars" ||
+              trip?.moneda?.toLowerCase() === "mixto") ? (
+              <div className="border border-gray-300 rounded-xl p-4 select-none bg-gray-50">
+                <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
+                  Detalle económico ARS:
+                </h1>
                 <span className="flex gap-1 font-semibold">
-                  Cotizacion USD en ARS:{" "}
+                  Moneda: <p className="font-normal ml-2 uppercase">ARS</p>
+                </span>
+                <span className="flex gap-1 font-semibold">
+                  Valor total:{" "}
                   <p className="font-normal ml-2">
-                    ${formattedAmount(trip.cotizacion)}
+                    ${trip?.valor_total && formattedAmount(trip.valor_total)}
                   </p>
                 </span>
-              )}
-              <span className="flex gap-1 font-semibold ">
-                Valor total:{" "}
-                <p className="font-normal ml-2">
-                  ${trip?.valor_total && formattedAmount(trip.valor_total)}
-                </p>
-              </span>
-              <span className="flex gap-1 font-semibold ">
-                Costo:{" "}
-                <p className="font-normal ml-2">
-                  ${trip?.costo && formattedAmount(trip.costo)}
-                </p>
-              </span>
-              <span className="flex gap-1 font-semibold ">
-                Ganancia:{" "}
-                <p
-                  className={`font-semibold ml-2 ${(trip?.ganancia ?? 0) < 0 ? "text-red-500" : "text-green-600"
-                    }`}
-                >
-                  ${trip?.ganancia && formattedAmount(trip.ganancia)}
-                </p>
-              </span>
-            </div>
+                <span className="flex gap-1 font-semibold">
+                  Costo:{" "}
+                  <p className="font-normal ml-2">
+                    ${trip?.costo && formattedAmount(trip.costo)}
+                  </p>
+                </span>
+                <span className="flex gap-1 font-semibold">
+                  Ganancia:{" "}
+                  <p
+                    className={`font-semibold ml-2 ${(trip?.ganancia ?? 0) < 0 ? "text-red-500" : "text-green-600"}`}
+                  >
+                    ${trip?.ganancia && formattedAmount(trip.ganancia)}
+                  </p>
+                </span>
+              </div>
+            ) : trip?.moneda?.toLowerCase() === "usd" ? (
+              /* Si es USD puro, el detalle USD va en la columna 2 */
+              <div className="border border-gray-300 rounded-xl p-4 select-none bg-gray-50">
+                <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
+                  Detalle económico USD:
+                </h1>
+                <span className="flex gap-1 font-semibold">
+                  Moneda: <p className="font-normal ml-2 uppercase">USD</p>
+                </span>
+                {trip?.cotizacion && (
+                  <span className="flex gap-1 font-semibold">
+                    Cotización USD en ARS:{" "}
+                    <p className="font-normal ml-2">
+                      ${formattedAmount(trip.cotizacion)}
+                    </p>
+                  </span>
+                )}
+                <span className="flex gap-1 font-semibold">
+                  Valor total:{" "}
+                  <p className="font-normal ml-2">
+                    U$D {trip?.valor_total_usd && formattedAmount(trip.valor_total_usd)}
+                  </p>
+                </span>
+                <span className="flex gap-1 font-semibold">
+                  Costo:{" "}
+                  <p className="font-normal ml-2">
+                    U$D {trip?.costo_usd && formattedAmount(trip.costo_usd)}
+                  </p>
+                </span>
+                <span className="flex gap-1 font-semibold">
+                  Ganancia:{" "}
+                  <p
+                    className={`font-semibold ml-2 ${(trip?.ganancia_usd ?? 0) < 0 ? "text-red-500" : "text-green-600"}`}
+                  >
+                    U$D {trip?.ganancia_usd && formattedAmount(trip.ganancia_usd)}
+                  </p>
+                </span>
+              </div>
+            ) : (
+              <div />
+            )}
+
+            {/* Columna 3: Detalle económico USD (solo para Mixto) */}
+            {trip?.moneda?.toLowerCase() === "mixto" ? (
+              <div className="border border-gray-300 rounded-xl p-4 select-none bg-gray-50">
+                <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-3">
+                  Detalle económico USD:
+                </h1>
+                <span className="flex gap-1 font-semibold">
+                  Moneda: <p className="font-normal ml-2 uppercase">USD</p>
+                </span>
+                {trip?.cotizacion && (
+                  <span className="flex gap-1 font-semibold">
+                    Cotización USD en ARS:{" "}
+                    <p className="font-normal ml-2">
+                      ${formattedAmount(trip.cotizacion)}
+                    </p>
+                  </span>
+                )}
+                <span className="flex gap-1 font-semibold">
+                  Valor total:{" "}
+                  <p className="font-normal ml-2">
+                    U$D {trip?.valor_total_usd && formattedAmount(trip.valor_total_usd)}
+                  </p>
+                </span>
+                <span className="flex gap-1 font-semibold">
+                  Costo:{" "}
+                  <p className="font-normal ml-2">
+                    U$D {trip?.costo_usd && formattedAmount(trip.costo_usd)}
+                  </p>
+                </span>
+                <span className="flex gap-1 font-semibold">
+                  Ganancia:{" "}
+                  <p
+                    className={`font-semibold ml-2 ${(trip?.ganancia_usd ?? 0) < 0 ? "text-red-500" : "text-green-600"}`}
+                  >
+                    U$D {trip?.ganancia_usd && formattedAmount(trip.ganancia_usd)}
+                  </p>
+                </span>
+              </div>
+            ) : (
+              <div />
+            )}
 
             <div className="border border-gray-300 rounded-xl p-4 col-span-full">
               <h1 className="font-bold text-xl text-blue-600 flex items-center gap-2 mb-2 select-none">
