@@ -6,11 +6,14 @@ import type { CreateTripRequest } from "../types/types";
 import { BtnCloseModal } from "./BtnCloseModal";
 import { useForm } from "@tanstack/react-form";
 import { useState, useEffect } from "react";
+import { isIsoDate, toDateInput } from "../utils/utils";
 
 export const TripCreateModal = () => {
   const { setIsCreate } = modalStore();
   const { data: services } = useServices();
   const { mutateAsync: createTrip } = useCreateTrip();
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const form = useForm({
     defaultValues: {
@@ -19,7 +22,7 @@ export const TripCreateModal = () => {
       valor_total_usd: 0,
       destino: "",
       apellido: "",
-      fecha: "",
+      fecha: today,
       fecha_ida: "",
       fecha_vuelta: "",
       servicios: [],
@@ -27,9 +30,9 @@ export const TripCreateModal = () => {
     } as CreateTripRequest,
     onSubmit: async ({ value, formApi }) => {
       const trip: CreateTripRequest = {
-        fecha_ida: value.fecha_ida,
-        fecha_vuelta: value.fecha_vuelta,
-        fecha: value.fecha,
+        fecha_ida: toDateInput(value.fecha_ida),
+        fecha_vuelta: toDateInput(value.fecha_vuelta),
+        fecha: toDateInput(value.fecha),
         moneda: value.moneda,
         destino: value.destino,
         apellido: value.apellido,
@@ -449,6 +452,7 @@ export const TripCreateModal = () => {
                 validators={{
                   onSubmit: ({ value }) => {
                     if (!value) return "La fecha es obligatoria";
+                    if (!isIsoDate(value)) return "Formato válido: yyyy-mm-dd";
                   },
                 }}
               >
@@ -477,6 +481,7 @@ export const TripCreateModal = () => {
                 validators={{
                   onSubmit: ({ value }) => {
                     if (!value) return "La fecha de ida es obligatoria";
+                    if (!isIsoDate(value)) return "Formato válido: yyyy-mm-dd";
                   },
                 }}
               >
@@ -505,35 +510,34 @@ export const TripCreateModal = () => {
                 validators={{
                   onSubmit: ({ value, fieldApi }) => {
                     if (!value) return "La fecha de vuelta es obligatoria";
+                    if (!isIsoDate(value)) return "Formato válido: yyyy-mm-dd";
+                    const fechaVuelta = toDateInput(value);
                     const fechaIda = fieldApi.form.getFieldValue("fecha_ida");
-                    if (fechaIda && value < fechaIda) {
+                    const fechaIdaNormalizada = toDateInput(fechaIda);
+                    if (fechaIdaNormalizada && fechaVuelta < fechaIdaNormalizada) {
                       return "La vuelta no puede ser antes que la ida";
                     }
                   },
                 }}
               >
-                {(field) => {
-                  const fechaIda = field.form.getFieldValue("fecha_ida") as string;
-                  return (
-                    <div className="flex flex-col">
-                      <label className="block font-semibold mb-1">
-                        Fecha de vuelta:
-                      </label>
-                      <input
-                        type="date"
-                        value={field.state.value || ""}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className="border p-2 rounded w-full"
-                        min={fechaIda}
-                      />
-                      {field.state.meta.errors.length > 0 && (
-                        <em className="text-red-600 text-sm">
-                          {field.state.meta.errors.join(", ")}
-                        </em>
-                      )}
-                    </div>
-                  );
-                }}
+                {(field) => (
+                  <div className="flex flex-col">
+                    <label className="block font-semibold mb-1">
+                      Fecha de vuelta:
+                    </label>
+                    <input
+                      type="date"
+                      value={field.state.value || ""}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      className="border p-2 rounded w-full"
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <em className="text-red-600 text-sm">
+                        {field.state.meta.errors.join(", ")}
+                      </em>
+                    )}
+                  </div>
+                )}
               </form.Field>
             </div>
 
