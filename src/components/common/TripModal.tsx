@@ -212,12 +212,7 @@ export const TripModal = () => {
                       <span className="col-span-1 text-sm">${s.valor && formattedAmount(s.valor)}</span>
                       <span className="col-span-1 uppercase text-sm">{s.moneda}</span>
                       <span className="col-span-2 text-sm">
-                        {!(
-                          trip?.moneda?.toLowerCase() === "ars" &&
-                          s.moneda?.toLowerCase() === "ars"
-                        ) && s.cotizacion
-                          ? `$${formattedAmount(s.cotizacion)}`
-                          : "-"}
+                        {s.cotizacion ? `$${formattedAmount(s.cotizacion)}` : "-"}
                       </span>
                       <span className="col-span-1 capitalize text-sm">
                         {s.pagado_por === "pendiente"

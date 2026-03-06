@@ -57,36 +57,27 @@ export const TripEditModal = () => {
       cotizacion: trip?.cotizacion ?? null,
     } as UpdateTripRequest,
     onSubmit: ({ value }) => {
-      const serviciosFormulario = value.servicios ?? [];
-      const hayServiciosSinCotizacion = serviciosFormulario.some(
-        (servicio) =>
-          servicio.cotizacion == null || Number(servicio.cotizacion) <= 0,
-      );
-
-      if (hayServiciosSinCotizacion) {
-        toast.error("La cotización de todos los servicios es obligatoria");
-        return;
-      }
 
       const serviciosOriginales = trip?.servicios ?? [];
 
       // detectamos cambios en servicios (solo los que se modificaron)
-      const serviciosActualizados: UpdateServiceData[] = serviciosFormulario
+      const serviciosActualizados: UpdateServiceData[] = (value.servicios ?? [])
         .filter((s) => {
           const original = serviciosOriginales.find((o) => o.id === s.id);
-          // Check if original exists and compare values.
-          // Note: original.tipo_cambio_id vs s.valor_tasa_cambio
-          if (!original) return true; // New service? (Shouldn't happen here usually but safe to include)
+          if (!original) return true;
+
+          const originalMoneda = (original.moneda as unknown as string)?.toLowerCase() === "usd" ? 2 : 1;
+          const originalCotizacion = original.cotizacion != null ? Number(original.cotizacion) : null;
+          const originalValor = Number(original.valor);
+          const originalObservacion = original.observacion ?? null;
+          const sCotizacion = s.cotizacion != null ? Number(s.cotizacion) : null;
 
           return (
-            s.valor !== original.valor ||
+            Number(s.valor) !== originalValor ||
             s.pagado_por !== original.pagado_por ||
-            s.moneda !==
-              ((original.moneda as unknown as string)?.toLowerCase() === "usd"
-                ? 2
-                : 1) ||
-            s.cotizacion !== (original.cotizacion ?? null) ||
-            s.observacion !== (original.observacion ?? null)
+            s.moneda !== originalMoneda ||
+            sCotizacion !== originalCotizacion ||
+            (s.observacion ?? null) !== originalObservacion
           );
         })
         .map((s) => ({
@@ -94,7 +85,7 @@ export const TripEditModal = () => {
           valor: Number(s.valor),
           pagado_por: s.pagado_por,
           moneda: s.moneda,
-          cotizacion: s.cotizacion ?? null,
+          cotizacion: s.cotizacion != null ? Number(s.cotizacion) : null,
           observacion: s.observacion ?? null,
         }));
       const valorTotalArsBase =
@@ -383,9 +374,9 @@ export const TripEditModal = () => {
                                 value={
                                   field.state.value
                                     ? new Intl.NumberFormat("es-AR", {
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0,
-                                      }).format(field.state.value)
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    }).format(field.state.value)
                                     : ""
                                 }
                                 onChange={(e) => {
@@ -409,8 +400,8 @@ export const TripEditModal = () => {
                             $
                             {trip?.costo !== undefined
                               ? new Intl.NumberFormat("es-AR").format(
-                                  trip.costo,
-                                )
+                                trip.costo,
+                              )
                               : "0"}
                           </p>
                         </div>
@@ -425,8 +416,8 @@ export const TripEditModal = () => {
                             $
                             {trip?.ganancia !== undefined
                               ? new Intl.NumberFormat("es-AR").format(
-                                  trip.ganancia,
-                                )
+                                trip.ganancia,
+                              )
                               : "0"}
                           </p>
                         </div>
@@ -452,9 +443,9 @@ export const TripEditModal = () => {
                                   value={
                                     field.state.value
                                       ? new Intl.NumberFormat("es-AR", {
-                                          minimumFractionDigits: 0,
-                                          maximumFractionDigits: 0,
-                                        }).format(field.state.value)
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      }).format(field.state.value)
                                       : ""
                                   }
                                   onChange={(e) => {
@@ -491,9 +482,9 @@ export const TripEditModal = () => {
                                   value={
                                     field.state.value
                                       ? new Intl.NumberFormat("es-AR", {
-                                          minimumFractionDigits: 0,
-                                          maximumFractionDigits: 0,
-                                        }).format(field.state.value)
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      }).format(field.state.value)
                                       : ""
                                   }
                                   onChange={(e) => {
@@ -527,8 +518,8 @@ export const TripEditModal = () => {
                             U$D{" "}
                             {trip?.costo_usd !== undefined
                               ? new Intl.NumberFormat("es-AR").format(
-                                  trip.costo_usd,
-                                )
+                                trip.costo_usd,
+                              )
                               : "0"}
                           </p>
                         </div>
@@ -543,8 +534,8 @@ export const TripEditModal = () => {
                             U$D{" "}
                             {trip?.ganancia_usd !== undefined
                               ? new Intl.NumberFormat("es-AR").format(
-                                  trip.ganancia_usd,
-                                )
+                                trip.ganancia_usd,
+                              )
                               : "0"}
                           </p>
                         </div>
@@ -593,9 +584,9 @@ export const TripEditModal = () => {
                               value={
                                 s.valor
                                   ? new Intl.NumberFormat("es-AR", {
-                                      minimumFractionDigits: 0,
-                                      maximumFractionDigits: 0,
-                                    }).format(s.valor)
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  }).format(s.valor)
                                   : ""
                               }
                               onChange={(e) => {
@@ -842,15 +833,15 @@ export const TripEditModal = () => {
                     (s) =>
                       !(field.state.value ?? []).some((fs) => fs.id === s.id),
                   ) && (
-                    <button
-                      type="button"
-                      className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
-                      onClick={() => setAdd(true)}
-                    >
-                      <IoIosAdd className="mr-2" />
-                      Agregar servicio
-                    </button>
-                  )}
+                      <button
+                        type="button"
+                        className="border-blue-500 border-2 text-blue-500 self-center flex items-center rounded-full hover:bg-blue-500 hover:text-white transition py-2 px-4"
+                        onClick={() => setAdd(true)}
+                      >
+                        <IoIosAdd className="mr-2" />
+                        Agregar servicio
+                      </button>
+                    )}
                 </div>
               )}
             </form.Field>
