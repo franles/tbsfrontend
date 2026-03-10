@@ -597,12 +597,17 @@ export const TripCreateModal = () => {
           </div>
 
           <div className="flex justify-center">
-            <button
-              type="submit"
-              className="w-1/4 py-2 mt-6 bg-blue-600 text-white rounded hover:bg-blue-700 select-none"
-            >
-              Crear viaje
-            </button>
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-1/4 py-2 mt-6 bg-blue-600 text-white rounded hover:bg-blue-700 select-none disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Creando..." : "Crear viaje"}
+                </button>
+              )}
+            </form.Subscribe>
           </div>
         </form>
       </section>
